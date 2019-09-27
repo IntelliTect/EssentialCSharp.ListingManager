@@ -21,8 +21,8 @@ namespace ListingUpdater
 
         public const string InteractivePromptPrefix = "INTL {0} ({1})>";
 
-        public static void Main(string path = "", int mode = 0, bool verbose = true, 
-            bool preview = true)
+        public static void Main(string path = "", int mode = 0, bool verbose = false, 
+            bool preview = false)
         {
             /*var colorList = new List<ConsoleColor>{ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, 
                 ConsoleColor.DarkCyan, ConsoleColor.DarkRed, ConsoleColor.Cyan};
