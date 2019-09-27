@@ -6,7 +6,7 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>ListingManager</ToolCommandName>
         <Authors>IntelliTect</Authors>
-        <Version>0.1.1</Version>
+        <Version>0.1.2</Version>
         <PackageId>IntelliTect.EssentialCSharp.ListingManager</PackageId>
         <Description>Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
