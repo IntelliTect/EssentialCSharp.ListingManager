@@ -248,8 +248,8 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
 
             var match = getListingData.Match(pathToTest);
 
-            string chapterNumber = matches.Groups[1].Value;
-            string listingNumber = matches.Groups[2].Value;
+            string chapterNumber = match.Groups[1].Value;
+            string listingNumber = match.Groups[2].Value;
 
             string testDirectory = Path.GetDirectoryName(pathToTest);
 
