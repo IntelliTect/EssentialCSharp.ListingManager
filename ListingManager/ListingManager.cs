@@ -79,7 +79,7 @@ namespace ListingManager
         }
         
         public static bool IsExtraListing(string path,
-            string regexNamespace = @".*Listing\d{2}.\d{2}(A|B|C|D).*.cs$")
+            string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
         {
             Regex fileNameRegex = new Regex(regexNamespace);
 
@@ -93,14 +93,14 @@ namespace ListingManager
         public static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
             string listingData, bool verbose = false, bool preview = false)
         {
-            string paddedChapterNumber = new string(chapterNumber+"").PadLeft(2, '0');
-            string paddedListingNumber = new string(listingNumber).PadLeft(2, '0');
+            string paddedChapterNumber = chapterNumber.ToString("00");
+            string paddedListingNumber = listingNumber.PadLeft(2, '0');
             
             string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
                                   $".Chapter{paddedChapterNumber}" +
                                   $".Listing{paddedChapterNumber}_" +
-                                  $"{paddedListingNumber}";
+                                  paddedListingNumber;
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
@@ -116,7 +116,7 @@ namespace ListingManager
         
         public static bool UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
         {
-            if (!Path.HasExtension(path) || Path.GetExtension(path) != ".cs")
+            if (Path.GetExtension(path) != ".cs")
             {
                 return false;
             }
@@ -158,7 +158,7 @@ namespace ListingManager
 
             Regex pathToTestRegex =
                 new Regex(Regex.Escape($"{testDirectory}{Path.DirectorySeparatorChar}{testFileName}") 
-                          + @".*.cs");
+                          + @".*\.cs");
 
             if (Directory.Exists(testDirectory))
             {
@@ -244,9 +244,9 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
                 return false;
             }
             
-            Regex getListingData = new Regex(@"Listing(\d{2}).(\d{2})");
+            Regex getListingData = new Regex(@"Listing(\d{2})\.(\d{2})");
 
-            var matches = getListingData.Match(pathToTest);
+            var match = getListingData.Match(pathToTest);
 
             string chapterNumber = matches.Groups[1].Value;
             string listingNumber = matches.Groups[2].Value;
