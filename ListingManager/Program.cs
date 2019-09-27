@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 
-namespace ListingUpdater
+namespace ListingManager
 {
     public class Program
     {
-        public const string IntelliTect =
+        private const string IntelliTect =
 @" _____       _       _ _ _ _______        _   
 |_   _|     | |     | | (_)__   __|      | |  
   | |  _ __ | |_ ___| | |_   | | ___  ___| |_ 
@@ -19,9 +14,10 @@ namespace ListingUpdater
  _| |_| | | | ||  __/ | | |  | |  __/ (__| |_ 
 |_____|_| |_|\__\___|_|_|_|  |_|\___|\___|\__|";
 
-        public const string InteractivePromptPrefix = "INTL {0} ({1})>";
+        private const string InteractivePromptPrefix = "INTL {0} ({1})>";
 
-        public static void Main(string path = "", int mode = 0, bool verbose = false, 
+        public static void Main(string path = "", ListingModes mode = ListingModes.ListingUpdating, 
+            bool verbose = false, 
             bool preview = false)
         {
             /*var colorList = new List<ConsoleColor>{ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, 
@@ -55,11 +51,11 @@ namespace ListingUpdater
 
             switch (mode)
             {
-                case 0: // listing updating
+                case ListingModes.ListingUpdating:
                     Console.WriteLine($"Updating listing namespaces of: {path}");
                     ListingManager.UpdateChapterListingNumbers(path, verbose, preview);
                     break;
-                case 1: // unit test generation
+                case ListingModes.TestGeneration:
                     var generatedTests 
                         = ListingManager.GenerateUnitTests(path, TestGeneration_Interactive, true);
                     if (verbose)
@@ -67,7 +63,7 @@ namespace ListingUpdater
                         Console.WriteLine($"{generatedTests.Count} tests generated");
                     }
                     break;
-                case 2: // scan everywhere for mismatched listings
+                case ListingModes.ScanForMismatchedListings:
                     var extraListings = ListingManager.GetAllExtraListings(path).OrderBy(x => x);
 
                     Console.WriteLine("---Extra Listings---");

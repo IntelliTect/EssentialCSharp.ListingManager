@@ -1,14 +1,14 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace ListingUpdater
+namespace ListingManager
 {
     public class ListingInformation
     {
-        public int ChapterNumber { get; set; }
-        public int ListingNumber { get; set; }
-        public string ListingSuffix { get; set; }
-        public string ListingDescription { get; set; }
+        public int ChapterNumber { get; }
+        public int ListingNumber { get; }
+        public string ListingSuffix { get; }
+        public string ListingDescription { get; }
 
         public ListingInformation(string listingPath)
         {

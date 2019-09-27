@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ListingUpdater.Tests
+namespace ListingManager.Tests
 {
     [TestClass]
     public class ListingInformationTests
@@ -9,6 +9,7 @@ namespace ListingUpdater.Tests
         [DataRow("Listing01.01.cs", 1, 1, null, null)]
         [DataRow("Listing01.02A.cs", 1, 2, "A", null)]
         [DataRow("Listing01.02.something.cs", 1, 2, null, "something")]
+        [DataRow("Listing05.04.Something.cs", 5, 4, null, "Something")]
         public void Constructor_GivenValidListings_PropertiesPopulatedSuccessfully(string listing,
             int chapterNumber, int listingNumber, string suffix, string description)
         {

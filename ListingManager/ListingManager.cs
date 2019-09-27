@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,26 +6,22 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace ListingUpdater
+namespace ListingManager
 {
     public static class ListingManager
     {
-        public static ICollection<string> GetAllExtraListings(string pathToStartFrom)
+        public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
         {
-            var files = new List<string>();
-            
-            FileManager.GetAllFilesAtPath(pathToStartFrom, true).ToList().ForEach(f =>
+            foreach (string file in FileManager.GetAllFilesAtPath(pathToStartFrom, true))
             {
-                if (IsExtraListing(f))
+                if (IsExtraListing(file))
                 {
-                    files.Add(f);
+                    yield return file;
                 }
-            });
-
-            return files;
+            }
         }
-        
-        private static bool IsListing(string listingPath, out ListingInformation listingData)
+
+        private static bool TryGetListing(string listingPath, out ListingInformation listingData)
         {
             listingData = null;
             
@@ -36,7 +31,7 @@ namespace ListingUpdater
             {
                 listingData = new ListingInformation(listingPath);
             }
-            catch (Exception)
+            catch (Exception) // don't care about the type of exception here. If things didn't go perfectly, abort
             {
                 return false;
             }
@@ -53,7 +48,7 @@ namespace ListingUpdater
                 .OrderBy(x => x)
                 .Where(x =>
                 {
-                    bool result = IsListing(x, out var data);
+                    bool result = TryGetListing(x, out var data);
                     if(result) listingData.Add(data);
                     return result;
                 }).ToList();
@@ -89,10 +84,8 @@ namespace ListingUpdater
             Regex fileNameRegex = new Regex(regexNamespace);
 
             string directoryNameFull = Path.GetDirectoryName(path);
-            int lastIndexOfPathSep = directoryNameFull.LastIndexOf(Path.DirectorySeparatorChar);
 
-            string directoryName = directoryNameFull
-                .Substring(lastIndexOfPathSep, directoryNameFull.Length - lastIndexOfPathSep);
+            string directoryName = Path.GetFileName(directoryNameFull);
 
             return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
         }
@@ -157,9 +150,11 @@ namespace ListingUpdater
         {
             string testDirectory = $"{Path.GetDirectoryName(listingPath)}.Tests";
 
-            Regex regex = new Regex(@"((Listing\d{2}.\d{2})([A-Z]?)((\.Tests)?)).*.cs$");
+            Regex regex = new Regex(@"((Listing\d{2}\.\d{2})([A-Z]?)((\.Tests)?)).*\.cs$");
 
-            string testFileName = regex.IsMatch(listingPath) ? regex.Match(listingPath).Groups[1].Value : "";
+            Match fileNameMatch = regex.Match(listingPath);
+
+            string testFileName = fileNameMatch.Success ? regex.Match(listingPath).Groups[1].Value : "";
 
             Regex pathToTestRegex =
                 new Regex(Regex.Escape($"{testDirectory}{Path.DirectorySeparatorChar}{testFileName}") 
@@ -181,7 +176,7 @@ namespace ListingUpdater
 
             return false;
         }
-        
+
         public static string GetTestLayout(string chapterNumber, string listingNumber)
         {
             return string.Format(TestHeaderLayout, 
@@ -189,12 +184,12 @@ namespace ListingUpdater
                        listingNumber.PadLeft(2, '0')) + TestBodyLayout;
         }
 
-        public static string TestHeaderLayout =
+        private static string TestHeaderLayout =
 @"using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Tests";
 
-        public static string TestBodyLayout =
+        private static string TestBodyLayout =
 @"
 {
     [TestClass]
@@ -208,19 +203,15 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
     }
 }";
 
-        public static ICollection<string> GetAllMissingUnitTests(string pathToChapter)
+        public static IEnumerable<string> GetAllMissingUnitTests(string pathToChapter)
         {
-            var toReturn = new List<string>();
-
             foreach (string file in FileManager.GetAllFilesAtPath(pathToChapter).OrderBy(x => x))
             {
                 if (!GetPathToAccompanyingUnitTest(file, out string testFileName))
                 {
-                    toReturn.Add(testFileName);
+                    yield return testFileName;
                 }    
             }
-
-            return toReturn;
         }
 
         public static ICollection<string> GenerateUnitTests(string pathToChapter, Action<string> action = null,
@@ -261,12 +252,9 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
             string listingNumber = matches.Groups[2].Value;
 
             string testDirectory = Path.GetDirectoryName(pathToTest);
-            
-            if (!Directory.Exists(testDirectory))
-            {
-                Directory.CreateDirectory(testDirectory);
-            }
-            
+
+            Directory.CreateDirectory(testDirectory);
+
             using (var writer = File.CreateText(pathToTest))
             {
                 writer.WriteLine(GetTestLayout(chapterNumber, listingNumber));

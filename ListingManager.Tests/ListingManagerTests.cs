@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ListingUpdater.Tests
+namespace ListingManager.Tests
 {
     [TestClass]
     public class ListingManagerTests
@@ -52,11 +52,11 @@ namespace ListingUpdater.Tests
 
             ICollection<string> expectedFiles = filesToMake;
             expectedFiles.Remove("Chapter02/Listing02.02.cs");
-            ConvertFilenamesToFullPath(ref expectedFiles);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
             
             WriteFiles(filesToMake);
 
-            var extraListings = ListingManager.GetAllExtraListings(Environment.CurrentDirectory);
+            var extraListings = ListingManager.GetAllExtraListings(Environment.CurrentDirectory).ToList();
             
             CollectionAssert.AreEquivalent((ICollection) expectedFiles, (ICollection) extraListings);
         }
@@ -90,7 +90,7 @@ namespace ListingUpdater.Tests
                 "}"
             };
             WriteFiles(filesToMake, toWrite);
-            ConvertFilenamesToFullPath(ref expectedFiles);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
             foreach (string file in filesToMake)
             {
                 CreatedFiles.Remove(file);
@@ -131,7 +131,7 @@ namespace ListingUpdater.Tests
                 "}"
             };
             WriteFiles(filesToMake, toWrite);
-            ConvertFilenamesToFullPath(ref expectedFiles);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
             foreach (string file in filesToMake)
             {
                 CreatedFiles.Remove(file);
@@ -179,7 +179,7 @@ namespace ListingUpdater.Tests
                 "}"
             };
             WriteFiles(filesToMake, toWrite);
-            ConvertFilenamesToFullPath(ref expectedFiles);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
             foreach (string file in filesToMake)
             {
                 CreatedFiles.Remove(file);
@@ -236,7 +236,7 @@ namespace ListingUpdater.Tests
             };
             
             WriteFiles(filesToMake, toWrite);
-            ConvertFilenamesToFullPath(ref expectedFiles);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
             foreach (string file in filesToMake)
             {
                 CreatedFiles.Remove(file);
@@ -286,7 +286,7 @@ namespace ListingUpdater.Tests
                 expectedFilesList.Add(file.Replace(chapter, chapter+".Tests"));
             }
             var expectedFiles = (ICollection<string>) expectedFilesList;
-            ConvertFilenamesToFullPath(ref expectedFiles);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
             
             WriteFiles(filesToCreate);
             CreatedDirectories.Add(chapter);
@@ -312,37 +312,26 @@ namespace ListingUpdater.Tests
             }
         }
 
-        private void ConvertFilenamesToFullPath(ref ICollection<string> fileNames)
+        private ICollection<string> ConvertFilenamesToFullPath(ICollection<string> fileNamesToConvert)
         {
             var fullPaths = new List<string>();
 
-            foreach (string fileName in fileNames)
+            foreach (string fileName in fileNamesToConvert)
             {
                 fullPaths.Add(Path.Combine(Environment.CurrentDirectory, fileName));
             }
-            
-            fileNames = fullPaths;
+
+            return fullPaths;
         }
 
         private void WriteFile(string fileName, IEnumerable<string> toWrite = null)
         {
             FileInfo file = new FileInfo(fileName);
             file.Directory?.Create();
-            using (var streamWriter = File.CreateText(fileName))
-            {
-                CreatedFiles.Add(fileName);
-                if (toWrite != null)
-                {
-                    foreach (var cur in toWrite)
-                    {
-                        streamWriter.WriteLine(cur);
-                    }
-                }
-                else
-                {
-                    streamWriter.WriteLine();
-                }
-            }
+            
+            File.WriteAllLines(fileName, toWrite ?? new List<string>());
+            
+            CreatedFiles.Add(fileName);
         }
 
         private void WriteFiles(IEnumerable<string> fileNames, IEnumerable<string> toWrite = null)
