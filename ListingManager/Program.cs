@@ -78,9 +78,9 @@ namespace ListingManager
             }
         }
 
-        private static void TestGeneration_Interactive(string missingTest)
+        private static bool TestGeneration_Interactive(string missingTest)
         {
-            InteractiveConsoleWrite("Choose an option", "d - delete, enter - continue");
+            InteractiveConsoleWrite("Choose an option", "d - delete, q - quit, enter - continue");
             string input = Console.ReadLine();
 
             switch (input)
@@ -89,7 +89,12 @@ namespace ListingManager
                     Console.WriteLine("Deleting test");
                     File.Delete(missingTest);
                     break;
+                case "q":
+                    Console.WriteLine("Quitting");
+                    return false;
             }
+
+            return true;
         }
 
         private static void InteractiveConsoleWrite(string toWrite, string userOptions)

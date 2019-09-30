@@ -214,7 +214,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
             }
         }
 
-        public static ICollection<string> GenerateUnitTests(string pathToChapter, Action<string> action = null,
+        public static ICollection<string> GenerateUnitTests(string pathToChapter, Func<string, bool> action = null,
             bool verbose = false)
         {
             var toReturn = new List<string>();
@@ -231,7 +231,14 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
                         Console.WriteLine($"Test generated: {missingTestName}");
                     }
                 }
-                action?.Invoke(missingTestName);
+                
+                if (action == null) continue;
+                bool shouldContinue = action.Invoke(missingTestName);
+
+                if (!shouldContinue)
+                {
+                    break;
+                }
             }
 
             return toReturn;
