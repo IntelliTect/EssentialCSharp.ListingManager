@@ -10,6 +10,7 @@ namespace ListingManager.Tests
         [DataRow("Listing01.02A.cs", 1, 2, "A", null)]
         [DataRow("Listing01.02.something.cs", 1, 2, null, "something")]
         [DataRow("Listing05.04.Something.cs", 5, 4, null, "Something")]
+        [DataRow("Listing09.13.Some.Parse.cs", 9, 13, null, "Some.Parse")]
         public void Constructor_GivenValidListings_PropertiesPopulatedSuccessfully(string listing,
             int chapterNumber, int listingNumber, string suffix, string description)
         {

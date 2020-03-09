@@ -12,7 +12,7 @@ namespace ListingManager
 
         public ListingInformation(string listingPath)
         {
-            Regex regex = new Regex(@"Listing(\d{2}).(\d{2})([A-Za-z]*)(\.{1}(\w*))?.cs$");
+            Regex regex = new Regex(@"Listing(\d{2}).(\d{2})([A-Za-z]*)(\.{1}(.*))?.cs$");
 
             var matches = regex.Match(listingPath);
 
