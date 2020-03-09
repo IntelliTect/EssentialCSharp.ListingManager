@@ -147,6 +147,76 @@ namespace ListingManager.Tests
         }
         
         [TestMethod]
+        public void UpdateChapterListingNumbers_MultipleListingsMissing_ListingsRenumbered()
+        {
+            ICollection<string> filesToMake = new List<string>
+            {
+                "Listing09.01.DeclaringAStruct.cs",
+                "Listing09.02.ErroneousInitialization.cs",
+                "Listing09.03.AccessError.cs",
+                "Listing09.05.SubtleBoxAndUnboxInstructions.cs",
+                "Listing09.06.UnboxMustBeSameType.cs",
+                "Listing09.07.SubtleBoxingIdiosyncrasies.cs",
+                "Listing09.08.AvoidingUnboxingAndCopying.cs",
+                "Listing09.09.ComparingAnIntegerSwitchToAnEnumSwitch.cs",
+                "Listing09.10.DefiningAnEnum.cs",
+                "Listing09.11.DefiningAnEnumType.cs",
+                "Listing09.12.CastingBetweenArraysOfEnums.cs",
+                "Listing09.13.ConvertingAStringToAnEnumUsingEnum.Parse.cs",
+                "Listing09.14.ConvertingAStringToAnEnumUsingEnum.TryParse.cs",
+                "Listing09.15.UsingEnumsAsFlags.cs",
+                "Listing09.16.UsingBitwiseORandANDWithFlagEnums.cs",
+                "Listing09.17.DefiningEnumValuesforFrequentCombinations.cs",
+                "Listing09.18.UsingFlagsAttribute.cs"
+            };
+
+            ICollection<string> expectedFiles = new List<string>
+            {
+                "Listing09.01.DeclaringAStruct.cs",
+                "Listing09.02.ErroneousInitialization.cs",
+                "Listing09.03.AccessError.cs",
+                "Listing09.04.SubtleBoxAndUnboxInstructions.cs",
+                "Listing09.05.UnboxMustBeSameType.cs",
+                "Listing09.06.SubtleBoxingIdiosyncrasies.cs",
+                "Listing09.07.AvoidingUnboxingAndCopying.cs",
+                "Listing09.08.ComparingAnIntegerSwitchToAnEnumSwitch.cs",
+                "Listing09.09.DefiningAnEnum.cs",
+                "Listing09.10.DefiningAnEnumType.cs",
+                "Listing09.11.CastingBetweenArraysOfEnums.cs",
+                "Listing09.12.ConvertingAStringToAnEnumUsingEnum.Parse.cs",
+                "Listing09.13.ConvertingAStringToAnEnumUsingEnum.TryParse.cs",
+                "Listing09.14.UsingEnumsAsFlags.cs",
+                "Listing09.15.UsingBitwiseORandANDWithFlagEnums.cs",
+                "Listing09.16.DefiningEnumValuesforFrequentCombinations.cs",
+                "Listing09.17.UsingFlagsAttribute.cs"
+            };
+
+            IEnumerable<string> toWrite = new List<string>
+            {
+                "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+                "{",
+                "    using System;",
+                "    using System.Reflection;",
+                "    public class Program { }",
+                "}"
+            };
+            WriteFiles(filesToMake, toWrite);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
+            foreach (string file in filesToMake)
+            {
+                CreatedFiles.Remove(file);
+            }
+            CreatedFiles.AddRange(expectedFiles);
+            
+            ListingManager.UpdateChapterListingNumbers(Environment.CurrentDirectory);
+
+            var files = Directory.EnumerateFiles(Environment.CurrentDirectory)
+                .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+            
+            CollectionAssert.AreEquivalent((ICollection) expectedFiles, files);
+        }
+        
+        [TestMethod]
         public void UpdateChapterListingNumbers_AdditionalListings_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -303,12 +373,26 @@ namespace ListingManager.Tests
         {
             foreach (var cur in CreatedFiles)
             {
-                File.Delete(cur);
+                try
+                {
+                    File.Delete(cur);
+                }
+                catch(Exception)
+                {
+                    // ignore
+                }
             }
 
             foreach (var cur in CreatedDirectories)
             {
-                Directory.Delete(cur, true);
+                try
+                {
+                    Directory.Delete(cur, true);
+                }
+                catch (Exception)
+                {
+                    // ignore
+                }
             }
         }
 
