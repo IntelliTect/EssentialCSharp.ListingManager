@@ -24,7 +24,7 @@ namespace ListingManager
         private static bool TryGetListing(string listingPath, out ListingInformation listingData)
         {
             listingData = null;
-            
+
             if (Path.GetExtension(listingPath) != ".cs") return false;
 
             try
@@ -40,16 +40,19 @@ namespace ListingManager
         }
 
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verboseMode = false, bool preview = false)
+            bool verboseMode = false, bool preview = false, bool changeChapterNumberBasedOnFolderName = false, bool onlyChangeChapterNumber =false)
         {
             var listingData = new List<ListingInformation>();
-            
+
+            int FolderChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
+
+
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
                 .OrderBy(x => x)
                 .Where(x =>
                 {
                     bool result = TryGetListing(x, out var data);
-                    if(result) listingData.Add(data);
+                    if (result) listingData.Add(data);
                     return result;
                 }).ToList();
 
@@ -59,25 +62,49 @@ namespace ListingManager
 
                 var curListingData = listingData[i];
 
-                if (listingNumber == curListingData.ListingNumber)
+                if (listingNumber == curListingData.ListingNumber && changeChapterNumberBasedOnFolderName==false)
                 {
                     continue;
                 }
 
-                UpdateListingNamespace(cur, curListingData.ChapterNumber, 
-                    listingNumber+"", 
-                    curListingData.ListingDescription, verboseMode, preview);
-
-                if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
-                {
-                    Console.Write("Updating test. ");
-                    UpdateListingNamespace(pathToTest, curListingData.ChapterNumber,
-                        listingNumber+"", 
-                        curListingData.ListingDescription, verboseMode, preview);
+                if (onlyChangeChapterNumber) {
+                    listingNumber = curListingData.ListingNumber;
                 }
+
+                if (changeChapterNumberBasedOnFolderName)
+                {
+                    UpdateListingNamespace(cur, FolderChapterNumber,
+                        listingNumber + "",
+                        curListingData.ListingDescription, verboseMode, preview);
+
+                    if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
+                    {
+                        Console.Write("Updating test. ");
+                        UpdateListingNamespace(pathToTest, FolderChapterNumber,
+                            listingNumber + "",
+                            curListingData.ListingDescription, verboseMode, preview);
+                    }
+                }
+                else
+                {
+                    UpdateListingNamespace(cur, curListingData.ChapterNumber,
+                        listingNumber + "",
+                        curListingData.ListingDescription, verboseMode, preview);
+
+                    if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
+                    {
+                        Console.Write("Updating test. ");
+                        UpdateListingNamespace(pathToTest, curListingData.ChapterNumber,
+                            listingNumber + "",
+                            curListingData.ListingDescription, verboseMode, preview);
+                    }
+
+                }
+
+
             }
         }
-        
+
         public static bool IsExtraListing(string path,
             string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
         {
@@ -95,7 +122,7 @@ namespace ListingManager
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
             string paddedListingNumber = listingNumber.PadLeft(2, '0');
-            
+
             string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
                                   $".Chapter{paddedChapterNumber}" +
@@ -110,10 +137,10 @@ namespace ListingManager
             {
                 Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
             }
-            
+
             if (!preview) UpdateNamespaceOfPath(path, newNamespace, newFileName);
         }
-        
+
         public static bool UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
         {
             if (Path.GetExtension(path) != ".cs")
@@ -123,7 +150,7 @@ namespace ListingManager
 
             // read file into memory
             string[] allLinesInFile = File.ReadAllLines(path);
-            
+
             File.Delete(path);
 
             string targetPath = Path.Combine(Path.GetDirectoryName(path), newFileName) ?? path;
@@ -157,7 +184,7 @@ namespace ListingManager
             string testFileName = fileNameMatch.Success ? regex.Match(listingPath).Groups[1].Value : "";
 
             Regex pathToTestRegex =
-                new Regex(Regex.Escape($"{testDirectory}{Path.DirectorySeparatorChar}{testFileName}") 
+                new Regex(Regex.Escape($"{testDirectory}{Path.DirectorySeparatorChar}{testFileName}")
                           + @".*\.cs");
 
             if (Directory.Exists(testDirectory))
@@ -179,8 +206,8 @@ namespace ListingManager
 
         public static string GetTestLayout(string chapterNumber, string listingNumber)
         {
-            return string.Format(TestHeaderLayout, 
-                       chapterNumber.PadLeft(2, '0'), 
+            return string.Format(TestHeaderLayout,
+                       chapterNumber.PadLeft(2, '0'),
                        listingNumber.PadLeft(2, '0')) + TestBodyLayout;
         }
 
@@ -210,7 +237,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
                 if (!GetPathToAccompanyingUnitTest(file, out string testFileName))
                 {
                     yield return testFileName;
-                }    
+                }
             }
         }
 
@@ -231,7 +258,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
                         Console.WriteLine($"Test generated: {missingTestName}");
                     }
                 }
-                
+
                 if (action == null) continue;
                 bool shouldContinue = action.Invoke(missingTestName);
 
@@ -250,7 +277,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
             {
                 return false;
             }
-            
+
             Regex getListingData = new Regex(@"Listing(\d{2})\.(\d{2})");
 
             var match = getListingData.Match(pathToTest);
@@ -274,7 +301,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
         {
             // according to: https://stackoverflow.com/a/15262019/637142
             // thanks to this we will pass everything as one command
-            command = command.Replace("\"","\"\"");
+            command = command.Replace("\"", "\"\"");
 
             string fileName = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "CMD.exe"
@@ -285,7 +312,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = fileName,
-                    Arguments = "-c \""+ command + "\"",
+                    Arguments = "-c \"" + command + "\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true

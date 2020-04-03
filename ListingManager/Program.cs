@@ -16,9 +16,11 @@ namespace ListingManager
 
         private const string InteractivePromptPrefix = "INTL {0} ({1})>";
 
-        public static void Main(string path = "", ListingModes mode = ListingModes.ListingUpdating, 
-            bool verbose = false, 
-            bool preview = false)
+        public static void Main(string path = "", ListingModes mode = ListingModes.ListingUpdating,
+            bool verbose = false,
+            bool preview = false,
+            bool byfolder = false,
+            bool chapteronly = false)
         {
             /*var colorList = new List<ConsoleColor>{ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, 
                 ConsoleColor.DarkCyan, ConsoleColor.DarkRed, ConsoleColor.Cyan};
@@ -32,7 +34,7 @@ namespace ListingManager
                 Console.WriteLine(line);
                 Console.ForegroundColor = prevColor;
             }*/
-            
+
             Console.WriteLine(IntelliTect);
 
             if (preview)
@@ -53,10 +55,10 @@ namespace ListingManager
             {
                 case ListingModes.ListingUpdating:
                     Console.WriteLine($"Updating listing namespaces of: {path}");
-                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview);
+                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byfolder, chapteronly);
                     break;
                 case ListingModes.TestGeneration:
-                    var generatedTests 
+                    var generatedTests
                         = ListingManager.GenerateUnitTests(path, TestGeneration_Interactive, true);
                     if (verbose)
                     {
