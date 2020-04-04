@@ -40,7 +40,7 @@ namespace ListingManager
         }
 
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verboseMode = false, bool preview = false, bool changeChapterNumberBasedOnFolderName = false, bool onlyChangeChapterNumber =false)
+            bool verboseMode = false, bool preview = false, bool changeChapterNumberBasedOnFolderName = false, bool onlyChangeChapterNumber = false)
         {
             var listingData = new List<ListingInformation>();
 
@@ -62,44 +62,38 @@ namespace ListingManager
 
                 var curListingData = listingData[i];
 
-                if (listingNumber == curListingData.ListingNumber && changeChapterNumberBasedOnFolderName==false)
+                if (listingNumber == curListingData.ListingNumber && onlyChangeChapterNumber == false)
                 {
                     continue;
                 }
 
-                if (onlyChangeChapterNumber) {
-                    listingNumber = curListingData.ListingNumber;
+                string completeListingNumber = listingNumber + ""; //default
+                int listingChapterNumber = curListingData.ChapterNumber; //default
+
+                if (onlyChangeChapterNumber)
+                {
+                    completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix;
                 }
 
                 if (changeChapterNumberBasedOnFolderName)
                 {
-                    UpdateListingNamespace(cur, FolderChapterNumber,
-                        listingNumber + "",
-                        curListingData.ListingDescription, verboseMode, preview);
-
-                    if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
-                    {
-                        Console.Write("Updating test. ");
-                        UpdateListingNamespace(pathToTest, FolderChapterNumber,
-                            listingNumber + "",
-                            curListingData.ListingDescription, verboseMode, preview);
-                    }
+                    listingChapterNumber = FolderChapterNumber;
                 }
-                else
+
+
+                UpdateListingNamespace(cur, listingChapterNumber,
+                    completeListingNumber,
+                    curListingData.ListingDescription, verboseMode, preview);
+
+                if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
                 {
-                    UpdateListingNamespace(cur, curListingData.ChapterNumber,
-                        listingNumber + "",
+                    Console.Write("Updating test. ");
+                    UpdateListingNamespace(pathToTest, listingChapterNumber,
+                        completeListingNumber,
                         curListingData.ListingDescription, verboseMode, preview);
-
-                    if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
-                    {
-                        Console.Write("Updating test. ");
-                        UpdateListingNamespace(pathToTest, curListingData.ChapterNumber,
-                            listingNumber + "",
-                            curListingData.ListingDescription, verboseMode, preview);
-                    }
-
                 }
+
+
 
 
             }

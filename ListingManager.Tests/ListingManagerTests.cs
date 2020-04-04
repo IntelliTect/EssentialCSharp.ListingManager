@@ -324,6 +324,71 @@ namespace ListingManager.Tests
             CollectionAssert.AreEquivalent((ICollection) expectedFiles, files);
         }
 
+
+        [TestMethod]
+        public void UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
+        {
+            ICollection<string> filesToMake = new List<string>
+            {
+                "Chapter42/Listing01.01.cs",
+                "Chapter42/Listing01.01A.Some.cs",
+                "Chapter42/Listing01.01B.cs",
+                "Chapter42/Listing01.01C.cs",
+                "Chapter42/Listing01.05.cs",
+                "Chapter42.Tests/Listing01.01.cs",
+                "Chapter42.Tests/Listing01.01A.Some.cs",
+                "Chapter42.Tests/Listing01.01B.cs",
+                "Chapter42.Tests/Listing01.01C.cs",
+                "Chapter42.Tests/Listing01.05.cs"
+            };
+
+            ICollection<string> expectedFiles = new List<string>
+            {
+                "Chapter42/Listing42.01.cs",
+                "Chapter42/Listing42.02.Some.cs",
+                "Chapter42/Listing42.03.cs",
+                "Chapter42/Listing42.04.cs",
+                "Chapter42/Listing42.05.cs",
+                "Chapter42.Tests/Listing42.01.cs",
+                "Chapter42.Tests/Listing42.02.Some.cs",
+                "Chapter42.Tests/Listing42.03.cs",
+                "Chapter42.Tests/Listing42.04.cs",
+                "Chapter42.Tests/Listing42.05.cs"
+            };
+
+            IEnumerable<string> toWrite = new List<string>
+            {
+                "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+                "{",
+                "    using System;",
+                "    using System.Reflection;",
+                "    public class Program { }",
+                "}"
+            };
+
+            WriteFiles(filesToMake, toWrite);
+            expectedFiles = ConvertFilenamesToFullPath(expectedFiles);
+            foreach (string file in filesToMake)
+            {
+                CreatedFiles.Remove(file);
+            }
+            CreatedFiles.AddRange(expectedFiles);
+
+            CreatedDirectories.Add("Chapter42");
+            CreatedDirectories.Add("Chapter42.Tests");
+
+            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), changeChapterNumberBasedOnFolderName:true);
+
+            var files = FileManager.GetAllFilesAtPath(Environment.CurrentDirectory, true)
+                .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+            foreach (string s in files) {
+                Console.WriteLine(s);
+            }
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        }
+
         [TestMethod]
         [DataRow("Chapter01", "Listing01.01A.cs")]
         [DataRow("Chapter02", "Listing02.01.cs")]
