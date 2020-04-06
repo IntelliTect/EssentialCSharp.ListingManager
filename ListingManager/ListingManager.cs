@@ -40,11 +40,9 @@ namespace ListingManager
         }
 
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verboseMode = false, bool preview = false, bool changeChapterNumberBasedOnFolderName = false, bool onlyChangeChapterNumber = false)
+            bool verboseMode = false, bool preview = false, bool byfolder = false, bool chapteronly = false)
         {
             var listingData = new List<ListingInformation>();
-
-            int FolderChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
 
 
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
@@ -62,22 +60,26 @@ namespace ListingManager
 
                 var curListingData = listingData[i];
 
-                if (listingNumber == curListingData.ListingNumber && onlyChangeChapterNumber == false)
+                if (chapteronly == false && byfolder == false)
                 {
-                    continue;
+                    if (listingNumber == curListingData.ListingNumber) //default
+                    {
+                        continue;
+                    }
                 }
 
                 string completeListingNumber = listingNumber + ""; //default
                 int listingChapterNumber = curListingData.ChapterNumber; //default
 
-                if (onlyChangeChapterNumber)
+                if (chapteronly)
                 {
-                    completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix;
+                    completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix + "";
+
                 }
 
-                if (changeChapterNumberBasedOnFolderName)
+                if (byfolder)
                 {
-                    listingChapterNumber = FolderChapterNumber;
+                    listingChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
                 }
 
 
@@ -115,7 +117,15 @@ namespace ListingManager
             string listingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
-            string paddedListingNumber = listingNumber.PadLeft(2, '0');
+            string paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
+
+            Char lastCharacterOfListingNumber = listingNumber.ElementAt(listingNumber.Length - 1);
+
+            if (Char.IsLetter(lastCharacterOfListingNumber) && listingNumber.Length == 2)
+            { //allows for keeping the original listing number with a suffix. e.g. "01A"   
+                paddedListingNumber = listingNumber.PadLeft(3, '0');
+            }
+
 
             string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
