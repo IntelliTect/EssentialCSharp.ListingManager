@@ -117,13 +117,19 @@ namespace ListingManager
             string listingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
-            string paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
+            
 
-            Char lastCharacterOfListingNumber = listingNumber.ElementAt(listingNumber.Length - 1);
+            string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
+            string paddedListingNumber = "";
+            //Char lastCharacterOfListingNumber = listingNumber.ElementAt(listingNumber.Length - 1);
 
-            if (Char.IsLetter(lastCharacterOfListingNumber) && listingNumber.Length == 2)
+            //if (Char.IsLetter(lastCharacterOfListingNumber) && listingNumber.Length == 2)
+            if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
             { //allows for keeping the original listing number with a suffix. e.g. "01A"   
                 paddedListingNumber = listingNumber.PadLeft(3, '0');
+            }
+            else {
+                paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
             }
 
 
