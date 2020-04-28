@@ -18,6 +18,8 @@ Any command can be run with these optional parameters.
 `ListingUpdating` can be run with the following additional optional parameters.
 
 - `preview` -> leave files in place but still print actions that would take place to console
+- `by-folder` -> changes a listing's chapter based on the chapter number in the chapter's path
+- `chapter-only` -> changes only the chapter of the listing, leaving the listing number unchanged. Use with `byfolder` 
 
 Run `ListingManager` from the command line. 
 
