@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ListingManager.Tests
 {
@@ -12,14 +7,11 @@ namespace ListingManager.Tests
     {
 
         [TestMethod]
-        public void GetChapterNumber()
+        [DataRow("Chapter01", 1)]
+        [DataRow("asdasdsad/asd/asd/asd/Chapter42", 42)]
+        public void GetChapterNumber(string chapterFilePath, int expectedChapterNum)
         {
-            string chapter1 = "Chapter01";
-            string chapter42 = "asdasdsad/asd/asd/asd/Chapter42";
-
-            Assert.IsTrue(FileManager.GetFolderChapterNumber(chapter1) == 1);
-            Assert.IsTrue(FileManager.GetFolderChapterNumber(chapter42) == 42);
-
+            Assert.IsTrue(FileManager.GetFolderChapterNumber(chapterFilePath) == expectedChapterNum);
         }
     }
 }

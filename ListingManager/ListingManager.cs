@@ -40,7 +40,7 @@ namespace ListingManager
         }
 
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verboseMode = false, bool preview = false, bool byfolder = false, bool chapteronly = false)
+            bool verboseMode = false, bool preview = false, bool byFolder = false, bool chapterOnly = false)
         {
             var listingData = new List<ListingInformation>();
 
@@ -60,28 +60,21 @@ namespace ListingManager
 
                 var curListingData = listingData[i];
 
-                if (chapteronly == false && byfolder == false)
-                {
-                    if (listingNumber == curListingData.ListingNumber) //default
-                    {
-                        continue;
-                    }
-                }
+                if (!chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { continue; } //default
 
                 string completeListingNumber = listingNumber + ""; //default
                 int listingChapterNumber = curListingData.ChapterNumber; //default
 
-                if (chapteronly)
+                if (chapterOnly)
                 {
                     completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix + "";
 
                 }
 
-                if (byfolder)
+                if (byFolder)
                 {
                     listingChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
                 }
-
 
                 UpdateListingNamespace(cur, listingChapterNumber,
                     completeListingNumber,
@@ -94,9 +87,6 @@ namespace ListingManager
                         completeListingNumber,
                         curListingData.ListingDescription, verboseMode, preview);
                 }
-
-
-
 
             }
         }
@@ -128,7 +118,6 @@ namespace ListingManager
             {
                 paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
             }
-
 
             string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +

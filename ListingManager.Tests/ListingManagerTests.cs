@@ -377,15 +377,11 @@ namespace ListingManager.Tests
             CreatedDirectories.Add("Chapter42");
             CreatedDirectories.Add("Chapter42.Tests");
 
-            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), byfolder:true);
+            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), byFolder:true);
 
             var files = FileManager.GetAllFilesAtPath(Environment.CurrentDirectory, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-            
-            Console.WriteLine();
-            foreach (string s in files) {
-                Console.WriteLine(s);
-            }
+       
             //Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
@@ -443,15 +439,10 @@ namespace ListingManager.Tests
             CreatedDirectories.Add("Chapter42");
             CreatedDirectories.Add("Chapter42.Tests");
 
-            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), byfolder: true, chapteronly:true);
+            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), byFolder: true, chapterOnly:true);
 
             var files = FileManager.GetAllFilesAtPath(Environment.CurrentDirectory, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-            Console.WriteLine();
-            foreach (string s in files)
-            {
-                Console.WriteLine(s);
-            }
 
             //Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);

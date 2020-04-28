@@ -19,8 +19,8 @@ namespace ListingManager
         public static void Main(string path = "", ListingModes mode = ListingModes.ListingUpdating,
             bool verbose = false,
             bool preview = false,
-            bool byfolder = false,
-            bool chapteronly = false)
+            bool byFolder = false,
+            bool chapterOnly = false)
         {
             /*var colorList = new List<ConsoleColor>{ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, 
                 ConsoleColor.DarkCyan, ConsoleColor.DarkRed, ConsoleColor.Cyan};
@@ -55,7 +55,7 @@ namespace ListingManager
             {
                 case ListingModes.ListingUpdating:
                     Console.WriteLine($"Updating listing namespaces of: {path}");
-                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byfolder, chapteronly);
+                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly);
                     break;
                 case ListingModes.TestGeneration:
                     var generatedTests
