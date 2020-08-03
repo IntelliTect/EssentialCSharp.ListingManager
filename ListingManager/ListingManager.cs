@@ -92,7 +92,7 @@ namespace ListingManager
         }
 
         public static bool IsExtraListing(string path,
-            string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
+            string regexNamespace = @".*Listing\d{2}\.\d{2}([A-Z]).*\.cs$")
         {
             Regex fileNameRegex = new Regex(regexNamespace);
 

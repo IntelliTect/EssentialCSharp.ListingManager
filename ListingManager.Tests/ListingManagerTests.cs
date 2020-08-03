@@ -43,6 +43,8 @@ namespace ListingManager.Tests
             {
                 @"Chapter01\Listing01.01A.SpecifyingLiteralValues.cs",
                 @"Chapter02\Listing02.01B.Something.cs",
+                @"Chapter02\Listing02.01Z.Somads.cs",
+                @"Chapter02\Listing02.01Y.Snother.cs",
                 @"Chapter02\Listing02.02.cs",
                 @"Chapter02\Listing02.03C.cs"
             };
@@ -225,6 +227,7 @@ namespace ListingManager.Tests
                 "Listing01.01A.Some.cs",
                 "Listing01.01B.cs",
                 "Listing01.01C.cs",
+                "Listing01.01Z.Z.cs",
                 "Listing01.02.cs",
                 "Listing01.02A.Test.cs"
             };
@@ -235,8 +238,9 @@ namespace ListingManager.Tests
                 "Listing01.02.Some.cs",
                 "Listing01.03.cs",
                 "Listing01.04.cs",
-                "Listing01.05.cs",
-                "Listing01.06.Test.cs"
+                "Listing01.05.Z.cs",
+                "Listing01.06.cs",
+                "Listing01.07.Test.cs"
             };
             
             IEnumerable<string> toWrite = new List<string>
