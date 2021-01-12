@@ -44,6 +44,14 @@ To find potentially mismatched listings in a chapter run,
 `ListingManager -path "user/EssentialCSharp/src/Chapter03/" -mode ScanForMismatchedListings`. Potentially mismatched listings
 will be printed to the console.
 
+To run all chapters in powershell from ListingManager directory,
+Get-ChildItem -Path 'insert.srcPathNameHere' -Directory | Where-Object {
+!$_.name.EndsWith("Tests")
+} | ForEach-Object {
+listingmanager --path $_.FullName --preview --verbose
+} 
+
+
 # Pushing new versions
 
 
