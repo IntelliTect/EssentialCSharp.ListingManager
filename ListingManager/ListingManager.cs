@@ -8,6 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace ListingManager
 {
+    /// <summary>
+    /// A utility class providing means to rename listings, namespaces, and corresponding unit tests.
+    /// </summary>
     public static class ListingManager
     {
         public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
@@ -21,7 +24,7 @@ namespace ListingManager
             }
         }
 
-        private static bool TryGetListing(string listingPath, out ListingInformation listingData)
+        private static bool TryGetListing(string listingPath, out ListingInformation? listingData)
         {
             listingData = null;
 
@@ -39,10 +42,19 @@ namespace ListingManager
             return true;
         }
 
+        /// <summary>
+        /// Updates the namespace, file names, and corresponding test file of the target listing. This has a cascading
+        /// effect, resulting in the renaming of subsequent listings in the same chapter.
+        /// </summary>
+        /// <param name="pathToChapter">Path to the target chapter</param>
+        /// <param name="verbose">When true, enables verbose console output</param>
+        /// <param name="preview">When true, leaves files in place and only print console output</param>
+        /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
+        /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verboseMode = false, bool preview = false, bool byFolder = false, bool chapterOnly = false)
+            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false)
         {
-            var listingData = new List<ListingInformation>();
+            var listingData = new List<ListingInformation?>();
 
 
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
@@ -59,8 +71,9 @@ namespace ListingManager
                 string cur = allListings[i];
 
                 var curListingData = listingData[i];
+                
 
-                if (!chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { continue; } //default
+                if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { continue; } //default
 
                 string completeListingNumber = listingNumber + ""; //default
                 int listingChapterNumber = curListingData.ChapterNumber; //default
@@ -78,14 +91,14 @@ namespace ListingManager
 
                 UpdateListingNamespace(cur, listingChapterNumber,
                     completeListingNumber,
-                    curListingData.ListingDescription, verboseMode, preview);
+                    curListingData.ListingDescription, verbose, preview);
 
                 if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
                 {
                     Console.Write("Updating test. ");
                     UpdateListingNamespace(pathToTest, listingChapterNumber,
                         completeListingNumber,
-                        curListingData.ListingDescription, verboseMode, preview);
+                        string.Empty, verbose, preview);
                 }
 
             }
@@ -96,14 +109,23 @@ namespace ListingManager
         {
             Regex fileNameRegex = new Regex(regexNamespace);
 
-            string directoryNameFull = Path.GetDirectoryName(path);
+            string directoryNameFull = Path.GetDirectoryName(path) ?? string.Empty;
 
             string directoryName = Path.GetFileName(directoryNameFull);
 
             return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
         }
 
-        public static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
+        /// <summary>
+        /// Updates the namespace and file name of the listing at <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">The path to the target listing</param>
+        /// <param name="chapterNumber">The chapter the listing belongs to</param>
+        /// <param name="listingNumber">The updated listing number</param>
+        /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
+        /// <param name="verbose">When true, enables verbose console output</param>
+        /// <param name="preview">When true, leaves files in place and only print console output</param>
+        private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
             string listingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
@@ -137,11 +159,11 @@ namespace ListingManager
             if (!preview) UpdateNamespaceOfPath(path, newNamespace, newFileName);
         }
 
-        public static bool UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
+        private static void UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
         {
             if (Path.GetExtension(path) != ".cs")
             {
-                return false;
+                return;
             }
 
             // read file into memory
@@ -149,7 +171,7 @@ namespace ListingManager
 
             File.Delete(path);
 
-            string targetPath = Path.Combine(Path.GetDirectoryName(path), newFileName) ?? path;
+            string targetPath = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, newFileName) ?? path;
 
             using (TextWriter textWriter = new StreamWriter(targetPath, true))
             {
@@ -165,8 +187,6 @@ namespace ListingManager
                     }
                 }
             }
-
-            return true;
         }
 
         public static bool GetPathToAccompanyingUnitTest(string listingPath, out string pathToTest)
@@ -200,7 +220,7 @@ namespace ListingManager
             return false;
         }
 
-        public static string GetTestLayout(string chapterNumber, string listingNumber)
+        private static string GetTestLayout(string chapterNumber, string listingNumber)
         {
             return string.Format(TestHeaderLayout,
                        chapterNumber.PadLeft(2, '0'),
@@ -226,7 +246,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
     }
 }";
 
-        public static IEnumerable<string> GetAllMissingUnitTests(string pathToChapter)
+        private static IEnumerable<string> GetAllMissingUnitTests(string pathToChapter)
         {
             foreach (string file in FileManager.GetAllFilesAtPath(pathToChapter).OrderBy(x => x))
             {
@@ -237,7 +257,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
             }
         }
 
-        public static ICollection<string> GenerateUnitTests(string pathToChapter, Func<string, bool> action = null,
+        public static ICollection<string> GenerateUnitTests(string pathToChapter, Func<string, bool>? action = null,
             bool verbose = false)
         {
             var toReturn = new List<string>();
@@ -267,7 +287,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
             return toReturn;
         }
 
-        public static bool GenerateUnitTest(string pathToTest)
+        private static bool GenerateUnitTest(string pathToTest)
         {
             if (File.Exists(pathToTest))
             {

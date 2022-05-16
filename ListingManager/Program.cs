@@ -22,19 +22,6 @@ namespace ListingManager
             bool byFolder = false,
             bool chapterOnly = false)
         {
-            /*var colorList = new List<ConsoleColor>{ConsoleColor.Blue, ConsoleColor.Green, ConsoleColor.Yellow, 
-                ConsoleColor.DarkCyan, ConsoleColor.DarkRed, ConsoleColor.Cyan};
-
-            var intelliTectSplit = IntelliTect.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-            for (var index = 0; index < intelliTectSplit.Length; index++)
-            {
-                string line = intelliTectSplit[index];
-                ConsoleColor prevColor = Console.ForegroundColor;
-                Console.ForegroundColor = colorList[index];
-                Console.WriteLine(line);
-                Console.ForegroundColor = prevColor;
-            }*/
-
             Console.WriteLine(IntelliTect);
 
             if (preview)
