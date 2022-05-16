@@ -56,7 +56,7 @@ namespace ListingManager.Tests
 
         public DirectoryInfo CreateTempDirectory(DirectoryInfo? parentDirectory = null, string? name = null)
         {
-            var tempDir = new DirectoryInfo(GetPath(parentDirectory, name, null, true));
+            var tempDir = new DirectoryInfo(GetPath(parentDirectory, name, null, false));
             tempDir.Create();
             _TempDirectories.Add(tempDir);
             return tempDir;
@@ -112,7 +112,7 @@ namespace ListingManager.Tests
             foreach (FileSystemInfo fsi in items)
             {
                 fsi.Refresh();
-                if (!fsi.Exists) return;
+                if (!fsi.Exists) continue;
 
                 Action? action = fsi switch
                 {

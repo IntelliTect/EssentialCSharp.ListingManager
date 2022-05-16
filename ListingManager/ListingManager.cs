@@ -98,7 +98,7 @@ namespace ListingManager
                     Console.Write("Updating test. ");
                     UpdateListingNamespace(pathToTest, listingChapterNumber,
                         completeListingNumber,
-                        string.Empty, verbose, preview);
+                        string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", verbose, preview);
                 }
 
             }
@@ -110,7 +110,6 @@ namespace ListingManager
             Regex fileNameRegex = new Regex(regexNamespace);
 
             string directoryNameFull = Path.GetDirectoryName(path) ?? string.Empty;
-
             string directoryName = Path.GetFileName(directoryNameFull);
 
             return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
@@ -149,7 +148,7 @@ namespace ListingManager
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
-                string.IsNullOrWhiteSpace(listingData) ? "" : $".{listingData}");
+                string.IsNullOrWhiteSpace(listingData) || string.IsNullOrEmpty(listingData) ? "" : $".{listingData}");
 
             if (verbose)
             {

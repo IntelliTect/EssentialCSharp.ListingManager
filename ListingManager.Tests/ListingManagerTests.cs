@@ -10,49 +10,33 @@ namespace ListingManager.Tests
     [TestClass]
     public class ListingManagerTests : TempFileTestBase
     {
-        private List<string> CreatedFiles { get; } = new();
-        private List<string> CreatedDirectories { get; } = new();
-
         [TestMethod]
         [DataRow("Listing02.01.SpecifyingLiteralValues.cs", false)]
         [DataRow("Listing02.01A.SpecifyingLiteralValues.cs", true)]
         [DataRow("Listing02.01.cs", false)]
         public void IsIncorrectListingFromPath_FindsIncorrectListing(string fileName, bool expectedResult)
         {
-            var fileInfo = CreateTempFile(null, fileName, fileName);
-
-            string directoryName = fileInfo.DirectoryName ?? string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(directoryName))
-            {
-                CreatedDirectories.Add(directoryName);
-            }
-
             string path = Path.Combine(TempDirectory.ToString(), fileName);
-            
+
             bool actualResult = ListingManager.IsExtraListing(path);
-            
+
             Assert.AreEqual(expectedResult, actualResult);
         }
-        
+
         [TestMethod]
         [DataRow("/Chapter02.Tests", "Listing02.01A.SpecifyingLiteralValues.cs", false)]
-        public void ListingsInTestDirectories_AreNotCountedAsExtraListings(string parentDirectory, string fileName, bool expectedResult)
+        public void ListingsInTestDirectories_AreNotCountedAsExtraListings(string parentDirectory, string fileName,
+            bool expectedResult)
         {
             var directory = CreateTempDirectory(name: parentDirectory);
             var fileInfo = CreateTempFile(directory, fileName, fileName);
 
             string directoryName = fileInfo.DirectoryName ?? string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(directoryName))
-            {
-                CreatedDirectories.Add(directoryName);
-            }
-
             string path = Path.Combine(directory.FullName, fileName);
-            
+
             bool actualResult = ListingManager.IsExtraListing(path);
-            
+
             Assert.AreEqual(expectedResult, actualResult);
         }
 
@@ -61,24 +45,21 @@ namespace ListingManager.Tests
         {
             ICollection<string> filesToMake = new List<string>
             {
-                @"Chapter01\Listing01.01A.SpecifyingLiteralValues.cs",
-                @"Chapter02\Listing02.01B.Something.cs",
-                @"Chapter02\Listing02.02.cs",
-                @"Chapter02\Listing02.03C.cs"
+                @"Listing02.01B.Something.cs",
+                @"Listing02.02.cs",
+                @"Listing02.03C.cs"
             };
-            
-            CreatedDirectories.Add("Chapter01");
-            CreatedDirectories.Add("Chapter02");
 
+            var tempDir = CreateTempDirectory(name: "Chapter02");
             ICollection<string> expectedFiles = filesToMake;
-            expectedFiles.Remove(@"Chapter02\Listing02.02.cs");
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            
-            WriteFiles(filesToMake, null);
+            expectedFiles.Remove(@"Listing02.02.cs");
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            var extraListings = ListingManager.GetAllExtraListings(Environment.CurrentDirectory).ToList();
-            
-            CollectionAssert.AreEquivalent((ICollection) expectedFiles, extraListings);
+            WriteFiles(tempDir, filesToMake, null);
+
+            var extraListings = ListingManager.GetAllExtraListings(tempDir.FullName).ToList();
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, extraListings);
         }
 
         [TestMethod]
@@ -91,7 +72,7 @@ namespace ListingManager.Tests
                 "Listing01.04.cs",
                 "Listing01.06.Something.cs"
             };
-            
+
             List<string> expectedFiles = new List<string>
             {
                 "Listing01.01.SpecifyingLiteralValues.cs",
@@ -109,21 +90,16 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = (List<string>)ConvertFilenamesToFullPath(expectedFiles);
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
-            
-            ListingManager.UpdateChapterListingNumbers(Environment.CurrentDirectory);
+            WriteFiles(TempDirectory, filesToMake, toWrite);
+            expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
-            var files = Directory.EnumerateFiles(Environment.CurrentDirectory)
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+
+            var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
             CollectionAssert.AreEquivalent(expectedFiles, files);
         }
-        
+
         [TestMethod]
         public void UpdateChapterListingNumbers_ListingAtBeginningOfListMissing_ListingsRenumbered()
         {
@@ -150,22 +126,17 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
-            
-            ListingManager.UpdateChapterListingNumbers(Environment.CurrentDirectory);
+            WriteFiles(TempDirectory, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            var files = Directory.EnumerateFiles(Environment.CurrentDirectory)
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+
+            var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-            
-            CollectionAssert.AreEquivalent((ICollection) expectedFiles, files);
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
-        
+
         [TestMethod]
         public void UpdateChapterListingNumbers_MultipleListingsMissing_ListingsRenumbered()
         {
@@ -220,22 +191,17 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
-            
-            ListingManager.UpdateChapterListingNumbers(Environment.CurrentDirectory);
+            WriteFiles(TempDirectory, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            var files = Directory.EnumerateFiles(Environment.CurrentDirectory)
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+
+            var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-            
-            CollectionAssert.AreEquivalent((ICollection) expectedFiles, files);
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
-        
+
         [TestMethod]
         public void UpdateChapterListingNumbers_AdditionalListings_ListingsRenumbered()
         {
@@ -258,7 +224,7 @@ namespace ListingManager.Tests
                 "Listing01.05.cs",
                 "Listing01.06.Test.cs"
             };
-            
+
             IEnumerable<string> toWrite = new List<string>
             {
                 "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
@@ -268,20 +234,15 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
-            
-            ListingManager.UpdateChapterListingNumbers(Environment.CurrentDirectory);
+            WriteFiles(TempDirectory, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            var files = Directory.EnumerateFiles(Environment.CurrentDirectory)
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+
+            var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-            
-            CollectionAssert.AreEquivalent((ICollection) expectedFiles, files);
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
         [TestMethod]
@@ -294,11 +255,11 @@ namespace ListingManager.Tests
                 "Chapter01/Listing01.01B.cs",
                 "Chapter01/Listing01.01C.cs",
                 "Chapter01/Listing01.05.cs",
-                "Chapter01.Tests/Listing01.01.cs",
-                "Chapter01.Tests/Listing01.01A.Some.cs",
-                "Chapter01.Tests/Listing01.01B.cs",
-                "Chapter01.Tests/Listing01.01C.cs",
-                "Chapter01.Tests/Listing01.05.cs"
+                "Chapter01.Tests/Listing01.01.Tests.cs",
+                "Chapter01.Tests/Listing01.01A.Some.Tests.cs",
+                "Chapter01.Tests/Listing01.01B.Tests.cs",
+                "Chapter01.Tests/Listing01.01C.Tests.cs",
+                "Chapter01.Tests/Listing01.05.Tests.cs"
             };
 
             ICollection<string> expectedFiles = new List<string>
@@ -308,13 +269,13 @@ namespace ListingManager.Tests
                 @"Chapter01\Listing01.03.cs",
                 @"Chapter01\Listing01.04.cs",
                 @"Chapter01\Listing01.05.cs",
-                @"Chapter01.Tests\Listing01.01.cs",
-                @"Chapter01.Tests\Listing01.02.cs",
-                @"Chapter01.Tests\Listing01.03.cs",
-                @"Chapter01.Tests\Listing01.04.cs",
-                @"Chapter01.Tests\Listing01.05.cs"
+                @"Chapter01.Tests\Listing01.01.Tests.cs",
+                @"Chapter01.Tests\Listing01.02.Some.Tests.cs",
+                @"Chapter01.Tests\Listing01.03.Tests.cs",
+                @"Chapter01.Tests\Listing01.04.Tests.cs",
+                @"Chapter01.Tests\Listing01.05.Tests.cs"
             };
-            
+
             IEnumerable<string> toWrite = new List<string>
             {
                 "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
@@ -324,29 +285,24 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
-            
-            CreatedDirectories.Add("Chapter01");
-            CreatedDirectories.Add("Chapter01.Tests");
-            
-            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter01"));
+            var tempDir = CreateTempDirectory();
+            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
+            CreateTempDirectory(tempDir, name: "Chapter01.Tests");
+            WriteFiles(tempDir, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            var files = FileManager.GetAllFilesAtPath(Environment.CurrentDirectory, true)
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+
+            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-            
-            CollectionAssert.AreEquivalent((ICollection) expectedFiles, files);
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
 
         [TestMethod]
-        public void UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
+        public void
+            UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
         {
             ICollection<string> filesToMake = new List<string>
             {
@@ -355,11 +311,11 @@ namespace ListingManager.Tests
                 "Chapter42/Listing01.01B.cs",
                 "Chapter42/Listing01.01C.cs",
                 "Chapter42/Listing01.05.cs",
-                "Chapter42.Tests/Listing01.01.cs",
-                "Chapter42.Tests/Listing01.01A.Some.cs",
-                "Chapter42.Tests/Listing01.01B.cs",
-                "Chapter42.Tests/Listing01.01C.cs",
-                "Chapter42.Tests/Listing01.05.cs"
+                "Chapter42.Tests/Listing01.01.Tests.cs",
+                "Chapter42.Tests/Listing01.01A.Some.Tests.cs",
+                "Chapter42.Tests/Listing01.01B.Tests.cs",
+                "Chapter42.Tests/Listing01.01C.Tests.cs",
+                "Chapter42.Tests/Listing01.05.Tests.cs"
             };
 
             ICollection<string> expectedFiles = new List<string>
@@ -369,11 +325,11 @@ namespace ListingManager.Tests
                 @"Chapter42\Listing42.03.cs",
                 @"Chapter42\Listing42.04.cs",
                 @"Chapter42\Listing42.05.cs",
-                @"Chapter42.Tests\Listing42.01.cs",
-                @"Chapter42.Tests\Listing42.02.cs",
-                @"Chapter42.Tests\Listing42.03.cs",
-                @"Chapter42.Tests\Listing42.04.cs",
-                @"Chapter42.Tests\Listing42.05.cs"
+                @"Chapter42.Tests\Listing42.01.Tests.cs",
+                @"Chapter42.Tests\Listing42.02.Some.Tests.cs",
+                @"Chapter42.Tests\Listing42.03.Tests.cs",
+                @"Chapter42.Tests\Listing42.04.Tests.cs",
+                @"Chapter42.Tests\Listing42.05.Tests.cs"
             };
 
             IEnumerable<string> toWrite = new List<string>
@@ -385,30 +341,25 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
+            var tempDir = CreateTempDirectory();
+            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+            CreateTempDirectory(tempDir, name: "Chapter42.Tests");
+            WriteFiles(tempDir, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
-            CreatedDirectories.Add("Chapter42");
-            CreatedDirectories.Add("Chapter42.Tests");
-
-            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), byFolder:true);
-
-            var files = FileManager.GetAllFilesAtPath(Environment.CurrentDirectory, true)
+            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-       
+
             //Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
 
         [TestMethod]
-        public void UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
+        public void
+            UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
         {
             ICollection<string> filesToMake = new List<string>
             {
@@ -417,11 +368,11 @@ namespace ListingManager.Tests
                 "Chapter42/Listing01.01B.cs",
                 "Chapter42/Listing01.01C.cs",
                 "Chapter42/Listing01.05.cs",
-                "Chapter42.Tests/Listing01.01.cs",
-                "Chapter42.Tests/Listing01.01A.Some.cs",
-                "Chapter42.Tests/Listing01.01B.cs",
-                "Chapter42.Tests/Listing01.01C.cs",
-                "Chapter42.Tests/Listing01.05.cs"
+                "Chapter42.Tests/Listing01.01.Tests.cs",
+                "Chapter42.Tests/Listing01.01A.Some.Tests.cs",
+                "Chapter42.Tests/Listing01.01B.Tests.cs",
+                "Chapter42.Tests/Listing01.01C.Tests.cs",
+                "Chapter42.Tests/Listing01.05.Tests.cs"
             };
 
             ICollection<string> expectedFiles = new List<string>
@@ -431,11 +382,11 @@ namespace ListingManager.Tests
                 @"Chapter42\Listing42.01B.cs",
                 @"Chapter42\Listing42.01C.cs",
                 @"Chapter42\Listing42.05.cs",
-                @"Chapter42.Tests\Listing42.01.cs",
-                @"Chapter42.Tests\Listing42.01A.cs",
-                @"Chapter42.Tests\Listing42.01B.cs",
-                @"Chapter42.Tests\Listing42.01C.cs",
-                @"Chapter42.Tests\Listing42.05.cs"
+                @"Chapter42.Tests\Listing42.01.Tests.cs",
+                @"Chapter42.Tests\Listing42.01A.Some.Tests.cs",
+                @"Chapter42.Tests\Listing42.01B.Tests.cs",
+                @"Chapter42.Tests\Listing42.01C.Tests.cs",
+                @"Chapter42.Tests\Listing42.05.Tests.cs"
             };
 
             IEnumerable<string> toWrite = new List<string>
@@ -447,28 +398,21 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
+            var tempDir = CreateTempDirectory();
+            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+            CreateTempDirectory(tempDir, name: "Chapter42.Tests");
+            WriteFiles(tempDir, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            WriteFiles(filesToMake, toWrite);
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            foreach (string file in filesToMake)
-            {
-                CreatedFiles.Remove(file);
-            }
-            CreatedFiles.AddRange(expectedFiles);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName,
+                byFolder: true, chapterOnly: true);
 
-            CreatedDirectories.Add("Chapter42");
-            CreatedDirectories.Add("Chapter42.Tests");
-
-            ListingManager.UpdateChapterListingNumbers(Path.Combine(Environment.CurrentDirectory, "Chapter42"), byFolder: true, chapterOnly:true);
-
-            var files = FileManager.GetAllFilesAtPath(Environment.CurrentDirectory, true)
+            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
             //Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
-
-
 
 
         [TestMethod]
@@ -479,7 +423,9 @@ namespace ListingManager.Tests
         public void GetPathToAccompanyingUnitTest_GivenListingWithNoTest_CorrectPathReturned(string chapter,
             string listingName)
         {
-            bool result = ListingManager.GetPathToAccompanyingUnitTest(chapter+Path.DirectorySeparatorChar+listingName, out string pathToTest);
+            bool result =
+                ListingManager.GetPathToAccompanyingUnitTest(chapter + Path.DirectorySeparatorChar + listingName,
+                    out string pathToTest);
             char directorySeparator = Path.DirectorySeparatorChar;
             Assert.IsFalse(result);
             Assert.AreEqual($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
@@ -489,90 +435,64 @@ namespace ListingManager.Tests
         public void GenerateUnitTests_TestsGenerated()
         {
             string chapter = "Chapter01";
-            
+
             List<string> filesToCreate = new List<string>
             {
-               @"Chapter01\Listing01.01.Something.cs",
-               @"Chapter01\Listing01.02A.cs",
-               @"Chapter01\Listing01.03B.Other.cs"
+                @"Listing01.01.Something.cs",
+                @"Listing01.02A.cs",
+                @"Listing01.03B.Other.cs"
             };
 
+            var tempDir = CreateTempDirectory();
+            var chapterDir = CreateTempDirectory(tempDir, name: chapter);
             var expectedFilesList = new List<string>();
             foreach (string file in filesToCreate)
             {
-                expectedFilesList.Add(file.Replace(chapter, chapter+".Tests"));
+                expectedFilesList.Add(@"Chapter01.Tests\" + file);
             }
-            var expectedFiles = (ICollection<string>) expectedFilesList;
-            expectedFiles = ConvertFilenamesToFullPath(expectedFiles).ToList();
-            
-            WriteFiles(filesToCreate, null);
-            CreatedDirectories.Add(chapter);
-            CreatedDirectories.Add(chapter + ".Tests");
+
+            var expectedFiles = (ICollection<string>)expectedFilesList;
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+            WriteFiles(chapterDir, filesToCreate, null);
 
             var generatedTests = ListingManager.GenerateUnitTests(
-                Path.Combine(Environment.CurrentDirectory, "Chapter01"));
-            
-            CollectionAssert.AreEquivalent((ICollection) expectedFiles, (ICollection) generatedTests);
+                chapterDir.FullName);
+
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, (ICollection)generatedTests);
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            foreach (var cur in CreatedFiles)
-            {
-                try
-                {
-                    File.Delete(cur);
-                }
-                catch(Exception)
-                {
-                    // ignore
-                }
-            }
 
-            foreach (var cur in CreatedDirectories)
-            {
-                try
-                {
-                    Directory.Delete(cur, true);
-                }
-                catch (Exception)
-                {
-                    // ignore
-                }
-            }
-        }
-
-        private IEnumerable<string> ConvertFilenamesToFullPath(IEnumerable<string> fileNamesToConvert)
+        private IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
+            DirectoryInfo? targetDirectory)
         {
             var fullPaths = new List<string>();
 
             foreach (string fileName in fileNamesToConvert)
             {
-                fullPaths.Add(Path.Combine(Environment.CurrentDirectory, fileName));
+                fullPaths.Add(Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName));
             }
 
             return fullPaths;
         }
 
-        private void WriteFile(string fileName, IEnumerable<string>? toWrite)
+        private FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)
         {
-            FileInfo file = new FileInfo(fileName);
-            file.Directory?.Create();
-            
-            File.WriteAllLines(fileName, toWrite ?? new List<string>());
-            
-            CreatedFiles.Add(fileName);
+            var ret = CreateTempFile(targetDirectory, name: fileName, contents: toWrite.ToString());
+            return ret;
         }
 
-        private void WriteFiles(IEnumerable<string> fileNames, IEnumerable<string>? toWrite)
+        private List<FileInfo> WriteFiles(DirectoryInfo targetDirectory, IEnumerable<string> fileNames,
+            IEnumerable<string>? toWrite)
         {
             List<string> filesToWrite = toWrite?.ToList() ?? new List<string>();
-
+            List<FileInfo> ret = new List<FileInfo>();
             foreach (string file in fileNames)
             {
-                WriteFile(file, filesToWrite);
+                ret.Add(WriteFile(targetDirectory, file, filesToWrite));
             }
+
+            return ret;
         }
     }
 }
