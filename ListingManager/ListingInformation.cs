@@ -1,6 +1,5 @@
 using System;
 using System.Text.RegularExpressions;
-#pragma warning disable CS1591
 
 namespace ListingManager
 {
