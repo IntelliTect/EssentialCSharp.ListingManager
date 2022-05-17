@@ -10,10 +10,13 @@
         <PackageId>IntelliTect.EssentialCSharp.ListingManager</PackageId>
         <Description>Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
+        <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="System.CommandLine.DragonFruit" Version="0.3.0-alpha.19405.1" />
+      <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22114.1" />
     </ItemGroup>
 
 </Project>
