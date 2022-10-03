@@ -55,6 +55,7 @@ listingmanager --path $_.FullName --preview --verbose
 
 # Pushing new versions
 
+The easiest and best way is to create a new release with a tag number and version number that are identical in the format of vx.x.x and a nuget release will be created and uploaded with that same number
 
 To push a new version from the command line you must first pack the changes as a nupkg by running `dotnet pack` at 
 the solution level. If the pack is successfully navigate to the directory where the nupkg was created. Run 
