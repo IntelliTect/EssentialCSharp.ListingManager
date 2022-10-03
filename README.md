@@ -1,4 +1,4 @@
-# ListingManager
+# ListingManager [![NuGet](https://img.shields.io/nuget/v/IntelliTect.EssentialCSharp.ListingManager.svg)](https://www.nuget.org/packages/IntelliTect.EssentialCSharp.ListingManager/)
 Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators
 
 # Installation
@@ -55,7 +55,9 @@ listingmanager --path $_.FullName --preview --verbose
 
 # Pushing new versions
 
+The easiest and best way is to create a new release with a tag number and version number that are identical in the format of vx.x.x and a nuget release will be created and uploaded with that same number.
 
+If you want the more difficult method:
 To push a new version from the command line you must first pack the changes as a nupkg by running `dotnet pack` at 
 the solution level. If the pack is successfully navigate to the directory where the nupkg was created. Run 
 `dotnet nuget push IntelliTect.EssentialCSharp.<version>.nupkg -k <ApiKey> -s https://api.nuget.org/v3/index.json`. For
