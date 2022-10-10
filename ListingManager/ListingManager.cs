@@ -96,7 +96,7 @@ namespace ListingManager
                 if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
                 {
                     Console.Write("Updating test. ");
-                    UpdateListingNamespace(pathToTest, listingChapterNumber,
+                    UpdateTestListingNamespace(pathToTest, listingChapterNumber,
                         completeListingNumber,
                         string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", verbose, preview);
                 }
@@ -124,13 +124,56 @@ namespace ListingManager
         /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
         /// <param name="verbose">When true, enables verbose console output</param>
         /// <param name="preview">When true, leaves files in place and only print console output</param>
-        private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
+        private static void UpdateTestListingNamespace(string path, int chapterNumber, string listingNumber,
             string listingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
 
             string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
             string paddedListingNumber = "";
+            if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
+            { //allows for keeping the original listing number with a suffix. e.g. "01A"   
+                paddedListingNumber = listingNumber.PadLeft(3, '0');
+            }
+            else
+            {
+                paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
+            }
+
+            string newFileNameTemplate = "Listing{0}.{1}{2}.Tests.cs";
+            string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
+                                  $".Chapter{paddedChapterNumber}" +
+                                  $".Listing{paddedChapterNumber}_" +
+                                  $"{paddedListingNumber}.Tests";
+            string newFileName = string.Format(newFileNameTemplate,
+                paddedChapterNumber,
+                paddedListingNumber,
+                string.IsNullOrWhiteSpace(listingData) || string.IsNullOrEmpty(listingData) ? "" : $".{listingData}");
+
+            if (verbose)
+            {
+                Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
+            }
+
+            if (!preview) UpdateNamespaceOfPath(path, newNamespace, newFileName);
+        }
+
+        /// <summary>
+        /// Updates the namespace and file name of the listing at <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">The path to the target listing</param>
+        /// <param name="chapterNumber">The chapter the listing belongs to</param>
+        /// <param name="listingNumber">The updated listing number</param>
+        /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
+        /// <param name="verbose">When true, enables verbose console output</param>
+        /// <param name="preview">When true, leaves files in place and only print console output</param>
+        private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
+            string listingData, bool verbose = false, bool preview = false)
+        {
+            string paddedChapterNumber = chapterNumber.ToString("00");
+
+            string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
+            string paddedListingNumber;
             if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
             { //allows for keeping the original listing number with a suffix. e.g. "01A"   
                 paddedListingNumber = listingNumber.PadLeft(3, '0');
