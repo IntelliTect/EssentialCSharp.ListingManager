@@ -356,6 +356,126 @@ namespace ListingManager.Tests
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
+        [TestMethod]
+        public void
+        UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestAndListingPairingIsMaintained_ListingsAndTestsUpdated()
+        {
+            ICollection<string> filesToMake = new List<string>
+            {
+                @"Chapter01\Listing01.01.HelloWorldInC#.cs",
+                @"Chapter01\Listing01.01.HelloWorldInC#.ps1",
+                @"Chapter01\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
+                @"Chapter01\Listing01.02B.MultipleStatementsOneOneLine.cs",
+                @"Chapter01\Listing01.02C.MultipleStatementsOnSeparateLines.cs",
+                @"Chapter01\Listing01.02D.SplittingAStatementAcrossMultipleLines.cs",
+                @"Chapter01\Listing01.02E.HelloWorldInC#.cs",
+                @"Chapter01\Listing01.03.BasicClassDeclaration.cs",
+                @"Chapter01\Listing01.04.BreakingApartHelloWorld.cs",
+                @"Chapter01\Listing01.05.TheMainMethodWithParametersAndAReturn.cs",
+                @"Chapter01\Listing01.08.NoIndentationFormatting.cs",
+                @"Chapter01\Listing01.09.RemovingWhitespace.cs",
+                @"Chapter01\Listing01.10.DeclaringAndAssigningAVariable.cs",
+                @"Chapter01\Listing01.11.DeclaringTwoVariablesWithinOneStatement.cs",
+                @"Chapter01\Listing01.12.ChangingTheValueOfAVariable.cs",
+                @"Chapter01\Listing01.13.AssignmentReturningAValueThatCanBeassignedAgain.cs",
+                @"Chapter01\Listing01.14.UsingSystemConsoleReadLine.cs",
+                @"Chapter01\Listing01.15.UsingSystemConsoleRead.cs",
+                @"Chapter01\Listing01.16.FormattingUsingStringInterpolation.cs",
+                @"Chapter01\Listing01.17.FormattingUsingCompositeFormatting.cs",
+                @"Chapter01\Listing01.18.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
+                @"Chapter01\Listing01.19.CommentingYourCode.cs",
+                @"Chapter01\Listing01.20.SampleCILOutput.cs",
+                @"Chapter01.Tests\Listing01.01.Tests.cs",
+                @"Chapter01.Tests\Listing01.02B.Tests.cs",
+                @"Chapter01.Tests\Listing01.02C.Tests.cs",
+                @"Chapter01.Tests\Listing01.02D.Tests.cs",
+                @"Chapter01.Tests\Listing01.02E.Tests.cs",
+                @"Chapter01.Tests\Listing01.04.Tests.cs",
+                @"Chapter01.Tests\Listing01.05.Tests.cs",
+                @"Chapter01.Tests\Listing01.08.Tests.cs",
+                @"Chapter01.Tests\Listing01.09.Tests.cs",
+                @"Chapter01.Tests\Listing01.10.Tests.cs",
+                @"Chapter01.Tests\Listing01.11.Tests.cs",
+                @"Chapter01.Tests\Listing01.12.Tests.cs",
+                @"Chapter01.Tests\Listing01.13.Tests.cs",
+                @"Chapter01.Tests\Listing01.14.Tests.cs",
+                @"Chapter01.Tests\Listing01.15.Tests.cs",
+                @"Chapter01.Tests\Listing01.16.Tests.cs",
+                @"Chapter01.Tests\Listing01.17.Tests.cs",
+                @"Chapter01.Tests\Listing01.18.Tests.cs",
+                @"Chapter01.Tests\Listing01.19.Tests.cs"
+            };
+
+            ICollection<string> expectedFiles = new List<string>
+            {
+                @"Chapter01\Listing01.01.HelloWorldInC#.cs",
+                @"Chapter01\Listing01.01.HelloWorldInC#.ps1",
+                @"Chapter01\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
+                @"Chapter01\Listing01.03.MultipleStatementsOneOneLine.cs",
+                @"Chapter01\Listing01.04.MultipleStatementsOnSeparateLines.cs",
+                @"Chapter01\Listing01.05.SplittingAStatementAcrossMultipleLines.cs",
+                @"Chapter01\Listing01.06.HelloWorldInC#.cs",
+                @"Chapter01\Listing01.07.BasicClassDeclaration.cs",
+                @"Chapter01\Listing01.08.BreakingApartHelloWorld.cs",
+                @"Chapter01\Listing01.09.TheMainMethodWithParametersAndAReturn.cs",
+                @"Chapter01\Listing01.10.NoIndentationFormatting.cs",
+                @"Chapter01\Listing01.11.RemovingWhitespace.cs",
+                @"Chapter01\Listing01.12.DeclaringAndAssigningAVariable.cs",
+                @"Chapter01\Listing01.13.DeclaringTwoVariablesWithinOneStatement.cs",
+                @"Chapter01\Listing01.14.ChangingTheValueOfAVariable.cs",
+                @"Chapter01\Listing01.15.AssignmentReturningAValueThatCanBeassignedAgain.cs",
+                @"Chapter01\Listing01.16.UsingSystemConsoleReadLine.cs",
+                @"Chapter01\Listing01.17.UsingSystemConsoleRead.cs",
+                @"Chapter01\Listing01.18.FormattingUsingStringInterpolation.cs",
+                @"Chapter01\Listing01.19.FormattingUsingCompositeFormatting.cs",
+                @"Chapter01\Listing01.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
+                @"Chapter01\Listing01.21.CommentingYourCode.cs",
+                @"Chapter01\Listing01.22.SampleCILOutput.cs",
+                @"Chapter01.Tests\Listing01.01.Tests.cs",
+                @"Chapter01.Tests\Listing01.03.Tests.cs",
+                @"Chapter01.Tests\Listing01.04.Tests.cs",
+                @"Chapter01.Tests\Listing01.05.Tests.cs",
+                @"Chapter01.Tests\Listing01.06.Tests.cs",
+                @"Chapter01.Tests\Listing01.08.Tests.cs",
+                @"Chapter01.Tests\Listing01.09.Tests.cs",
+                @"Chapter01.Tests\Listing01.10.Tests.cs",
+                @"Chapter01.Tests\Listing01.11.Tests.cs",
+                @"Chapter01.Tests\Listing01.12.Tests.cs",
+                @"Chapter01.Tests\Listing01.13.Tests.cs",
+                @"Chapter01.Tests\Listing01.14.Tests.cs",
+                @"Chapter01.Tests\Listing01.15.Tests.cs",
+                @"Chapter01.Tests\Listing01.16.Tests.cs",
+                @"Chapter01.Tests\Listing01.17.Tests.cs",
+                @"Chapter01.Tests\Listing01.18.Tests.cs",
+                @"Chapter01.Tests\Listing01.19.Tests.cs",
+                @"Chapter01.Tests\Listing01.20.Tests.cs",
+                @"Chapter01.Tests\Listing01.21.Tests.cs"
+            };
+
+            IEnumerable<string> toWrite = new List<string>
+            {
+                "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing18_01",
+                "{",
+                "    using System;",
+                "    using System.Reflection;",
+                "    public class Program { }",
+                "}"
+            };
+            var tempDir = CreateTempDirectory();
+            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
+            CreateTempDirectory(tempDir, name: "Chapter01.Tests");
+            WriteFiles(tempDir, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+
+            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+                .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+            //Assert
+            CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        }
+
 
         [TestMethod]
         public void

@@ -140,7 +140,7 @@ namespace ListingManager
                 paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
             }
 
-            string newFileNameTemplate = "Listing{0}.{1}{2}.Tests.cs";
+            string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
                                   $".Chapter{paddedChapterNumber}" +
                                   $".Listing{paddedChapterNumber}_" +
