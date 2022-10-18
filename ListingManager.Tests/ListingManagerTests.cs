@@ -63,6 +63,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
         {
             List<string> filesToMake = new List<string>
@@ -101,6 +102,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void UpdateChapterListingNumbers_ListingAtBeginningOfListMissing_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -138,6 +140,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void UpdateChapterListingNumbers_MultipleListingsMissing_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -203,6 +206,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void UpdateChapterListingNumbers_AdditionalListings_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -246,6 +250,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void UpdateChapterListingNumbers_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
         {
             ICollection<string> filesToMake = new List<string>
@@ -357,13 +362,13 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void
         UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestAndListingPairingIsMaintained_ListingsAndTestsUpdated()
         {
             ICollection<string> filesToMake = new List<string>
             {
                 @"Chapter01\Listing01.01.HelloWorldInC#.cs",
-                @"Chapter01\Listing01.01.HelloWorldInC#.ps1",
                 @"Chapter01\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
                 @"Chapter01\Listing01.02B.MultipleStatementsOneOneLine.cs",
                 @"Chapter01\Listing01.02C.MultipleStatementsOnSeparateLines.cs",
@@ -409,7 +414,6 @@ namespace ListingManager.Tests
             ICollection<string> expectedFiles = new List<string>
             {
                 @"Chapter01\Listing01.01.HelloWorldInC#.cs",
-                @"Chapter01\Listing01.01.HelloWorldInC#.ps1",
                 @"Chapter01\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
                 @"Chapter01\Listing01.03.MultipleStatementsOneOneLine.cs",
                 @"Chapter01\Listing01.04.MultipleStatementsOnSeparateLines.cs",
@@ -552,6 +556,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void GenerateUnitTests_TestsGenerated()
         {
             string chapter = "Chapter01";

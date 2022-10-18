@@ -66,7 +66,7 @@ namespace ListingManager
                 }).ToList();
             foreach (string path in allListings)
             {
-                File.Copy(path, $"{path}.{ListingInformation.TemporaryExtension}", true);
+                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
                 File.Delete(path);
             }
             allListings = FileManager.GetAllFilesAtPath(pathToChapter)
@@ -84,7 +84,7 @@ namespace ListingManager
                 }).ToList();
             foreach (string path in allTestListings)
             {
-                File.Copy(path, $"{path}.{ListingInformation.TemporaryExtension}", true);
+                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
                 File.Delete(path);
             }
             allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
@@ -99,11 +99,11 @@ namespace ListingManager
                 }
                 string cur = allListings[i];
 
-                ListingInformation curListingData = listingData[i];
-                
+                ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
+
 
                 if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { 
-                    File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
+                    File.Copy(curListingData?.TemporaryPath, curListingData?.Path, true);
                     continue;
                 } //default
 
@@ -125,14 +125,22 @@ namespace ListingManager
                     completeListingNumber,
                     curListingData.ListingDescription, curListingData, verbose, preview);
 
-                if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
+                if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
                 {
                     Console.Write("Updating test. ");
-                    UpdateTestListingNamespace(pathToTest, listingChapterNumber,
+                    UpdateListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
                         completeListingNumber,
                         string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", curListingData, verbose, preview);
                 }
 
+            }
+            foreach (string path in allListings)
+            {
+                File.Delete(path);
+            }
+            foreach (string path in allTestListings)
+            {
+                File.Delete(path);
             }
         }
 
