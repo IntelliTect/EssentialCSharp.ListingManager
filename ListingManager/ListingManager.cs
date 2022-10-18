@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -102,7 +101,8 @@ namespace ListingManager
                 ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
 
 
-                if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { 
+                if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber)
+                {
                     File.Copy(curListingData?.TemporaryPath, curListingData?.Path, true);
                     if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation currentTestListingData)
                     {
@@ -225,7 +225,7 @@ namespace ListingManager
             string paddedListingNumber;
             if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
             {
-            //allows for keeping the original listing number with a suffix. e.g. "01A"   
+                //allows for keeping the original listing number with a suffix. e.g. "01A"   
                 paddedListingNumber = listingNumber.PadLeft(3, '0');
             }
             else

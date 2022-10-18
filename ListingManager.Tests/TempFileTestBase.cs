@@ -1,30 +1,30 @@
-﻿using System;
+﻿using Polly;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Polly;
 using Xunit.Sdk;
 
 namespace ListingManager.Tests
 {
     public abstract class TempFileTestBase : IDisposable
     {
-         private readonly Lazy<DirectoryInfo> _WorkingDirectory = new(() =>
-        {
-            DirectoryInfo working = new(Path.Combine(Path.GetTempPath(),
-                typeof(TempFileTestBase).Assembly.GetName().Name!,
-                Path.GetRandomFileName()));
+        private readonly Lazy<DirectoryInfo> _WorkingDirectory = new(() =>
+       {
+           DirectoryInfo working = new(Path.Combine(Path.GetTempPath(),
+               typeof(TempFileTestBase).Assembly.GetName().Name!,
+               Path.GetRandomFileName()));
 
-            if (working.Exists)
-            {
-                working.Delete(recursive: true);
-            }
+           if (working.Exists)
+           {
+               working.Delete(recursive: true);
+           }
 
-            working.Create();
-            return working;
-        }, LazyThreadSafetyMode.ExecutionAndPublication);
+           working.Create();
+           return working;
+       }, LazyThreadSafetyMode.ExecutionAndPublication);
 
         private readonly List<FileInfo> _TempFiles = new();
         private readonly List<DirectoryInfo> _TempDirectories = new();

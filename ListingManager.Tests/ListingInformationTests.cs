@@ -18,9 +18,9 @@ namespace ListingManager.Tests
 
             Assert.AreEqual(chapterNumber, listingInformation.ChapterNumber);
             Assert.AreEqual(listingNumber, listingInformation.ListingNumber);
-            
+
             Assert.AreEqual(suffix ?? "", listingInformation.ListingSuffix);
-            
+
             Assert.AreEqual(description ?? "", listingInformation.ListingDescription);
         }
     }
