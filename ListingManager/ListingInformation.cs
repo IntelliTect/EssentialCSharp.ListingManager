@@ -5,10 +5,13 @@ namespace ListingManager
 {
     public class ListingInformation
     {
+        private string TemporaryExtension = ".tmp";
         public int ChapterNumber { get; }
         public int ListingNumber { get; }
         public string ListingSuffix { get; }
         public string ListingDescription { get; }
+        public string TemporaryPath { get; }
+        public string Path { get => TemporaryPath.Remove(TemporaryPath.Length - TemporaryExtension.Length, TemporaryExtension.Length); }
 
         public ListingInformation(string listingPath)
         {
@@ -24,6 +27,7 @@ namespace ListingManager
                 ListingNumber = listingNumber;
                 ListingSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
                 ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : "";
+                TemporaryPath = listingPath + TemporaryExtension;
             }
             else
             {
