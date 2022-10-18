@@ -104,6 +104,10 @@ namespace ListingManager
 
                 if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { 
                     File.Copy(curListingData?.TemporaryPath, curListingData?.Path, true);
+                    if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation currentTestListingData)
+                    {
+                        File.Copy(currentTestListingData?.TemporaryPath, currentTestListingData?.Path, true);
+                    }
                     continue;
                 } //default
 
