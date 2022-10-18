@@ -5,13 +5,13 @@ namespace ListingManager
 {
     public class ListingInformation
     {
-        private string TemporaryExtension = ".tmp";
+        public const string TemporaryExtension = ".tmp";
         public int ChapterNumber { get; }
         public int ListingNumber { get; }
         public string ListingSuffix { get; }
         public string ListingDescription { get; }
         public string TemporaryPath { get; }
-        public string Path { get => TemporaryPath.Remove(TemporaryPath.Length - TemporaryExtension.Length, TemporaryExtension.Length); }
+        public string Path => TemporaryPath.Remove(TemporaryPath.Length - TemporaryExtension.Length, TemporaryExtension.Length);
 
         public ListingInformation(string listingPath)
         {

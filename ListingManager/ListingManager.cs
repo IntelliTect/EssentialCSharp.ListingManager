@@ -66,12 +66,12 @@ namespace ListingManager
                 }).ToList();
             foreach (string path in allListings)
             {
-                File.Copy(path, $"{path}.tmp", true);
+                File.Copy(path, $"{path}.{ListingInformation.TemporaryExtension}", true);
                 File.Delete(path);
             }
-            allListings = FileManager.GetAllFilesAtPath($"{pathToChapter}")
+            allListings = FileManager.GetAllFilesAtPath(pathToChapter)
                 .OrderBy(x => x)
-                .Where(x => Path.GetExtension(x) == ".tmp").ToList();
+                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             var testListingData = new List<ListingInformation?>();
             List<string> allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
@@ -84,18 +84,18 @@ namespace ListingManager
                 }).ToList();
             foreach (string path in allTestListings)
             {
-                File.Copy(path, $"{path}.tmp", true);
+                File.Copy(path, $"{path}.{ListingInformation.TemporaryExtension}", true);
                 File.Delete(path);
             }
             allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
                 .OrderBy(x => x)
-                .Where(x => Path.GetExtension(x) == ".tmp").ToList();
+                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             for (int i = 0, listingNumber = 1; i < allListings.Count; i++, listingNumber++)
             {
                 if (allListings.Count != listingData.Count)
                 {
-                    throw new InvalidOperationException("The number of listing data and allListings doesn't match, possibly .tmp files exist in your directory already.");
+                    throw new InvalidOperationException($"The number of listing data and allListings doesn't match, possibly {ListingInformation.TemporaryExtension} files exist in your directory already.");
                 }
                 string cur = allListings[i];
 
@@ -188,7 +188,10 @@ namespace ListingManager
                 Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
             }
 
-            if (!preview) UpdateNamespaceOfPath(path, newNamespace, newFileName);
+            if (!preview)
+            {
+                UpdateNamespaceOfPath(path, newNamespace, newFileName);
+            }
         }
 
         /// <summary>
@@ -206,10 +209,11 @@ namespace ListingManager
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
 
-            string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
+            const string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
             string paddedListingNumber;
             if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
-            { //allows for keeping the original listing number with a suffix. e.g. "01A"   
+            {
+            //allows for keeping the original listing number with a suffix. e.g. "01A"   
                 paddedListingNumber = listingNumber.PadLeft(3, '0');
             }
             else
