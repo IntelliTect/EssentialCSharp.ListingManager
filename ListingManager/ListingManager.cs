@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -55,8 +56,6 @@ namespace ListingManager
             bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false)
         {
             var listingData = new List<ListingInformation?>();
-
-
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
                 .OrderBy(x => x)
                 .Where(x =>
@@ -65,15 +64,52 @@ namespace ListingManager
                     if (result) listingData.Add(data);
                     return result;
                 }).ToList();
+            foreach (string path in allListings)
+            {
+                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
+                File.Delete(path);
+            }
+            allListings = FileManager.GetAllFilesAtPath(pathToChapter)
+                .OrderBy(x => x)
+                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
+
+            var testListingData = new List<ListingInformation?>();
+            List<string> allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+                .OrderBy(x => x)
+                .Where(x =>
+                {
+                    bool result = TryGetListing(x, out var data);
+                    if (result) testListingData.Add(data);
+                    return result;
+                }).ToList();
+            foreach (string path in allTestListings)
+            {
+                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
+                File.Delete(path);
+            }
+            allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+                .OrderBy(x => x)
+                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             for (int i = 0, listingNumber = 1; i < allListings.Count; i++, listingNumber++)
             {
+                if (allListings.Count != listingData.Count)
+                {
+                    throw new InvalidOperationException($"The number of listing data and allListings doesn't match, possibly {ListingInformation.TemporaryExtension} files exist in your directory already.");
+                }
                 string cur = allListings[i];
 
-                var curListingData = listingData[i];
-                
+                ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
 
-                if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { continue; } //default
+
+                if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber) { 
+                    File.Copy(curListingData?.TemporaryPath, curListingData?.Path, true);
+                    if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation currentTestListingData)
+                    {
+                        File.Copy(currentTestListingData?.TemporaryPath, currentTestListingData?.Path, true);
+                    }
+                    continue;
+                } //default
 
                 string completeListingNumber = listingNumber + ""; //default
                 int listingChapterNumber = curListingData.ChapterNumber; //default
@@ -91,16 +127,24 @@ namespace ListingManager
 
                 UpdateListingNamespace(cur, listingChapterNumber,
                     completeListingNumber,
-                    curListingData.ListingDescription, verbose, preview);
+                    curListingData.ListingDescription, curListingData, verbose, preview);
 
-                if (GetPathToAccompanyingUnitTest(cur, out string pathToTest))
+                if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
                 {
                     Console.Write("Updating test. ");
-                    UpdateListingNamespace(pathToTest, listingChapterNumber,
+                    UpdateListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
                         completeListingNumber,
-                        string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", verbose, preview);
+                        string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", curListingData, verbose, preview);
                 }
 
+            }
+            foreach (string path in allListings)
+            {
+                File.Delete(path);
+            }
+            foreach (string path in allTestListings)
+            {
+                File.Delete(path);
             }
         }
 
@@ -122,10 +166,11 @@ namespace ListingManager
         /// <param name="chapterNumber">The chapter the listing belongs to</param>
         /// <param name="listingNumber">The updated listing number</param>
         /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
+        /// <param name="curListingData"></param>
         /// <param name="verbose">When true, enables verbose console output</param>
         /// <param name="preview">When true, leaves files in place and only print console output</param>
-        private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
-            string listingData, bool verbose = false, bool preview = false)
+        private static void UpdateTestListingNamespace(string path, int chapterNumber, string listingNumber,
+            string listingData, ListingInformation curListingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
 
@@ -133,6 +178,54 @@ namespace ListingManager
             string paddedListingNumber = "";
             if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
             { //allows for keeping the original listing number with a suffix. e.g. "01A"   
+                paddedListingNumber = listingNumber.PadLeft(3, '0');
+            }
+            else
+            {
+                paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
+            }
+
+            string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
+            string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
+                                  $".Chapter{paddedChapterNumber}" +
+                                  $".Listing{paddedChapterNumber}_" +
+                                  $"{paddedListingNumber}.Tests";
+            string newFileName = string.Format(newFileNameTemplate,
+                paddedChapterNumber,
+                paddedListingNumber,
+                string.IsNullOrWhiteSpace(listingData) || string.IsNullOrEmpty(listingData) ? "" : $".{listingData}");
+
+            if (verbose)
+            {
+                Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
+            }
+
+            if (!preview)
+            {
+                UpdateNamespaceOfPath(path, newNamespace, newFileName);
+            }
+        }
+
+        /// <summary>
+        /// Updates the namespace and file name of the listing at <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">The path to the target listing</param>
+        /// <param name="chapterNumber">The chapter the listing belongs to</param>
+        /// <param name="listingNumber">The updated listing number</param>
+        /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
+        /// <param name="verbose">When true, enables verbose console output</param>
+        /// <param name="preview">When true, leaves files in place and only print console output</param>
+        /// <param name="curListingData">An instance of ListingInformation for the current listing.</param>
+        private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
+            string listingData, ListingInformation curListingData, bool verbose = false, bool preview = false)
+        {
+            string paddedChapterNumber = chapterNumber.ToString("00");
+
+            const string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
+            string paddedListingNumber;
+            if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
+            {
+            //allows for keeping the original listing number with a suffix. e.g. "01A"   
                 paddedListingNumber = listingNumber.PadLeft(3, '0');
             }
             else
@@ -160,15 +253,13 @@ namespace ListingManager
 
         private static void UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
         {
-            if (Path.GetExtension(path) != ".cs")
+            if (Path.GetExtension(path) != ".tmp")
             {
                 return;
             }
 
             // read file into memory
             string[] allLinesInFile = File.ReadAllLines(path);
-
-            File.Delete(path);
 
             string targetPath = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, newFileName) ?? path;
 
@@ -192,7 +283,7 @@ namespace ListingManager
         {
             string testDirectory = $"{Path.GetDirectoryName(listingPath)}.Tests";
 
-            Regex regex = new Regex(@"((Listing\d{2}\.\d{2})([A-Z]?)((\.Tests)?)).*\.cs$");
+            Regex regex = new Regex(@"((Listing\d{2}\.\d{2})([A-Z]?)((\.Tests)?)).*\.cs.tmp$");
 
             Match fileNameMatch = regex.Match(listingPath);
 
