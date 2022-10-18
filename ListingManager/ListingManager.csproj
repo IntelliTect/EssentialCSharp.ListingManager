@@ -40,7 +40,7 @@
 		</PackageReference>
 	</ItemGroup>
     <ItemGroup>
-      <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22114.1" />
+      <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
 	      <PrivateAssets>all</PrivateAssets>
 	      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
