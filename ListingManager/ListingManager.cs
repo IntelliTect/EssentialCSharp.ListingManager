@@ -132,7 +132,7 @@ namespace ListingManager
                 if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
                 {
                     Console.Write("Updating test. ");
-                    UpdateListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
+                    UpdateTestListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
                         completeListingNumber,
                         string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", curListingData, verbose, preview);
                 }
@@ -193,7 +193,7 @@ namespace ListingManager
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
-                string.IsNullOrWhiteSpace(listingData) || string.IsNullOrEmpty(listingData) ? "" : $".{listingData}");
+                ".Tests");
 
             if (verbose)
             {

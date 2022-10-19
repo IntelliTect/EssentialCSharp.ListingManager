@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -22,6 +22,10 @@ namespace ListingManager
             bool byFolder = false,
             bool chapterOnly = false)
         {
+            while (path.EndsWith("\\"))
+            {
+                path = path.Remove(path.Length - 1, 1);
+            }
             Console.WriteLine(IntelliTect);
 
             if (preview)
