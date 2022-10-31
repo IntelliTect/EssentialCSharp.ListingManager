@@ -269,7 +269,14 @@ namespace ListingManager
                 {
                     if (line.StartsWith("namespace"))
                     {
-                        textWriter.WriteLine("namespace " + newNamespace);
+                        if (line.TrimEnd().EndsWith(";"))
+                        {
+                            textWriter.WriteLine("namespace " + newNamespace + ";");
+                        }
+                        else
+                        {
+                            textWriter.WriteLine("namespace " + newNamespace);
+                        }
                     }
                     else
                     {
