@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>netcoreapp3.1; net7.0</TargetFrameworks>
+        <TargetFramework>net7.0</TargetFramework>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>ListingManager</ToolCommandName>
 		<RepositoryType>git</RepositoryType>
@@ -32,8 +32,8 @@
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="../README.md" Pack="true" PackagePath="\"/>
-		<SourceRoot Include="$(MSBuildThisFileDirectory)/"/>
+		<None Include="../README.md" Pack="true" PackagePath="\" />
+		<SourceRoot Include="$(MSBuildThisFileDirectory)/" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
