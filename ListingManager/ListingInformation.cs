@@ -15,7 +15,7 @@ namespace ListingManager
 
         public ListingInformation(string listingPath)
         {
-            Regex regex = new Regex(@"Listing(\d{2}).(\d{2})([A-Za-z]*)(\.{1}(.*))?.cs$");
+            Regex regex = new(@"Listing(\d{2}).(\d{2})([A-Za-z]*)(\.{1}(.*))?.cs$");
 
             var matches = regex.Match(listingPath);
 
@@ -31,7 +31,7 @@ namespace ListingManager
             }
             else
             {
-                throw new ArgumentException(nameof(listingPath));
+                throw new ArgumentException("Listing information not successfully able to be parsed from listing path.", nameof(listingPath));
             }
         }
     }

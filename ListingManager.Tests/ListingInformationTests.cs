@@ -14,7 +14,7 @@ namespace ListingManager.Tests
         public void Constructor_GivenValidListings_PropertiesPopulatedSuccessfully(string listing,
             int chapterNumber, int listingNumber, string suffix, string description)
         {
-            ListingInformation listingInformation = new ListingInformation(listing);
+            ListingInformation listingInformation = new(listing);
 
             Assert.AreEqual(chapterNumber, listingInformation.ChapterNumber);
             Assert.AreEqual(listingNumber, listingInformation.ListingNumber);
