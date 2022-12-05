@@ -134,7 +134,7 @@ namespace ListingManager
                     Console.Write("Updating test. ");
                     UpdateTestListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
                         completeListingNumber,
-                        string.IsNullOrEmpty(curListingData.ListingDescription) ? "Tests" : curListingData.ListingDescription + ".Tests", curListingData, verbose, preview);
+                        curListingData.ListingDescription, curListingData, verbose, preview);
                 }
 
             }
@@ -190,10 +190,12 @@ namespace ListingManager
                                   $".Chapter{paddedChapterNumber}" +
                                   $".Listing{paddedChapterNumber}_" +
                                   $"{paddedListingNumber}.Tests";
+
+            string suffix = string.IsNullOrEmpty(listingData) ? "Tests" : listingData + ".Tests";
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
-                ".Tests");
+                $".{suffix}");
 
             if (verbose)
             {
@@ -241,7 +243,7 @@ namespace ListingManager
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
-                string.IsNullOrWhiteSpace(listingData) || string.IsNullOrEmpty(listingData) ? "" : $".{listingData}");
+                string.IsNullOrWhiteSpace(listingData) ? "" : $".{listingData}");
 
             if (verbose)
             {
