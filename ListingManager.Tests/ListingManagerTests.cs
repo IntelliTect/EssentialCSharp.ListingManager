@@ -65,7 +65,7 @@ namespace ListingManager.Tests
         [Ignore]
         public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
         {
-            List<string> filesToMake = new List<string>
+            List<string> filesToMake = new()
             {
                 "Listing01.01.SpecifyingLiteralValues.cs",
                 "Listing01.02.cs",
@@ -73,7 +73,7 @@ namespace ListingManager.Tests
                 "Listing01.06.Something.cs"
             };
 
-            List<string> expectedFiles = new List<string>
+            List<string> expectedFiles = new()
             {
                 "Listing01.01.SpecifyingLiteralValues.cs",
                 "Listing01.02.cs",
@@ -81,7 +81,7 @@ namespace ListingManager.Tests
                 "Listing01.04.Something.cs"
             };
 
-            List<string> toWrite = new List<string>
+            List<string> toWrite = new()
             {
                 "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
                 "{",
@@ -559,7 +559,7 @@ namespace ListingManager.Tests
         {
             string chapter = "Chapter01";
 
-            List<string> filesToCreate = new List<string>
+            List<string> filesToCreate = new()
             {
                 @"Listing01.01.Something.cs",
                 @"Listing01.02A.cs",
@@ -609,7 +609,7 @@ namespace ListingManager.Tests
             IEnumerable<string>? toWrite)
         {
             List<string> filesToWrite = toWrite?.ToList() ?? new List<string>();
-            List<FileInfo> ret = new List<FileInfo>();
+            List<FileInfo> ret = new();
             foreach (string file in fileNames)
             {
                 ret.Add(WriteFile(targetDirectory, file, filesToWrite));
