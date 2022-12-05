@@ -249,7 +249,6 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void UpdateChapterListingNumbers_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
         {
             ICollection<string> filesToMake = new List<string>
@@ -274,7 +273,7 @@ namespace ListingManager.Tests
                 @"Chapter01\Listing01.04.cs",
                 @"Chapter01\Listing01.05.cs",
                 @"Chapter01.Tests\Listing01.01.Tests.cs",
-                @"Chapter01.Tests\Listing01.02.Tests.cs",
+                @"Chapter01.Tests\Listing01.02.Some.Tests.cs",
                 @"Chapter01.Tests\Listing01.03.Tests.cs",
                 @"Chapter01.Tests\Listing01.04.Tests.cs",
                 @"Chapter01.Tests\Listing01.05.Tests.cs"
@@ -330,7 +329,7 @@ namespace ListingManager.Tests
                 @"Chapter42\Listing42.04.cs",
                 @"Chapter42\Listing42.05.cs",
                 @"Chapter42.Tests\Listing42.01.Tests.cs",
-                @"Chapter42.Tests\Listing42.02.Tests.cs",
+                @"Chapter42.Tests\Listing42.02.Some.Tests.cs",
                 @"Chapter42.Tests\Listing42.03.Tests.cs",
                 @"Chapter42.Tests\Listing42.04.Tests.cs",
                 @"Chapter42.Tests\Listing42.05.Tests.cs"
@@ -361,6 +360,7 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void
         UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestAndListingPairingIsMaintained_ListingsAndTestsUpdated()
         {
@@ -480,7 +480,6 @@ namespace ListingManager.Tests
 
 
         [TestMethod]
-        [Ignore]
         public void
             UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
         {
@@ -506,7 +505,7 @@ namespace ListingManager.Tests
                 @"Chapter42\Listing42.01C.cs",
                 @"Chapter42\Listing42.05.cs",
                 @"Chapter42.Tests\Listing42.01.Tests.cs",
-                @"Chapter42.Tests\Listing42.01A.Tests.cs",
+                @"Chapter42.Tests\Listing42.01A.Some.Tests.cs",
                 @"Chapter42.Tests\Listing42.01B.Tests.cs",
                 @"Chapter42.Tests\Listing42.01C.Tests.cs",
                 @"Chapter42.Tests\Listing42.05.Tests.cs"
