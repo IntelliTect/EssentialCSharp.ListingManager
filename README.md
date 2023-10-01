@@ -11,6 +11,10 @@ Run `dotnet tool update -g IntelliTect.EssentialCSharp.ListingManager`. This wil
 
 # Usage
 
+**Currently there are bugs in this program and the main usage should be the following: `ListingManager.exe --path <DirectoryOfTheChapter> --mode ListingUpdating`**
+
+The rest will hopefully be fixed better in the future. It can be used, but may break
+
 Any command can be run with these optional parameters.
 
 - `verbose` -> provides more detail into what the command is doing
