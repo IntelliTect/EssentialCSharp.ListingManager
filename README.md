@@ -9,11 +9,13 @@ Run `dotnet tool install IntelliTect.EssentialCSharp.ListingManager -g`. This wi
 
 Run `dotnet tool update -g IntelliTect.EssentialCSharp.ListingManager`. This will update the Nupkg for use globally.
 
-# Usage
+# Current State
 
 **Currently there are bugs in this program and the main usage should be the following: `ListingManager.exe --path <DirectoryOfTheChapter> --mode ListingUpdating`**
 
 The rest will hopefully be fixed better in the future. It can be used, but may break
+
+# Usage
 
 Any command can be run with these optional parameters.
 
