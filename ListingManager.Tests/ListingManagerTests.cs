@@ -549,39 +549,6 @@ namespace ListingManager.Tests
             Assert.AreEqual($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
         }
 
-        [TestMethod]
-        [Ignore]
-        public void GenerateUnitTests_TestsGenerated()
-        {
-            string chapter = "Chapter01";
-
-            List<string> filesToCreate = new()
-            {
-                @"Listing01.01.Something.cs",
-                @"Listing01.02A.cs",
-                @"Listing01.03B.Other.cs"
-            };
-
-            var tempDir = CreateTempDirectory();
-            var chapterDir = CreateTempDirectory(tempDir, name: chapter);
-            var expectedFilesList = new List<string>();
-            foreach (string file in filesToCreate)
-            {
-                expectedFilesList.Add(@"Chapter01.Tests\" + file);
-            }
-
-            var expectedFiles = (ICollection<string>)expectedFilesList;
-            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
-
-            WriteFiles(chapterDir, filesToCreate, null);
-
-            var generatedTests = ListingManager.GenerateUnitTests(
-                chapterDir.FullName);
-
-            CollectionAssert.AreEquivalent((ICollection)expectedFiles, (ICollection)generatedTests);
-        }
-
-
         private IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
             DirectoryInfo? targetDirectory)
         {

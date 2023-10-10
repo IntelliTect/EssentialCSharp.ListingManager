@@ -38,14 +38,6 @@ NOTE: It is highly recommended that you commit and push your changes before runn
 run this command with `--preview` and `--verbose` specified to ensure there are no adverse affects. Once you are confident
 that the proposed changes are what you want, you can run the command without the `--preview` modifier.
 
-For help with the creation of missing unit tests in a chapter run 
-`ListingManager -path "user/EssentialCSharp/src/Chapter03/" -mode TestGeneration`. This will find missing tests and
-generate a unit test with the correct imports, filename, and namespace so you can just focus on proper assertions within
-the test. From the interactive prompt `INTL>` you can provide any of the following options followed by enter.
-- `d` -> deletes the previously generated test and continues
-- `q` -> leaves the previously generated test as is and exits
-- enter -> leaves previously genertaed test as is and continues
-
 To find potentially mismatched listings in a chapter run, 
 `ListingManager -path "user/EssentialCSharp/src/Chapter03/" -mode ScanForMismatchedListings`. Potentially mismatched listings
 will be printed to the console.
