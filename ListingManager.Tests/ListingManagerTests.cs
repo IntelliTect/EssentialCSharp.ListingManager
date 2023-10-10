@@ -62,7 +62,6 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
         {
             List<string> filesToMake = new()
@@ -93,7 +92,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -101,7 +100,6 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void UpdateChapterListingNumbers_ListingAtBeginningOfListMissing_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -130,7 +128,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -139,7 +137,6 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void UpdateChapterListingNumbers_MultipleListingsMissing_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -196,7 +193,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -239,7 +236,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, default, default, default, default, true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
