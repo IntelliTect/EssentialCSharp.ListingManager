@@ -360,7 +360,6 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void
         UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestAndListingPairingIsMaintained_ListingsAndTestsUpdated()
         {
@@ -433,25 +432,25 @@ namespace ListingManager.Tests
                 @"Chapter01\Listing01.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
                 @"Chapter01\Listing01.21.CommentingYourCode.cs",
                 @"Chapter01\Listing01.22.SampleCILOutput.cs",
-                @"Chapter01.Tests\Listing01.01.Tests.cs",
-                @"Chapter01.Tests\Listing01.03.Tests.cs",
-                @"Chapter01.Tests\Listing01.04.Tests.cs",
-                @"Chapter01.Tests\Listing01.05.Tests.cs",
-                @"Chapter01.Tests\Listing01.06.Tests.cs",
-                @"Chapter01.Tests\Listing01.08.Tests.cs",
-                @"Chapter01.Tests\Listing01.09.Tests.cs",
-                @"Chapter01.Tests\Listing01.10.Tests.cs",
-                @"Chapter01.Tests\Listing01.11.Tests.cs",
-                @"Chapter01.Tests\Listing01.12.Tests.cs",
-                @"Chapter01.Tests\Listing01.13.Tests.cs",
-                @"Chapter01.Tests\Listing01.14.Tests.cs",
-                @"Chapter01.Tests\Listing01.15.Tests.cs",
-                @"Chapter01.Tests\Listing01.16.Tests.cs",
-                @"Chapter01.Tests\Listing01.17.Tests.cs",
-                @"Chapter01.Tests\Listing01.18.Tests.cs",
-                @"Chapter01.Tests\Listing01.19.Tests.cs",
-                @"Chapter01.Tests\Listing01.20.Tests.cs",
-                @"Chapter01.Tests\Listing01.21.Tests.cs"
+                @"Chapter01.Tests\Listing01.01.HelloWorldInC#.Tests.cs",
+                @"Chapter01.Tests\Listing01.03.MultipleStatementsOneOneLine.Tests.cs",
+                @"Chapter01.Tests\Listing01.04.MultipleStatementsOnSeparateLines.Tests.cs",
+                @"Chapter01.Tests\Listing01.05.SplittingAStatementAcrossMultipleLines.Tests.cs",
+                @"Chapter01.Tests\Listing01.06.HelloWorldInC#.Tests.cs",
+                @"Chapter01.Tests\Listing01.08.BreakingApartHelloWorld.Tests.cs",
+                @"Chapter01.Tests\Listing01.09.TheMainMethodWithParametersAndAReturn.Tests.cs",
+                @"Chapter01.Tests\Listing01.10.NoIndentationFormatting.Tests.cs",
+                @"Chapter01.Tests\Listing01.11.RemovingWhitespace.Tests.cs",
+                @"Chapter01.Tests\Listing01.12.DeclaringAndAssigningAVariable.Tests.cs",
+                @"Chapter01.Tests\Listing01.13.DeclaringTwoVariablesWithinOneStatement.Tests.cs",
+                @"Chapter01.Tests\Listing01.14.ChangingTheValueOfAVariable.Tests.cs",
+                @"Chapter01.Tests\Listing01.15.AssignmentReturningAValueThatCanBeassignedAgain.Tests.cs",
+                @"Chapter01.Tests\Listing01.16.UsingSystemConsoleReadLine.Tests.cs",
+                @"Chapter01.Tests\Listing01.17.UsingSystemConsoleRead.Tests.cs",
+                @"Chapter01.Tests\Listing01.18.FormattingUsingStringInterpolation.Tests.cs",
+                @"Chapter01.Tests\Listing01.19.FormattingUsingCompositeFormatting.Tests.cs",
+                @"Chapter01.Tests\Listing01.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.Tests.cs",
+                @"Chapter01.Tests\Listing01.21.CommentingYourCode.Tests.cs",
             };
 
             IEnumerable<string> toWrite = new List<string>
@@ -520,6 +519,7 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
+
             var tempDir = CreateTempDirectory();
             var chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
             CreateTempDirectory(tempDir, name: "Chapter42.Tests");
