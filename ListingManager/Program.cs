@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 
 namespace ListingManager
@@ -61,11 +60,6 @@ namespace ListingManager
                     Console.WriteLine($"Mode ({mode}) does not exist. Exiting");
                     break;
             }
-        }
-
-        private static void InteractiveConsoleWrite(string toWrite, string userOptions)
-        {
-            Console.Write(InteractivePromptPrefix, toWrite, userOptions);
         }
     }
 }

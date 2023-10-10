@@ -321,13 +321,6 @@ namespace ListingManager
             return false;
         }
 
-        private static string GetTestLayout(string chapterNumber, string listingNumber)
-        {
-            return string.Format(TestHeaderLayout,
-                       chapterNumber.PadLeft(2, '0'),
-                       listingNumber.PadLeft(2, '0')) + TestBodyLayout;
-        }
-
         private static readonly string TestHeaderLayout =
 @"using Microsoft.VisualStudio.TestTools.UnitTesting;
 
