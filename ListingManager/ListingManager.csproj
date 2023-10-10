@@ -13,7 +13,7 @@
         <PackageId>IntelliTect.EssentialCSharp.ListingManager</PackageId>
         <Description>Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <LangVersion>10</LangVersion>
+        <LangVersion>11</LangVersion>
         <Nullable>enable</Nullable>
         <NoWarn>CS1591</NoWarn>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
