@@ -52,7 +52,7 @@ namespace ListingManager
         /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
         /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false)
+            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
         {
             var listingData = new List<ListingInformation?>();
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
@@ -73,22 +73,27 @@ namespace ListingManager
                 .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             var testListingData = new List<ListingInformation?>();
-            List<string> allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-                .OrderBy(x => x)
-                .Where(x =>
-                {
-                    bool result = TryGetListing(x, out var data);
-                    if (result) testListingData.Add(data);
-                    return result;
-                }).ToList();
-            foreach (string path in allTestListings)
+
+            List<string> allTestListings = Array.Empty<string>().ToList();
+            if (!singleDir)
             {
-                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
-                File.Delete(path);
+                allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+                    .OrderBy(x => x)
+                    .Where(x =>
+                    {
+                        bool result = TryGetListing(x, out var data);
+                        if (result) testListingData.Add(data);
+                        return result;
+                    }).ToList();
+                foreach (string path in allTestListings)
+                {
+                    File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
+                    File.Delete(path);
+                }
+                allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+                    .OrderBy(x => x)
+                    .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
             }
-            allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-                .OrderBy(x => x)
-                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             for (int i = 0, listingNumber = 1; i < allListings.Count; i++, listingNumber++)
             {
@@ -117,7 +122,6 @@ namespace ListingManager
                 if (chapterOnly)
                 {
                     completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix + "";
-
                 }
 
                 if (byFolder)
@@ -136,15 +140,17 @@ namespace ListingManager
                         completeListingNumber,
                         curListingData.ListingDescription, verbose, preview);
                 }
-
             }
             foreach (string path in allListings)
             {
                 File.Delete(path);
             }
-            foreach (string path in allTestListings)
+            if (!singleDir)
             {
-                File.Delete(path);
+                foreach (string path in allTestListings)
+                {
+                    File.Delete(path);
+                }
             }
         }
 

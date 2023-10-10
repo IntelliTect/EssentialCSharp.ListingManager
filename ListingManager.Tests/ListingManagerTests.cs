@@ -205,7 +205,6 @@ namespace ListingManager.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void UpdateChapterListingNumbers_AdditionalListings_ListingsRenumbered()
         {
             ICollection<string> filesToMake = new List<string>
@@ -240,7 +239,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, default, default, default, default, true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
