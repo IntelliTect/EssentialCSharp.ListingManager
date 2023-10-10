@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 
 namespace ListingManager
@@ -48,14 +47,6 @@ namespace ListingManager
                     Console.WriteLine($"Updating listing namespaces of: {path}");
                     ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly);
                     break;
-                case ListingModes.TestGeneration:
-                    var generatedTests
-                        = ListingManager.GenerateUnitTests(path, TestGeneration_Interactive, true);
-                    if (verbose)
-                    {
-                        Console.WriteLine($"{generatedTests.Count} tests generated");
-                    }
-                    break;
                 case ListingModes.ScanForMismatchedListings:
                     var extraListings = ListingManager.GetAllExtraListings(path).OrderBy(x => x);
 
@@ -69,30 +60,6 @@ namespace ListingManager
                     Console.WriteLine($"Mode ({mode}) does not exist. Exiting");
                     break;
             }
-        }
-
-        private static bool TestGeneration_Interactive(string missingTest)
-        {
-            InteractiveConsoleWrite("Choose an option", "d - delete, q - quit, enter - continue");
-            string input = Console.ReadLine();
-
-            switch (input)
-            {
-                case "d":
-                    Console.WriteLine("Deleting test");
-                    File.Delete(missingTest);
-                    break;
-                case "q":
-                    Console.WriteLine("Quitting");
-                    return false;
-            }
-
-            return true;
-        }
-
-        private static void InteractiveConsoleWrite(string toWrite, string userOptions)
-        {
-            Console.Write(InteractivePromptPrefix, toWrite, userOptions);
         }
     }
 }

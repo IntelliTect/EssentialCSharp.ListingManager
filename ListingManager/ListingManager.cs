@@ -51,8 +51,9 @@ namespace ListingManager
         /// <param name="preview">When true, leaves files in place and only print console output</param>
         /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
         /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
+        /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false)
+            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
         {
             var listingData = new List<ListingInformation?>();
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
@@ -73,22 +74,27 @@ namespace ListingManager
                 .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             var testListingData = new List<ListingInformation?>();
-            List<string> allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-                .OrderBy(x => x)
-                .Where(x =>
-                {
-                    bool result = TryGetListing(x, out var data);
-                    if (result) testListingData.Add(data);
-                    return result;
-                }).ToList();
-            foreach (string path in allTestListings)
+
+            List<string> allTestListings = Array.Empty<string>().ToList();
+            if (!singleDir)
             {
-                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
-                File.Delete(path);
+                allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+                    .OrderBy(x => x)
+                    .Where(x =>
+                    {
+                        bool result = TryGetListing(x, out var data);
+                        if (result) testListingData.Add(data);
+                        return result;
+                    }).ToList();
+                foreach (string path in allTestListings)
+                {
+                    File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
+                    File.Delete(path);
+                }
+                allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+                    .OrderBy(x => x)
+                    .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
             }
-            allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-                .OrderBy(x => x)
-                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
             for (int i = 0, listingNumber = 1; i < allListings.Count; i++, listingNumber++)
             {
@@ -117,7 +123,6 @@ namespace ListingManager
                 if (chapterOnly)
                 {
                     completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix + "";
-
                 }
 
                 if (byFolder)
@@ -136,15 +141,17 @@ namespace ListingManager
                         completeListingNumber,
                         curListingData.ListingDescription, verbose, preview);
                 }
-
             }
             foreach (string path in allListings)
             {
                 File.Delete(path);
             }
-            foreach (string path in allTestListings)
+            if (!singleDir)
             {
-                File.Delete(path);
+                foreach (string path in allTestListings)
+                {
+                    File.Delete(path);
+                }
             }
         }
 
@@ -315,13 +322,6 @@ namespace ListingManager
             return false;
         }
 
-        private static string GetTestLayout(string chapterNumber, string listingNumber)
-        {
-            return string.Format(TestHeaderLayout,
-                       chapterNumber.PadLeft(2, '0'),
-                       listingNumber.PadLeft(2, '0')) + TestBodyLayout;
-        }
-
         private static readonly string TestHeaderLayout =
 @"using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -340,73 +340,6 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
         }
     }
 }";
-
-        private static IEnumerable<string> GetAllMissingUnitTests(string pathToChapter)
-        {
-            foreach (string file in FileManager.GetAllFilesAtPath(pathToChapter).OrderBy(x => x))
-            {
-                if (!GetPathToAccompanyingUnitTest(file, out string testFileName))
-                {
-                    yield return testFileName;
-                }
-            }
-        }
-
-        public static ICollection<string> GenerateUnitTests(string pathToChapter, Func<string, bool>? action = null,
-            bool verbose = false)
-        {
-            var toReturn = new List<string>();
-
-            var missingTests = GetAllMissingUnitTests(pathToChapter);
-
-            foreach (string missingTestName in missingTests)
-            {
-                if (GenerateUnitTest(missingTestName))
-                {
-                    toReturn.Add(missingTestName);
-                    if (verbose)
-                    {
-                        Console.WriteLine($"Test generated: {missingTestName}");
-                    }
-                }
-
-                if (action == null) continue;
-                bool shouldContinue = action.Invoke(missingTestName);
-
-                if (!shouldContinue)
-                {
-                    break;
-                }
-            }
-
-            return toReturn;
-        }
-
-        private static bool GenerateUnitTest(string pathToTest)
-        {
-            if (File.Exists(pathToTest))
-            {
-                return false;
-            }
-
-            Regex getListingData = new(@"Listing(\d{2})\.(\d{2})");
-
-            var match = getListingData.Match(pathToTest);
-
-            string chapterNumber = match.Groups[1].Value;
-            string listingNumber = match.Groups[2].Value;
-
-            string testDirectory = Path.GetDirectoryName(pathToTest);
-
-            Directory.CreateDirectory(testDirectory);
-
-            using (var writer = File.CreateText(pathToTest))
-            {
-                writer.WriteLine(GetTestLayout(chapterNumber, listingNumber));
-            }
-
-            return true;
-        }
 
         public static string ExecuteBashCommand(string command)
         {
