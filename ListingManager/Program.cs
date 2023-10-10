@@ -45,7 +45,7 @@ namespace ListingManager
             {
                 case ListingModes.ListingUpdating:
                     Console.WriteLine($"Updating listing namespaces of: {path}");
-                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly);
+                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly, onlyCSFiles: true);
                     break;
                 case ListingModes.ScanForMismatchedListings:
                     var extraListings = ListingManager.GetAllExtraListings(path).OrderBy(x => x);

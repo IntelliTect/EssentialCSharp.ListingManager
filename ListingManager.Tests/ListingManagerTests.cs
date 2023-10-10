@@ -92,7 +92,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -128,7 +128,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -193,7 +193,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -236,7 +236,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -290,7 +290,7 @@ namespace ListingManager.Tests
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, onlyCSFiles: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -346,12 +346,12 @@ namespace ListingManager.Tests
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true, onlyCSFiles: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
@@ -464,12 +464,12 @@ namespace ListingManager.Tests
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true, onlyCSFiles: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
@@ -523,12 +523,12 @@ namespace ListingManager.Tests
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName,
-                byFolder: true, chapterOnly: true);
+                byFolder: true, chapterOnly: true, onlyCSFiles: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
@@ -536,16 +536,16 @@ namespace ListingManager.Tests
         public void
             RenumberAllFilesIncludingXML_DontChangeFiles_ListingsAndTestsUpdated()
         {
-            List<string> filesToMake = new List<string>
+            List<string> filesToMake = new()
             {
-                "Chapter18/Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
-                "Chapter18/Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
-                "Chapter18/Listing18.03.csproj.xml",
-                "Chapter18/Listing18.04.DeclaringTheStackClass.cs",
-                "Chapter18/Listing18.05.ReflectionWithGenerics.cs",
-                "Chapter18.Tests/Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
-                "Chapter18.Tests/Listing18.02.Tests.cs",
-                "Chapter18.Tests/Listing18.05.ReflectionWithGenerics.Tests.cs",
+                @"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
+                @"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
+                @"Chapter18\Listing18.03.csproj.xml",
+                @"Chapter18\Listing18.04.DeclaringTheStackClass.cs",
+                @"Chapter18\Listing18.05.ReflectionWithGenerics.cs",
+                @"Chapter18.Tests\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
+                @"Chapter18.Tests\Listing18.02.Tests.cs",
+                @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
             };
             List<string> expectedFiles = filesToMake.ToList();
 
@@ -568,9 +568,9 @@ namespace ListingManager.Tests
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
-                .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+                .Where(x => ListingInformation.approvedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent(expectedFiles, files, $"Files are in dir: {tempDir}");
         }
 

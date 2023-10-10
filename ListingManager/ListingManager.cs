@@ -24,15 +24,21 @@ namespace ListingManager
             }
         }
 
-        private static bool TryGetListing(string listingPath, out ListingInformation? listingData)
+        private static bool TryGetListing(string listingPath, out ListingInformation? listingData, bool onlyCSFiles = false)
         {
             listingData = null;
-
-            if (Path.GetExtension(listingPath) != ".cs") return false;
+            if (onlyCSFiles)
+            {
+                if (Path.GetExtension(listingPath) != ".cs") return false;
+            }
+            else
+            {
+                if (!ListingInformation.approvedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
+            }
 
             try
             {
-                listingData = new ListingInformation(listingPath);
+                listingData = new ListingInformation(listingPath, onlyCSFiles: onlyCSFiles);
             }
             catch (Exception) // don't care about the type of exception here. If things didn't go perfectly, abort
             {
@@ -52,15 +58,16 @@ namespace ListingManager
         /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
         /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
         /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
+        /// <param name="onlyCSFiles">Only update files ending in the .cs extension</param>
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
+            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false, bool onlyCSFiles = false)
         {
-            var listingData = new List<ListingInformation?>();
+            List<ListingInformation?> listingData = new();
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
                 .OrderBy(x => x)
                 .Where(x =>
                 {
-                    bool result = TryGetListing(x, out var data);
+                    bool result = TryGetListing(x, out ListingInformation? data, onlyCSFiles: onlyCSFiles);
                     if (result) listingData.Add(data);
                     return result;
                 }).ToList();
@@ -73,7 +80,7 @@ namespace ListingManager
                 .OrderBy(x => x)
                 .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
-            var testListingData = new List<ListingInformation?>();
+            List<ListingInformation?> testListingData = new();
 
             List<string> allTestListings = Array.Empty<string>().ToList();
             if (!singleDir)
@@ -82,7 +89,7 @@ namespace ListingManager
                     .OrderBy(x => x)
                     .Where(x =>
                     {
-                        bool result = TryGetListing(x, out var data);
+                        bool result = TryGetListing(x, out var data, onlyCSFiles: true);
                         if (result) testListingData.Add(data);
                         return result;
                     }).ToList();
@@ -132,7 +139,7 @@ namespace ListingManager
 
                 UpdateListingNamespace(cur, listingChapterNumber,
                     completeListingNumber,
-                    curListingData.ListingDescription, verbose, preview);
+                    curListingData, verbose, preview);
 
                 if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
                 {
@@ -224,7 +231,7 @@ namespace ListingManager
         /// <param name="verbose">When true, enables verbose console output</param>
         /// <param name="preview">When true, leaves files in place and only print console output</param>
         private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
-            string listingData, bool verbose = false, bool preview = false)
+            ListingInformation listingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
 
@@ -240,7 +247,7 @@ namespace ListingManager
                 paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
             }
 
-            string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
+            string newFileNameTemplate = "Listing{0}.{1}{2}" + listingData.ListingExtension;
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
                                   $".Chapter{paddedChapterNumber}" +
                                   $".Listing{paddedChapterNumber}_" +
@@ -248,7 +255,7 @@ namespace ListingManager
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
-                string.IsNullOrWhiteSpace(listingData) ? "" : $".{listingData}");
+                string.IsNullOrWhiteSpace(listingData.ListingDescription) ? "" : $".{listingData.ListingDescription}");
 
             if (verbose)
             {
@@ -347,7 +354,7 @@ namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Test
             // thanks to this we will pass everything as one command
             command = command.Replace("\"", "\"\"");
 
-            string fileName = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            string fileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "CMD.exe"
                 : "/bin/bash";
 
