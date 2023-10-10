@@ -51,6 +51,7 @@ namespace ListingManager
         /// <param name="preview">When true, leaves files in place and only print console output</param>
         /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
         /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
+        /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
         public static void UpdateChapterListingNumbers(string pathToChapter,
             bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
         {
