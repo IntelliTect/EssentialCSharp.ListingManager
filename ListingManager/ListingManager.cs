@@ -28,7 +28,7 @@ namespace ListingManager
         {
             listingData = null;
 
-                if (!ListingInformation.approvedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
+                if (!ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
 
 
             try

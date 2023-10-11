@@ -568,7 +568,7 @@ namespace ListingManager.Tests
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
-                .Where(x => ListingInformation.approvedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
+                .Where(x => ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
 
             // Assert
             CollectionAssert.AreEquivalent(expectedFiles, files, $"Files are in dir: {tempDir}");

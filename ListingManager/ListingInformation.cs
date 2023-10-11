@@ -7,7 +7,7 @@ namespace ListingManager
 {
     public partial class ListingInformation
     {
-        public static IReadOnlyList<string> approvedFileTypes { get; } = new[] { ".cs", ".xml" };
+        public static IReadOnlyList<string> ApprovedFileTypes { get; } = new[] { ".cs", ".xml" };
         public const string TemporaryExtension = ".tmp";
         public int ChapterNumber { get; }
         public int ListingNumber { get; }
@@ -23,7 +23,7 @@ namespace ListingManager
 
             var matches = regex.Match(listingPath);
 
-            if (approvedFileTypes.Contains(matches.Groups[6].Value.ToLower()) is false) throw new ArgumentException("Listing path is not of an approved file type.", nameof(listingPath));
+            if (ApprovedFileTypes.Contains(matches.Groups[6].Value.ToLower()) is false) throw new ArgumentException("Listing path is not of an approved file type.", nameof(listingPath));
 
             if (int.TryParse(matches.Groups[1].Value, out int chapterNumber)
                 && int.TryParse(matches.Groups[2].Value, out int listingNumber)
