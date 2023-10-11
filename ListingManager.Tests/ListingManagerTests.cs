@@ -28,9 +28,6 @@ public class ListingManagerTests : TempFileTestBase
         bool expectedResult)
     {
         var directory = CreateTempDirectory(name: parentDirectory);
-        var fileInfo = CreateTempFile(directory, fileName, fileName);
-
-        string directoryName = fileInfo.DirectoryName ?? string.Empty;
 
         string path = Path.Combine(directory.FullName, fileName);
 

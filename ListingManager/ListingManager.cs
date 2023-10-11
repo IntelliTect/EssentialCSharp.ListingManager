@@ -11,7 +11,7 @@ namespace EssentialCSharp.ListingManager;
 /// <summary>
 /// A utility class providing means to rename listings, namespaces, and corresponding unit tests.
 /// </summary>
-public static class ListingManager
+public static partial class ListingManager
 {
     public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
     {
@@ -29,7 +29,6 @@ public static class ListingManager
         listingData = null;
 
         if (!ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
-
 
         try
         {
@@ -107,13 +106,12 @@ public static class ListingManager
 
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
 
-
-            if (curListingData is null || !chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber)
+            if (!chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber)
             {
-                File.Copy(curListingData?.TemporaryPath, curListingData?.Path, true);
+                File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
                 if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
                 {
-                    File.Copy(currentTestListingData?.TemporaryPath, currentTestListingData?.Path, true);
+                    File.Copy(currentTestListingData.TemporaryPath, currentTestListingData.Path, true);
                 }
                 continue;
             } //default
@@ -229,9 +227,8 @@ public static class ListingManager
     {
         string paddedChapterNumber = chapterNumber.ToString("00");
 
-        const string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
         string paddedListingNumber;
-        if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
+        if (ListingManager.SingleDigitListingWithSuffix().IsMatch(listingNumber))
         {
             //allows for keeping the original listing number with a suffix. e.g. "01A"   
             paddedListingNumber = listingNumber.PadLeft(3, '0');
@@ -296,7 +293,7 @@ public static class ListingManager
     {
         string testDirectory = $"{Path.GetDirectoryName(listingPath)}.Tests";
 
-        Regex regex = new(@"((Listing\d{2}\.\d{2})([A-Z]?)((\.Tests)?)).*\.cs.tmp$");
+        Regex regex = TemporaryListingTestFile();
 
         Match fileNameMatch = regex.Match(listingPath);
 
@@ -350,4 +347,9 @@ public static class ListingManager
 
         return proc.StandardOutput.ReadToEnd();
     }
+
+    [GeneratedRegex(@"\d{1}[A-Za-z]")]
+    private static partial Regex SingleDigitListingWithSuffix();
+    [GeneratedRegex("((Listing\\d{2}\\.\\d{2})([A-Z]?)((\\.Tests)?)).*\\.cs.tmp$")]
+    private static partial Regex TemporaryListingTestFile();
 }
