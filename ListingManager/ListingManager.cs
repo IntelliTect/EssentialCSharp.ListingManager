@@ -323,25 +323,6 @@ namespace ListingManager
             return false;
         }
 
-        private static readonly string TestHeaderLayout =
-@"using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Tests";
-
-        private static readonly string TestBodyLayout =
-@"
-{
-    [TestClass]
-    public class ProgramTests
-    {
-        [TestMethod]
-        public void UnitTest1()
-        {
-            Assert.Fail();
-        }
-    }
-}";
-
         public static string ExecuteBashCommand(string command)
         {
             // according to: https://stackoverflow.com/a/15262019/637142
