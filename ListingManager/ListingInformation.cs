@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ListingManager
@@ -22,6 +23,8 @@ namespace ListingManager
 
             var matches = regex.Match(listingPath);
 
+            if (approvedFileTypes.Contains(matches.Groups[6].Value.ToLower()) is false) throw new ArgumentException("Listing path is not of an approved file type.", nameof(listingPath));
+
             if (int.TryParse(matches.Groups[1].Value, out int chapterNumber)
                 && int.TryParse(matches.Groups[2].Value, out int listingNumber)
                 && matches.Success)
@@ -40,7 +43,7 @@ namespace ListingManager
         }
 
         // Match any approved files regex: regexr.com/7lfi2
-        [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))?(.cs|.xml)$")]
+        [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.\\w+)$")]
         private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
     }
 }
