@@ -6,7 +6,7 @@ namespace ListingManager
 {
     public partial class ListingInformation
     {
-        public static List<string> approvedFileTypes = new() { ".cs", ".xml" };
+        public static IReadOnlyList<string> approvedFileTypes { get; } = new[] { ".cs", ".xml" };
         public const string TemporaryExtension = ".tmp";
         public int ChapterNumber { get; }
         public int ListingNumber { get; }
@@ -16,11 +16,9 @@ namespace ListingManager
         public string Path => TemporaryPath.Remove(TemporaryPath.Length - TemporaryExtension.Length, TemporaryExtension.Length);
         public string ListingExtension { get; }
 
-        public ListingInformation(string listingPath, bool onlyCSFiles = false)
+        public ListingInformation(string listingPath)
         {
-            // Only match .cs files regex: regexr.com/7lfhv
-            // Match any approved files regex: regexr.com/7lfi2
-            Regex regex = onlyCSFiles ? ExtractListingNameFromCSFile() : ExtractListingNameFromAnyApprovedFileTypes();
+            Regex regex = ExtractListingNameFromAnyApprovedFileTypes();
 
             var matches = regex.Match(listingPath);
 
@@ -41,9 +39,8 @@ namespace ListingManager
             }
         }
 
-        [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))?[.cs,.xml]$")]
+        // Match any approved files regex: regexr.com/7lfi2
+        [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))?(.cs|.xml)$")]
         private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
-        [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))?.cs$")]
-        private static partial Regex ExtractListingNameFromCSFile();
     }
 }

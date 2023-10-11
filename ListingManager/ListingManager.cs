@@ -24,21 +24,16 @@ namespace ListingManager
             }
         }
 
-        private static bool TryGetListing(string listingPath, out ListingInformation? listingData, bool onlyCSFiles = false)
+        private static bool TryGetListing(string listingPath, out ListingInformation? listingData)
         {
             listingData = null;
-            if (onlyCSFiles)
-            {
-                if (Path.GetExtension(listingPath) != ".cs") return false;
-            }
-            else
-            {
+
                 if (!ListingInformation.approvedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
-            }
+
 
             try
             {
-                listingData = new ListingInformation(listingPath, onlyCSFiles: onlyCSFiles);
+                listingData = new ListingInformation(listingPath);
             }
             catch (Exception) // don't care about the type of exception here. If things didn't go perfectly, abort
             {
@@ -58,16 +53,15 @@ namespace ListingManager
         /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
         /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
         /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
-        /// <param name="onlyCSFiles">Only update files ending in the .cs extension</param>
         public static void UpdateChapterListingNumbers(string pathToChapter,
-            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false, bool onlyCSFiles = false)
+            bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
         {
             List<ListingInformation?> listingData = new();
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
                 .OrderBy(x => x)
                 .Where(x =>
                 {
-                    bool result = TryGetListing(x, out ListingInformation? data, onlyCSFiles: onlyCSFiles);
+                    bool result = TryGetListing(x, out ListingInformation? data);
                     if (result) listingData.Add(data);
                     return result;
                 }).ToList();
@@ -89,7 +83,7 @@ namespace ListingManager
                     .OrderBy(x => x)
                     .Where(x =>
                     {
-                        bool result = TryGetListing(x, out var data, onlyCSFiles: true);
+                        bool result = TryGetListing(x, out var data);
                         if (result) testListingData.Add(data);
                         return result;
                     }).ToList();

@@ -92,7 +92,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -128,7 +128,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -193,7 +193,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -236,7 +236,7 @@ namespace ListingManager.Tests
             WriteFiles(TempDirectory, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
             var files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -290,7 +290,7 @@ namespace ListingManager.Tests
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -346,7 +346,7 @@ namespace ListingManager.Tests
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -464,7 +464,7 @@ namespace ListingManager.Tests
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true, onlyCSFiles: true);
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -523,7 +523,7 @@ namespace ListingManager.Tests
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName,
-                byFolder: true, chapterOnly: true, onlyCSFiles: true);
+                byFolder: true, chapterOnly: true);
 
             var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();

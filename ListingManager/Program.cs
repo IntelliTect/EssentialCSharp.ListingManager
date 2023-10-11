@@ -43,7 +43,6 @@ namespace ListingManager
 
             switch (mode)
             {
-                // TODO: Add an option to only update .cs files instead of all "approved" file types. 
                 case ListingModes.ListingUpdating:
                     Console.WriteLine($"Updating listing namespaces of: {path}");
                     ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly, false);
