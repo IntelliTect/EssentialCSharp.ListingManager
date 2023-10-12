@@ -1,4 +1,4 @@
-# ListingManager [![NuGet](https://img.shields.io/nuget/v/IntelliTect.EssentialCSharp.ListingManager.svg)](https://www.nuget.org/packages/IntelliTect.EssentialCSharp.ListingManager/)
+# EssentialCSharp.ListingManager [![NuGet](https://img.shields.io/nuget/v/IntelliTect.EssentialCSharp.ListingManager.svg)](https://www.nuget.org/packages/IntelliTect.EssentialCSharp.ListingManager/)
 Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators
 
 # Installation
@@ -8,12 +8,6 @@ Run `dotnet tool install IntelliTect.EssentialCSharp.ListingManager -g`. This wi
 # Update
 
 Run `dotnet tool update -g IntelliTect.EssentialCSharp.ListingManager`. This will update the Nupkg for use globally.
-
-# Current State
-
-**Currently there are bugs in this program and the main usage should be the following: `ListingManager.exe --path <DirectoryOfTheChapter> --mode ListingUpdating`**
-
-The rest will hopefully be fixed better in the future. It can be used, but may break
 
 # Usage
 
