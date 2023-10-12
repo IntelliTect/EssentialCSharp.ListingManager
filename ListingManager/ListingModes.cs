@@ -1,9 +1,8 @@
-namespace ListingManager
+namespace EssentialCSharp.ListingManager;
+
+public enum ListingModes
 {
-    public enum ListingModes
-    {
-        ListingUpdating = 0,
-        TestGeneration = 1,
-        ScanForMismatchedListings = 2
-    }
+    ListingUpdating = 0,
+    TestGeneration = 1,
+    ScanForMismatchedListings = 2
 }
