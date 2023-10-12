@@ -1,4 +1,3 @@
-using EssentialCSharp.ListingManager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EssentialCSharp.ListingManager.Tests;

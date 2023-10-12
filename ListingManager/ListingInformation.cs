@@ -41,12 +41,8 @@ public partial class ListingInformation
             throw new ArgumentException("Listing information not successfully able to be parsed from listing path.", nameof(listingPath));
         }
     }
-    else
-    {
-        throw new ArgumentException("Listing information not successfully able to be parsed from listing path.", nameof(listingPath));
+    // Match any approved files regex: regexr.com/7lfi2
+    [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.(\\w+))$")]
+    private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
 }
 
-// Match any approved files regex: regexr.com/7lfi2
-[GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.(\\w+))$")]
-private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
-}
