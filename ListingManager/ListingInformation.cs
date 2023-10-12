@@ -34,7 +34,7 @@ namespace ListingManager
                 ListingSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
                 ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : "";
                 TemporaryPath = listingPath + TemporaryExtension;
-                ListingExtension = System.IO.Path.GetExtension(listingPath);
+                ListingExtension = matches.Groups[6].Value;
             }
             else
             {
