@@ -28,7 +28,8 @@ namespace ListingManager
         {
             listingData = null;
 
-            if (Path.GetExtension(listingPath) != ".cs") return false;
+            if (!ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
+
 
             try
             {
@@ -55,12 +56,12 @@ namespace ListingManager
         public static void UpdateChapterListingNumbers(string pathToChapter,
             bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
         {
-            var listingData = new List<ListingInformation?>();
+            List<ListingInformation?> listingData = new();
             List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
                 .OrderBy(x => x)
                 .Where(x =>
                 {
-                    bool result = TryGetListing(x, out var data);
+                    bool result = TryGetListing(x, out ListingInformation? data);
                     if (result) listingData.Add(data);
                     return result;
                 }).ToList();
@@ -73,7 +74,7 @@ namespace ListingManager
                 .OrderBy(x => x)
                 .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
 
-            var testListingData = new List<ListingInformation?>();
+            List<ListingInformation?> testListingData = new();
 
             List<string> allTestListings = Array.Empty<string>().ToList();
             if (!singleDir)
@@ -132,7 +133,7 @@ namespace ListingManager
 
                 UpdateListingNamespace(cur, listingChapterNumber,
                     completeListingNumber,
-                    curListingData.ListingDescription, verbose, preview);
+                    curListingData, verbose, preview);
 
                 if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
                 {
@@ -224,7 +225,7 @@ namespace ListingManager
         /// <param name="verbose">When true, enables verbose console output</param>
         /// <param name="preview">When true, leaves files in place and only print console output</param>
         private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
-            string listingData, bool verbose = false, bool preview = false)
+            ListingInformation listingData, bool verbose = false, bool preview = false)
         {
             string paddedChapterNumber = chapterNumber.ToString("00");
 
@@ -240,7 +241,7 @@ namespace ListingManager
                 paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
             }
 
-            string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
+            string newFileNameTemplate = "Listing{0}.{1}{2}" + listingData.ListingExtension;
             string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
                                   $".Chapter{paddedChapterNumber}" +
                                   $".Listing{paddedChapterNumber}_" +
@@ -248,7 +249,7 @@ namespace ListingManager
             string newFileName = string.Format(newFileNameTemplate,
                 paddedChapterNumber,
                 paddedListingNumber,
-                string.IsNullOrWhiteSpace(listingData) ? "" : $".{listingData}");
+                string.IsNullOrWhiteSpace(listingData.ListingDescription) ? "" : $".{listingData.ListingDescription}");
 
             if (verbose)
             {
@@ -322,32 +323,13 @@ namespace ListingManager
             return false;
         }
 
-        private static readonly string TestHeaderLayout =
-@"using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter{0}.Listing{0}_{1}.Tests";
-
-        private static readonly string TestBodyLayout =
-@"
-{
-    [TestClass]
-    public class ProgramTests
-    {
-        [TestMethod]
-        public void UnitTest1()
-        {
-            Assert.Fail();
-        }
-    }
-}";
-
         public static string ExecuteBashCommand(string command)
         {
             // according to: https://stackoverflow.com/a/15262019/637142
             // thanks to this we will pass everything as one command
             command = command.Replace("\"", "\"\"");
 
-            string fileName = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            string fileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "CMD.exe"
                 : "/bin/bash";
 

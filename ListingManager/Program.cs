@@ -13,8 +13,6 @@ namespace ListingManager
  _| |_| | | | ||  __/ | | |  | |  __/ (__| |_ 
 |_____|_| |_|\__\___|_|_|_|  |_|\___|\___|\__|";
 
-        private const string InteractivePromptPrefix = "INTL {0} ({1})>";
-
         public static void Main(string path = "", ListingModes mode = ListingModes.ListingUpdating,
             bool verbose = false,
             bool preview = false,
@@ -45,7 +43,7 @@ namespace ListingManager
             {
                 case ListingModes.ListingUpdating:
                     Console.WriteLine($"Updating listing namespaces of: {path}");
-                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly);
+                    ListingManager.UpdateChapterListingNumbers(path, verbose, preview, byFolder, chapterOnly, false);
                     break;
                 case ListingModes.ScanForMismatchedListings:
                     var extraListings = ListingManager.GetAllExtraListings(path).OrderBy(x => x);

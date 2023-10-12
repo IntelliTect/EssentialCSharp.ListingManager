@@ -49,7 +49,7 @@ namespace ListingManager.Tests
                 @"Listing02.03C.cs"
             };
 
-            var tempDir = CreateTempDirectory(name: "Chapter02");
+            DirectoryInfo tempDir = CreateTempDirectory(name: "Chapter02");
             ICollection<string> expectedFiles = filesToMake;
             expectedFiles.Remove(@"Listing02.02.cs");
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
@@ -94,7 +94,7 @@ namespace ListingManager.Tests
 
             ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
-            var files = Directory.EnumerateFiles(TempDirectory.FullName)
+            List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
             CollectionAssert.AreEquivalent(expectedFiles, files);
         }
@@ -130,7 +130,7 @@ namespace ListingManager.Tests
 
             ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
-            var files = Directory.EnumerateFiles(TempDirectory.FullName)
+            List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
@@ -195,7 +195,7 @@ namespace ListingManager.Tests
 
             ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
-            var files = Directory.EnumerateFiles(TempDirectory.FullName)
+            List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
@@ -238,7 +238,7 @@ namespace ListingManager.Tests
 
             ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
-            var files = Directory.EnumerateFiles(TempDirectory.FullName)
+            List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
@@ -284,15 +284,15 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            var tempDir = CreateTempDirectory();
-            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
+            DirectoryInfo tempDir = CreateTempDirectory();
+            DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
             CreateTempDirectory(tempDir, name: "Chapter01.Tests");
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
 
-            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
@@ -340,18 +340,18 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            var tempDir = CreateTempDirectory();
-            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+            DirectoryInfo tempDir = CreateTempDirectory();
+            DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
             CreateTempDirectory(tempDir, name: "Chapter42.Tests");
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
-            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
@@ -458,18 +458,18 @@ namespace ListingManager.Tests
                 "    public class Program { }",
                 "}"
             };
-            var tempDir = CreateTempDirectory();
-            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
+            DirectoryInfo tempDir = CreateTempDirectory();
+            DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
             CreateTempDirectory(tempDir, name: "Chapter01.Tests");
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
-            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
@@ -516,8 +516,8 @@ namespace ListingManager.Tests
                 "}"
             };
 
-            var tempDir = CreateTempDirectory();
-            var chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+            DirectoryInfo tempDir = CreateTempDirectory();
+            DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
             CreateTempDirectory(tempDir, name: "Chapter42.Tests");
             WriteFiles(tempDir, filesToMake, toWrite);
             expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
@@ -525,13 +525,56 @@ namespace ListingManager.Tests
             ListingManager.UpdateChapterListingNumbers(chapterDir.FullName,
                 byFolder: true, chapterOnly: true);
 
-            var files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
                 .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-            //Assert
+            // Assert
             CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
         }
 
+        [TestMethod]
+        public void RenumberAllFilesIncludingXML_DontChangeFiles_ListingsAndTestsUpdated()
+        {
+            // Make sure csproj file is created, but doesn't get renumbered (is ignored)
+            List<string> filesToMake = new()
+            {
+                @"Chapter18.csproj",
+                @"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
+                @"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
+                @"Chapter18\Listing18.03.csproj.xml",
+                @"Chapter18\Listing18.04.DeclaringTheStackClass.cs",
+                @"Chapter18\Listing18.05.ReflectionWithGenerics.cs",
+                @"Chapter18.Tests\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
+                @"Chapter18.Tests\Listing18.02.Tests.cs",
+                @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
+            };
+            List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
+            Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+
+            IEnumerable<string> toWrite = new List<string>
+            {
+                "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+                "{",
+                "    using System;",
+                "    using System.Reflection;",
+                "    public class Program { }",
+                "}"
+            };
+
+            DirectoryInfo tempDir = CreateTempDirectory();
+            DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
+            CreateTempDirectory(tempDir, name: "Chapter18.Tests");
+            WriteFiles(tempDir, filesToMake, toWrite);
+            expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+            ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+
+            List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+                .Where(x => ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
+
+            // Assert
+            CollectionAssert.AreEquivalent(expectedFiles, files, $"Files are in dir: {tempDir}");
+        }
 
         [TestMethod]
         [DataRow("Chapter01", "Listing01.01A.cs")]

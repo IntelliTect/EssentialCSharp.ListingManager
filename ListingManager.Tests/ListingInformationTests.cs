@@ -23,5 +23,24 @@ namespace ListingManager.Tests
 
             Assert.AreEqual(description ?? "", listingInformation.ListingDescription);
         }
+
+        [TestMethod]
+        [DataRow("Listing01.01.cs")]
+        [DataRow("Listing05.04.Something.xml")]
+        [DataRow("Listing05.04.Something.XML")]
+        public void Constructor_GivenValidListingFileTypes_CreatesNewListingInformation(string listing)
+        {
+            ListingInformation listingInformation = new(listing);
+            Assert.IsNotNull(listingInformation);
+            Assert.AreEqual(System.IO.Path.GetExtension(listing), listingInformation.ListingExtension);
+        }
+
+        [TestMethod]
+        [DataRow("Listing01.02.something.txt")]
+        [DataRow("Listing01.02A.csproj")]
+        public void Constructor_GivenInvalidListingFileTypes_ThrowsArgumentException(string listing)
+        {
+            Assert.ThrowsException<System.ArgumentException>(() => new ListingInformation(listing));
+        }
     }
 }
