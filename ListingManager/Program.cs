@@ -40,15 +40,26 @@ public class Program
             name: "--chapteronly",
             description: "");
 
-        var listingUpdating = new Command("update", "Updates namespaces and filenames for all lisitngs and accompanying tests within a chapter") { directoryIn, verboseOption, previewOption, byFolderOption, chapterOnlyOption };
+        var listingUpdating = new Command("update", "Updates namespaces and filenames for all lisitngs and accompanying tests within a chapter")
+        {
+            directoryIn,
+            verboseOption,
+            previewOption,
+            byFolderOption,
+            chapterOnlyOption
+        };
 
         // Give better description when intent and functionality becomes more flushed out
-        var ScanForMismatchedListings = new Command("scan", "Scans for mismatched listings") { directoryIn };
+        var scanForMismatchedListings = new Command("scan", "Scans for mismatched listings")
+        {
+            directoryIn
+        };
+
 
         var rootCommand = new RootCommand()
         {
             listingUpdating,
-            ScanForMismatchedListings
+            scanForMismatchedListings
         };
 
         listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder, chapterOnly) =>
@@ -60,7 +71,7 @@ public class Program
             ListingManager.UpdateChapterListingNumbers(directoryIn!.FullName, verbose, preview, byFolder, chapterOnly, false);
         }, directoryIn, verboseOption, previewOption, byFolderOption, chapterOnlyOption);
 
-        ScanForMismatchedListings.SetHandler((directoryIn) =>
+        scanForMismatchedListings.SetHandler((directoryIn) =>
         {
             Console.WriteLine(IntelliTect);
             var extraListings = ListingManager.GetAllExtraListings(directoryIn!.FullName).OrderBy(x => x);
