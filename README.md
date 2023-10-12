@@ -26,14 +26,14 @@ Run `ListingManager` from the command line.
 For available commands run `ListingManager -h`. This will display all the commands available to you.
 
 To update Listings at a path provide the Chapter's path and specify the `ListingUpdating` mode.
-`ListingManager -path "user/EssentialCSharp/src/Chapter03/" -mode ListingUpdating` or 
-`ListingManager -path "user/EssentialCSharp/src/Chapter03/"`
+`ListingManager --path "user/EssentialCSharp/src/Chapter03/" --mode ListingUpdating` or 
+`ListingManager --path "user/EssentialCSharp/src/Chapter03/"`
 NOTE: It is highly recommended that you commit and push your changes before running this command. Additionally you should 
 run this command with `--preview` and `--verbose` specified to ensure there are no adverse affects. Once you are confident
 that the proposed changes are what you want, you can run the command without the `--preview` modifier.
 
 To find potentially mismatched listings in a chapter run, 
-`ListingManager -path "user/EssentialCSharp/src/Chapter03/" -mode ScanForMismatchedListings`. Potentially mismatched listings
+`ListingManager --path "user/EssentialCSharp/src/Chapter03/" --mode ScanForMismatchedListings`. Potentially mismatched listings
 will be printed to the console.
 
 To run all chapters in powershell from ListingManager directory,
