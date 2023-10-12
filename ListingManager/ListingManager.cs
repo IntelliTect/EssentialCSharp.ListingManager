@@ -135,10 +135,16 @@ public static partial class ListingManager
 
             if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
             {
-                Console.Write("Updating test. ");
-                UpdateTestListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
-                    completeListingNumber,
-                    curListingData.ListingDescription, verbose, preview);
+                if (verbose)
+                {
+                    Console.WriteLine($"Updating namespace for test {curTestListingData.ChapterNumber}.{curTestListingData.ListingNumber}");
+                }
+                if (!preview)
+                {
+                    UpdateTestListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
+                        completeListingNumber,
+                        curListingData.ListingDescription, verbose, preview);
+                }
             }
         }
         foreach (string path in allListings)
@@ -202,10 +208,7 @@ public static partial class ListingManager
             paddedListingNumber,
             $".{suffix}");
 
-        if (verbose)
-        {
-            Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
-        }
+        Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
 
         if (!preview)
         {
@@ -248,10 +251,7 @@ public static partial class ListingManager
             paddedListingNumber,
             string.IsNullOrWhiteSpace(listingData.ListingDescription) ? "" : $".{listingData.ListingDescription}");
 
-        if (verbose)
-        {
-            Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
-        }
+        Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
 
         if (!preview) UpdateNamespaceOfPath(path, newNamespace, newFileName);
     }
