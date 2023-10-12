@@ -55,6 +55,7 @@ public static partial class ListingManager
     public static void UpdateChapterListingNumbers(string pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
     {
+        bool isGitRepo = LibGit2Sharp.Repository.IsValid(pathToChapter);
         List<ListingInformation?> listingData = new();
         List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
             .OrderBy(x => x)
@@ -88,8 +89,15 @@ public static partial class ListingManager
                 }).ToList();
             foreach (string path in allTestListings)
             {
-                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
-                File.Delete(path);
+                if (isGitRepo)
+                {
+
+                }
+                else
+                {
+                    File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
+                    File.Delete(path);
+                }
             }
             allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
                 .OrderBy(x => x)
