@@ -5,14 +5,20 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using LibGit2Sharp;
 
 namespace EssentialCSharp.ListingManager;
 
 /// <summary>
 /// A utility class providing means to rename listings, namespaces, and corresponding unit tests.
 /// </summary>
-public static partial class ListingManager
+public partial class ListingManager
 {
+    public ListingManager()
+    {
+    }
+    public bool IsGitRepo { get; set; }
+
     public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
     {
         foreach (string file in FileManager.GetAllFilesAtPath(pathToStartFrom, true))
@@ -52,10 +58,10 @@ public static partial class ListingManager
     /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
     /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
     /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
-    public static void UpdateChapterListingNumbers(string pathToChapter,
+    public void UpdateChapterListingNumbers(string pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
     {
-        bool isGitRepo = LibGit2Sharp.Repository.IsValid(pathToChapter);
+        IsGitRepo = Repository.IsValid(pathToChapter);
         List<ListingInformation?> listingData = new();
         List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
             .OrderBy(x => x)
@@ -67,8 +73,15 @@ public static partial class ListingManager
             }).ToList();
         foreach (string path in allListings)
         {
-            File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
-            File.Delete(path);
+            if (IsGitRepo)
+            {
+                Commands.Move(repo, path, $"{path}{ListingInformation.TemporaryExtension}");
+            }
+            else
+            {
+                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
+                File.Delete(path);
+            }
         }
         allListings = FileManager.GetAllFilesAtPath(pathToChapter)
             .OrderBy(x => x)
@@ -89,9 +102,9 @@ public static partial class ListingManager
                 }).ToList();
             foreach (string path in allTestListings)
             {
-                if (isGitRepo)
+                if (IsGitRepo)
                 {
-
+                    Commands.Move(repo, path, $"{path}{ListingInformation.TemporaryExtension}");
                 }
                 else
                 {
@@ -119,7 +132,14 @@ public static partial class ListingManager
                 File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
                 if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
                 {
-                    File.Copy(currentTestListingData.TemporaryPath, currentTestListingData.Path, true);
+                    if (IsGitRepo)
+                    {
+                        Commands.Move(repo, currentTestListingData.TemporaryPath, currentTestListingData.Path);
+                    }
+                    else
+                    {
+                        File.Copy(currentTestListingData.TemporaryPath, currentTestListingData.Path, true);
+                    }
                 }
                 continue;
             } //default
@@ -239,7 +259,7 @@ public static partial class ListingManager
         string paddedChapterNumber = chapterNumber.ToString("00");
 
         string paddedListingNumber;
-        if (ListingManager.SingleDigitListingWithSuffix().IsMatch(listingNumber))
+        if (SingleDigitListingWithSuffix().IsMatch(listingNumber))
         {
             //allows for keeping the original listing number with a suffix. e.g. "01A"   
             paddedListingNumber = listingNumber.PadLeft(3, '0');
