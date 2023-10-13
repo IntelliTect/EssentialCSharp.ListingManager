@@ -1,4 +1,6 @@
+using LibGit2Sharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +11,10 @@ namespace EssentialCSharp.ListingManager.Tests;
 [TestClass]
 public class ListingManagerTests : TempFileTestBase
 {
+    // Create the committer's signature and commit
+    Signature author = new Signature("IntellitectTestingBot", "info@intellitect.com", DateTime.Now);
+
+    #region IsExtraListing
     [TestMethod]
     [DataRow("Listing02.01.SpecifyingLiteralValues.cs", false)]
     [DataRow("Listing02.01A.SpecifyingLiteralValues.cs", true)]
@@ -35,6 +41,7 @@ public class ListingManagerTests : TempFileTestBase
 
         Assert.AreEqual(expectedResult, actualResult);
     }
+    #endregion IsExtraListing
 
     [TestMethod]
     public void GetAllExtraListings_ExtraListingsReturned()
@@ -58,6 +65,58 @@ public class ListingManagerTests : TempFileTestBase
         CollectionAssert.AreEquivalent((ICollection)expectedFiles, extraListings);
     }
 
+    #region UpdateChapterListingNumbers
+    #region GitStorageManager
+    [TestMethod]
+    public void UpdateChapterListingNumbers_GitStorageManager_ListingsWithinListMissing_ListingsRenumbered()
+    {
+        List<string> filesToMake = new()
+        {
+            "Listing01.01.SpecifyingLiteralValues.cs",
+            "Listing01.02.cs",
+            "Listing01.04.cs",
+            "Listing01.06.Something.cs"
+        };
+
+        List<string> expectedFiles = new()
+        {
+            "Listing01.01.SpecifyingLiteralValues.cs",
+            "Listing01.02.cs",
+            "Listing01.03.cs",
+            "Listing01.04.Something.cs"
+        };
+
+        List<string> toWrite = new()
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+        WriteFiles(TempDirectory, filesToMake, toWrite);
+        expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
+
+        string rootedPath = Repository.Init(TempDirectory.FullName);
+        //Assert.AreEqual(rootedPath, TempDirectory.FullName);
+        using (var repo = new Repository(TempDirectory.FullName))
+        {
+            Commands.Stage(repo, "*");
+
+            // Commit to the repository
+            repo.Commit("Here's a commit i made!", author, author);
+        }
+
+        ListingManager listingManager = new(TempDirectory.FullName, new GitStorageManager(TempDirectory.FullName));
+        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+
+        List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+        CollectionAssert.AreEquivalent(expectedFiles, files);
+    }
+    #endregion GitStorageManager
+    #region UsingOSStorageManager
     [TestMethod]
     public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
     {
@@ -299,7 +358,6 @@ public class ListingManagerTests : TempFileTestBase
 
         CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
     }
-
 
     [TestMethod]
     public void
@@ -580,6 +638,8 @@ public class ListingManagerTests : TempFileTestBase
         // Assert
         CollectionAssert.AreEquivalent(expectedFiles, files, $"Files are in dir: {tempDir}");
     }
+    #endregion UsingOSStorageManager
+    #endregion UpdateChapterListingNumbers
 
     [TestMethod]
     [DataRow("Chapter01", "Listing01.01A.cs")]

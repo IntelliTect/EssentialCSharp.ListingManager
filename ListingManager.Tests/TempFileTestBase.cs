@@ -31,7 +31,6 @@ public abstract class TempFileTestBase : IDisposable
     protected DirectoryInfo TempDirectory => _WorkingDirectory.Value;
     private bool _Disposed;
 
-
     private FileInfo CreateTempFileWithContent(DirectoryInfo? parentDirectory, string? name = null, byte[]? fileContents = null, string? extension = null)
     {
         var tempFile = new FileInfo(GetPath(parentDirectory, name, extension, false));
@@ -113,10 +112,19 @@ public abstract class TempFileTestBase : IDisposable
             fsi.Refresh();
             if (!fsi.Exists) continue;
 
+            fsi.DeleteReadOnly();
             Action? action = fsi switch
             {
                 FileInfo file => () => file.Delete(),
-                DirectoryInfo dir => () => dir.Delete(recursive: true),
+                DirectoryInfo dir => () =>
+                {
+                    if (dir.Exists)
+                    {
+
+                        dir.Delete(recursive: true);
+                    }
+                }
+                ,
                 _ => null,
             };
 
