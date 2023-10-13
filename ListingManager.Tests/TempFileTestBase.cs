@@ -113,35 +113,6 @@ public abstract class TempFileTestBase : IDisposable
             if (!fsi.Exists) continue;
 
             fsi.DeleteReadOnly();
-            Action? action = fsi switch
-            {
-                FileInfo file => () => file.Delete(),
-                DirectoryInfo dir => () =>
-                {
-                    if (dir.Exists)
-                    {
-
-                        dir.Delete(recursive: true);
-                    }
-                }
-                ,
-                _ => null,
-            };
-
-            if (action is null) continue;
-
-            aggregator.Run(() =>
-            {
-                Policy
-                    .Handle<Exception>()
-                    .WaitAndRetry(retryCount: 100, _ => TimeSpan.FromMilliseconds(10))
-                    .Execute(action);
-            });
-        }
-
-        if (aggregator.HasExceptions)
-        {
-            throw aggregator.ToException();
         }
     }
 
