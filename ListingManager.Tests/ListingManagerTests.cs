@@ -89,7 +89,7 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
-        ListingManager listingManager = new();
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
@@ -126,7 +126,7 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new();
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
@@ -192,7 +192,7 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new();
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
@@ -236,10 +236,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new();
-        Assert.IsFalse(listingManager.IsGitRepo);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
-        Assert.IsFalse(listingManager.IsGitRepo);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -293,10 +291,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new();
-        Assert.IsFalse(listingManager.IsGitRepo);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
-        Assert.IsFalse(listingManager.IsGitRepo);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -352,10 +348,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new();
-        Assert.IsFalse(listingManager.IsGitRepo);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
-        Assert.IsFalse(listingManager.IsGitRepo);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -473,10 +467,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new();
-        Assert.IsFalse(listingManager.IsGitRepo);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
-        Assert.IsFalse(listingManager.IsGitRepo);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -534,11 +526,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new();
-        Assert.IsFalse(listingManager.IsGitRepo);
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName,
-            byFolder: true, chapterOnly: true);
-        Assert.IsFalse(listingManager.IsGitRepo);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true, chapterOnly: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -582,10 +571,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new();
-        Assert.IsFalse(listingManager.IsGitRepo);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
-        Assert.IsFalse(listingManager.IsGitRepo);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();

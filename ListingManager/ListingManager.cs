@@ -14,10 +14,17 @@ namespace EssentialCSharp.ListingManager;
 /// </summary>
 public partial class ListingManager
 {
-    public ListingManager()
+    public IStorageManager StorageManager { get; }
+
+    public ListingManager(string pathToChapter)
     {
+        StorageManager = Repository.IsValid(pathToChapter) ? new GitStorageManager(pathToChapter) : new OSStorageManager();
     }
-    public bool IsGitRepo { get; set; }
+
+    public ListingManager(string pathToChapter, IStorageManager storageManager)
+    {
+        StorageManager = storageManager;
+    }
 
     public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
     {
@@ -61,7 +68,6 @@ public partial class ListingManager
     public void UpdateChapterListingNumbers(string pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
     {
-        IsGitRepo = Repository.IsValid(pathToChapter);
         List<ListingInformation?> listingData = new();
         List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
             .OrderBy(x => x)
@@ -73,15 +79,7 @@ public partial class ListingManager
             }).ToList();
         foreach (string path in allListings)
         {
-            if (IsGitRepo)
-            {
-                Commands.Move(repo, path, $"{path}{ListingInformation.TemporaryExtension}");
-            }
-            else
-            {
-                File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
-                File.Delete(path);
-            }
+                StorageManager.Move(path, $"{path}{ListingInformation.TemporaryExtension}");
         }
         allListings = FileManager.GetAllFilesAtPath(pathToChapter)
             .OrderBy(x => x)
@@ -102,15 +100,7 @@ public partial class ListingManager
                 }).ToList();
             foreach (string path in allTestListings)
             {
-                if (IsGitRepo)
-                {
-                    Commands.Move(repo, path, $"{path}{ListingInformation.TemporaryExtension}");
-                }
-                else
-                {
-                    File.Copy(path, $"{path}{ListingInformation.TemporaryExtension}", true);
-                    File.Delete(path);
-                }
+                    StorageManager.Move(path, $"{path}{ListingInformation.TemporaryExtension}");
             }
             allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
                 .OrderBy(x => x)
@@ -132,14 +122,7 @@ public partial class ListingManager
                 File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
                 if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
                 {
-                    if (IsGitRepo)
-                    {
-                        Commands.Move(repo, currentTestListingData.TemporaryPath, currentTestListingData.Path);
-                    }
-                    else
-                    {
-                        File.Copy(currentTestListingData.TemporaryPath, currentTestListingData.Path, true);
-                    }
+                    StorageManager.Move(currentTestListingData.TemporaryPath, currentTestListingData.Path);
                 }
                 continue;
             } //default
