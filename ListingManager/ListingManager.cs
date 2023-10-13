@@ -119,6 +119,7 @@ public partial class ListingManager
 
             if (!chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber)
             {
+                // TODO: redo renaming logic to handle using StorageManager.Move
                 File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
                 if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
                 {
@@ -329,34 +330,6 @@ public partial class ListingManager
         pathToTest = $"{testDirectory}{Path.DirectorySeparatorChar}{Path.GetFileName(listingPath)}";
 
         return false;
-    }
-
-    public static string ExecuteBashCommand(string command)
-    {
-        // according to: https://stackoverflow.com/a/15262019/637142
-        // thanks to this we will pass everything as one command
-        command = command.Replace("\"", "\"\"");
-
-        string fileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? "CMD.exe"
-            : "/bin/bash";
-
-        var proc = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = "-c \"" + command + "\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            }
-        };
-
-        proc.Start();
-        proc.WaitForExit();
-
-        return proc.StandardOutput.ReadToEnd();
     }
 
     [GeneratedRegex(@"\d{1}[A-Za-z]")]
