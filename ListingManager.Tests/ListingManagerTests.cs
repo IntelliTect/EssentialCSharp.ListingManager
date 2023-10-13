@@ -100,20 +100,25 @@ public class ListingManagerTests : TempFileTestBase
 
         string rootedPath = Repository.Init(TempDirectory.FullName);
         //Assert.AreEqual(rootedPath, TempDirectory.FullName);
-        using (var repo = new Repository(TempDirectory.FullName))
-        {
-            Commands.Stage(repo, "*");
+        using var repo = new Repository(TempDirectory.FullName);
 
-            // Commit to the repository
-            repo.Commit("Here's a commit i made!", author, author);
-        }
+        Commands.Stage(repo, "*");
+
+        // Commit to the repository
+        repo.Commit("Here's a commit i made!", author, author);
 
         ListingManager listingManager = new(TempDirectory.FullName, new GitStorageManager(TempDirectory.FullName));
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
-
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
         CollectionAssert.AreEquivalent(expectedFiles, files);
+
+        Commands.Stage(repo, "*");
+        repo.RetrieveStatus();
+        Assert.AreEqual(FileStatus.Unaltered, repo.RetrieveStatus(files[0]));
+        Assert.AreEqual(FileStatus.Unaltered, repo.RetrieveStatus(files[1]));
+        Assert.AreEqual(FileStatus.RenamedInIndex, repo.RetrieveStatus(files[2]));
+        Assert.AreEqual(FileStatus.RenamedInIndex, repo.RetrieveStatus(files[3]));
     }
     #endregion GitStorageManager
     #region UsingOSStorageManager
