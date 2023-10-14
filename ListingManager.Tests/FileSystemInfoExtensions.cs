@@ -6,8 +6,8 @@ namespace EssentialCSharp.ListingManager.Tests
     {
         public static void DeleteReadOnly(this FileSystemInfo fileSystemInfo)
         {
-            var directoryInfo = fileSystemInfo as DirectoryInfo;
-            if (directoryInfo != null)
+            DirectoryInfo? directoryInfo = fileSystemInfo as DirectoryInfo;
+            if (directoryInfo is not null)
             {
                 foreach (FileSystemInfo childInfo in directoryInfo.GetFileSystemInfos())
                 {

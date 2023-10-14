@@ -68,46 +68,11 @@ public partial class ListingManager
     public void UpdateChapterListingNumbers(string pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool chapterOnly = false, bool singleDir = false)
     {
-        List<ListingInformation?> listingData = new();
-        List<string> allListings = FileManager.GetAllFilesAtPath(pathToChapter)
-            .OrderBy(x => x)
-            .Where(x =>
-            {
-                bool result = TryGetListing(x, out ListingInformation? data);
-                if (result) listingData.Add(data);
-                return result;
-            }).ToList();
-        foreach (string path in allListings)
-        {
-                StorageManager.Move(path, $"{path}{ListingInformation.TemporaryExtension}");
-        }
-        allListings = FileManager.GetAllFilesAtPath(pathToChapter)
-            .OrderBy(x => x)
-            .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
-
-        List<ListingInformation?> testListingData = new();
-
-        List<string> allTestListings = Array.Empty<string>().ToList();
-        if (!singleDir)
-        {
-            allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-                .OrderBy(x => x)
-                .Where(x =>
-                {
-                    bool result = TryGetListing(x, out var data);
-                    if (result) testListingData.Add(data);
-                    return result;
-                }).ToList();
-            foreach (string path in allTestListings)
-            {
-                    StorageManager.Move(path, $"{path}{ListingInformation.TemporaryExtension}");
-            }
-            allTestListings = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-                .OrderBy(x => x)
-                .Where(x => Path.GetExtension(x) == ListingInformation.TemporaryExtension).ToList();
-        }
-
-        for (int i = 0, listingNumber = 1; i < allListings.Count; i++, listingNumber++)
+        List<ListingInformation> listingData = PopulateListingDataFromPath(pathToChapter, singleDir);
+        List<string> allListings = new();
+        List<ListingInformation> testListingData = new();
+        List<string> allTestListings = new();
+        for (int i = 0, listingNumber = 1; i < listingData.Count; i++, listingNumber++)
         {
             if (allListings.Count != listingData.Count)
             {
@@ -120,7 +85,8 @@ public partial class ListingManager
             if (!chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber)
             {
                 // TODO: redo renaming logic to handle using StorageManager.Move
-                File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
+                //File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
+                StorageManager.Move(curListingData.TemporaryPath, curListingData.Path);
                 if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
                 {
                     StorageManager.Move(currentTestListingData.TemporaryPath, currentTestListingData.Path);
@@ -170,17 +136,6 @@ public partial class ListingManager
                 File.Delete(path);
             }
         }
-    }
-
-    public static bool IsExtraListing(string path,
-        string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
-    {
-        Regex fileNameRegex = new(regexNamespace);
-
-        string directoryNameFull = Path.GetDirectoryName(path) ?? string.Empty;
-        string directoryName = Path.GetFileName(directoryNameFull);
-
-        return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
     }
 
     /// <summary>
@@ -330,6 +285,62 @@ public partial class ListingManager
         pathToTest = $"{testDirectory}{Path.DirectorySeparatorChar}{Path.GetFileName(listingPath)}";
 
         return false;
+    }
+
+    public static List<ListingInformation> PopulateListingDataFromPath(string pathToChapter, bool singleDir)
+    {
+        List<ListingInformation> listingData = new();
+        var listingFiles = FileManager.GetAllFilesAtPath(pathToChapter)
+            .OrderBy(x => x).ToList();
+        foreach (string fileName in listingFiles)
+        {
+            bool result = TryGetListing(fileName, out ListingInformation? data);
+            if (result)
+            {
+                if (data is not null)
+                {
+                    listingData.Add(data);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Listing data is unexpectedly null with a successful result");
+                }
+            }
+        }
+
+        if (!singleDir)
+        {
+            var listingTestFiles = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
+    .OrderBy(x => x).ToList();
+            foreach (string fileName in listingTestFiles)
+            {
+                bool result = TryGetListing(fileName, out ListingInformation? data);
+                if (result)
+                {
+                    if (data is not null)
+                    {
+                        ListingInformation? associatedListing = listingData.Where(x => x?.ListingNumber == data?.ListingNumber && x?.ChapterNumber == data?.ChapterNumber).First().AssociatedTest = data;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Listing data is unexpectedly null with a successful result");
+                    }
+                }
+            }
+        }
+
+        return listingData;
+    }
+
+    public static bool IsExtraListing(string path,
+        string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
+    {
+        Regex fileNameRegex = new(regexNamespace);
+
+        string directoryNameFull = Path.GetDirectoryName(path) ?? string.Empty;
+        string directoryName = Path.GetFileName(directoryNameFull);
+
+        return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
     }
 
     [GeneratedRegex(@"\d{1}[A-Za-z]")]

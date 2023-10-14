@@ -13,9 +13,11 @@ public partial class ListingInformation
     public int ListingNumber { get; }
     public string ListingSuffix { get; }
     public string ListingDescription { get; }
-    public string TemporaryPath { get; }
-    public string Path => TemporaryPath.Remove(TemporaryPath.Length - TemporaryExtension.Length, TemporaryExtension.Length);
+    public string TemporaryPath => Path + TemporaryExtension;
+    public string Path { get; }
     public string ListingExtension { get; }
+    public string FileContents { get; set; }
+    public ListingInformation? AssociatedTest { get; set; }
 
     public ListingInformation(string listingPath)
     {
@@ -33,8 +35,9 @@ public partial class ListingInformation
             ListingNumber = listingNumber;
             ListingSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
             ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : "";
-            TemporaryPath = listingPath + TemporaryExtension;
+            Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
+            FileContents = System.IO.File.ReadAllText(listingPath);
         }
         else
         {
