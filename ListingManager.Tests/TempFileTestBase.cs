@@ -91,6 +91,38 @@ public abstract class TempFileTestBase : IDisposable
         return Path.Combine(directory.FullName, fileName);
     }
 
+    public IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
+        DirectoryInfo? targetDirectory)
+    {
+        var fullPaths = new List<string>();
+
+        foreach (string fileName in fileNamesToConvert)
+        {
+            fullPaths.Add(Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName));
+        }
+
+        return fullPaths;
+    }
+
+    public FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)
+    {
+        var ret = CreateTempFile(targetDirectory, name: fileName, contents: toWrite.ToString());
+        return ret;
+    }
+
+    public List<FileInfo> WriteFiles(DirectoryInfo targetDirectory, IEnumerable<string> fileNames,
+        IEnumerable<string>? toWrite)
+    {
+        List<string> filesToWrite = toWrite?.ToList() ?? new List<string>();
+        List<FileInfo> ret = new();
+        foreach (string file in fileNames)
+        {
+            ret.Add(WriteFile(targetDirectory, file, filesToWrite));
+        }
+
+        return ret;
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (_Disposed || !disposing)

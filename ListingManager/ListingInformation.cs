@@ -9,8 +9,35 @@ public partial class ListingInformation
 {
     public static IReadOnlyList<string> ApprovedFileTypes { get; } = new[] { ".cs", ".xml" };
     public const string TemporaryExtension = ".tmp";
-    public int ChapterNumber { get; }
-    public int ListingNumber { get; }
+    private int newListingNumber;
+    private int newChapterNumber;
+
+    public bool Changed { get; private set; }
+    public int OriginalChapterNumber { get; }
+    public int OriginalListingNumber { get; }
+    public int NewChapterNumber
+    {
+        get => newChapterNumber; 
+        set
+        {
+            if (value != OriginalChapterNumber)
+            {
+                Changed = true;
+            }
+            newChapterNumber = value;
+        }
+    }
+    public int NewListingNumber {
+        get => newListingNumber; 
+        set
+        {
+            if (value != OriginalListingNumber)
+            {
+                Changed = true;
+            }
+            newListingNumber = value;
+        }
+    }
     public string ListingSuffix { get; }
     public string ListingDescription { get; }
     public string TemporaryPath => Path + TemporaryExtension;
@@ -31,8 +58,8 @@ public partial class ListingInformation
             && int.TryParse(matches.Groups[2].Value, out int listingNumber)
             && matches.Success)
         {
-            ChapterNumber = chapterNumber;
-            ListingNumber = listingNumber;
+            OriginalChapterNumber = NewChapterNumber = chapterNumber;
+            OriginalListingNumber = NewListingNumber = listingNumber;
             ListingSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
             ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : "";
             Path = listingPath;

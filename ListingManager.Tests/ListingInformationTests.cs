@@ -16,8 +16,8 @@ public class ListingInformationTests
     {
         ListingInformation listingInformation = new(listing);
 
-        Assert.AreEqual(chapterNumber, listingInformation.ChapterNumber);
-        Assert.AreEqual(listingNumber, listingInformation.ListingNumber);
+        Assert.AreEqual(chapterNumber, listingInformation.OriginalChapterNumber);
+        Assert.AreEqual(listingNumber, listingInformation.OriginalListingNumber);
 
         Assert.AreEqual(suffix ?? "", listingInformation.ListingSuffix);
 

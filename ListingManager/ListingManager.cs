@@ -74,32 +74,32 @@ public partial class ListingManager
         List<string> allTestListings = new();
         for (int i = 0, listingNumber = 1; i < listingData.Count; i++, listingNumber++)
         {
-            if (allListings.Count != listingData.Count)
-            {
-                throw new InvalidOperationException($"The number of listing data and allListings doesn't match, possibly {ListingInformation.TemporaryExtension} files exist in your directory already.");
-            }
-            string cur = allListings[i];
+            //string cur = allListings[i];
 
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
 
-            if (!chapterOnly && !byFolder && listingNumber == curListingData.ListingNumber)
+            if (!chapterOnly && !byFolder && listingNumber == curListingData.OriginalListingNumber)
             {
                 // TODO: redo renaming logic to handle using StorageManager.Move
                 //File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
-                StorageManager.Move(curListingData.TemporaryPath, curListingData.Path);
-                if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
-                {
-                    StorageManager.Move(currentTestListingData.TemporaryPath, currentTestListingData.Path);
-                }
+                //.Move(curListingData.TemporaryPath, curListingData.Path);
+                //if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
+                //{
+                    //StorageManager.Move(currentTestListingData.TemporaryPath, currentTestListingData.Path);
+                //}
                 continue;
             } //default
 
             string completeListingNumber = listingNumber + ""; //default
-            int listingChapterNumber = curListingData.ChapterNumber; //default
+            int listingChapterNumber = curListingData.OriginalChapterNumber; //default
 
             if (chapterOnly)
             {
-                completeListingNumber = curListingData.ListingNumber + curListingData.ListingSuffix + "";
+                completeListingNumber = curListingData.OriginalListingNumber + curListingData.ListingSuffix + "";
+            }
+            else
+            {
+                curListingData.NewListingNumber = listingNumber;
             }
 
             if (byFolder)
@@ -107,15 +107,15 @@ public partial class ListingManager
                 listingChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
             }
 
-            UpdateListingNamespace(cur, listingChapterNumber,
+            UpdateListingNamespace(curListingData, listingChapterNumber,
                 completeListingNumber,
-                curListingData, verbose, preview);
+                verbose, preview);
 
-            if (testListingData.Where(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
+            if (testListingData.Where(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
             {
                 if (verbose)
                 {
-                    Console.WriteLine($"Updating namespace for test {curTestListingData.ChapterNumber}.{curTestListingData.ListingNumber}");
+                    Console.WriteLine($"Updating namespace for test {curTestListingData.OriginalChapterNumber}.{curTestListingData.OriginalListingNumber}");
                 }
                 if (!preview)
                 {
@@ -186,14 +186,14 @@ public partial class ListingManager
     /// <summary>
     /// Updates the namespace and file name of the listing at <paramref name="path"/>
     /// </summary>
-    /// <param name="path">The path to the target listing</param>
+    /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
     /// <param name="chapterNumber">The chapter the listing belongs to</param>
     /// <param name="listingNumber">The updated listing number</param>
-    /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
     /// <param name="verbose">When true, enables verbose console output</param>
     /// <param name="preview">When true, leaves files in place and only print console output</param>
-    private static void UpdateListingNamespace(string path, int chapterNumber, string listingNumber,
-        ListingInformation listingData, bool verbose = false, bool preview = false)
+    /// 
+    private static void UpdateListingNamespace(ListingInformation listingData, int chapterNumber, string listingNumber,
+        bool verbose = false, bool preview = false)
     {
         string paddedChapterNumber = chapterNumber.ToString("00");
 
@@ -218,9 +218,9 @@ public partial class ListingManager
             paddedListingNumber,
             string.IsNullOrWhiteSpace(listingData.ListingDescription) ? "" : $".{listingData.ListingDescription}");
 
-        Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
+        Console.WriteLine($"Corrective action. {Path.GetFileName(listingData.Path)} rename to {newFileName}");
 
-        if (!preview) UpdateNamespaceOfPath(path, newNamespace, newFileName);
+        if (!preview) UpdateNamespaceOfPath(listingData.Path, newNamespace, newFileName);
     }
 
     private static void UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
@@ -319,7 +319,7 @@ public partial class ListingManager
                 {
                     if (data is not null)
                     {
-                        ListingInformation? associatedListing = listingData.Where(x => x?.ListingNumber == data?.ListingNumber && x?.ChapterNumber == data?.ChapterNumber).First().AssociatedTest = data;
+                        ListingInformation? associatedListing = listingData.Where(x => x?.OriginalListingNumber == data?.OriginalListingNumber && x?.OriginalChapterNumber == data?.OriginalChapterNumber).First().AssociatedTest = data;
                     }
                     else
                     {

@@ -540,7 +540,6 @@ public class ListingManagerTests : TempFileTestBase
         CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
     }
 
-
     [TestMethod]
     public void
         UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
@@ -680,7 +679,7 @@ public class ListingManagerTests : TempFileTestBase
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(TempDirectory.FullName, true);
         Xunit.Assert.Equal(4, listingInformation.Count);
-        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(01, item.ChapterNumber));
+        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(01, item.OriginalChapterNumber));
         Xunit.Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0], listingInformation[0].Path);
         Xunit.Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
     }
@@ -720,16 +719,17 @@ public class ListingManagerTests : TempFileTestBase
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
         Xunit.Assert.Equal(5, listingInformation.Count);
-        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(18, item.ChapterNumber));
+        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(18, item.OriginalChapterNumber));
         Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
         Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
 
         IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
         Xunit.Assert.Equal(3, listingsWithTests.Count);
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.ChapterNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingNumber, listing.AssociatedTest!.ListingNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ChapterNumber, listing.AssociatedTest!.ChapterNumber));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingSuffix, listing.AssociatedTest!.ListingSuffix));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
     #endregion PopulateListingDataFromPath
 
@@ -747,37 +747,5 @@ public class ListingManagerTests : TempFileTestBase
         char directorySeparator = Path.DirectorySeparatorChar;
         Assert.IsFalse(result);
         Assert.AreEqual($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
-    }
-
-    private IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
-        DirectoryInfo? targetDirectory)
-    {
-        var fullPaths = new List<string>();
-
-        foreach (string fileName in fileNamesToConvert)
-        {
-            fullPaths.Add(Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName));
-        }
-
-        return fullPaths;
-    }
-
-    private FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)
-    {
-        var ret = CreateTempFile(targetDirectory, name: fileName, contents: toWrite.ToString());
-        return ret;
-    }
-
-    private List<FileInfo> WriteFiles(DirectoryInfo targetDirectory, IEnumerable<string> fileNames,
-        IEnumerable<string>? toWrite)
-    {
-        List<string> filesToWrite = toWrite?.ToList() ?? new List<string>();
-        List<FileInfo> ret = new();
-        foreach (string file in fileNames)
-        {
-            ret.Add(WriteFile(targetDirectory, file, filesToWrite));
-        }
-
-        return ret;
     }
 }
