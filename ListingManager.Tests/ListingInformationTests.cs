@@ -137,4 +137,36 @@ public class ListingInformationTests : TempFileTestBase
 
         Assert.AreEqual(expected, (new ListingInformation(writtenFiles.First().FullName)).GetPaddedListingNumberWithSuffix());
     }
+
+    [TestMethod]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01", "Listing01.01.cs", false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_05", "Listing01.05.cs", false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04", "Listing01.04a.cs", false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", true)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_06", "Listing01.06B.cs", false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C", "Listing01.07C.cs", true)]
+    public void GetNewNamespace_Namespace_ReturnCorrectNewNamespace(string expected, string listingPath, bool chapterOnly)
+    {
+        List<string> filesToMake = new()
+        {
+            listingPath
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
+        WriteFiles(tempDir, filesToMake, toWrite);
+        var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
+        Xunit.Assert.Single(writtenFiles);
+
+        Assert.AreEqual(expected, (new ListingInformation(writtenFiles.First().FullName)).GetNewNamespace(chapterOnly));
+    }
 }
