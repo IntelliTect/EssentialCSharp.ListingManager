@@ -111,9 +111,9 @@ public partial class ListingManager
                 }
                 if (!preview)
                 {
-                    UpdateTestListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
-                        completeListingNumber,
-                        curListingData.ListingDescription, verbose, preview);
+                    //UpdateTestListingNamespace(curTestListingData.TemporaryPath, listingChapterNumber,
+                    //    completeListingNumber,
+                    //    curListingData.ListingDescription, verbose, preview);
                 }
             }
         }

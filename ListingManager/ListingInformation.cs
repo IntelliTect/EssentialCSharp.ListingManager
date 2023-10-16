@@ -76,26 +76,25 @@ public partial class ListingInformation
     [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.(\\w+))$")]
     private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
 
-    public string GetPaddedListingNumber()
+    public string GetPaddedListingNumberWithSuffix()
     {
-        throw new NotImplementedException();
+        string paddedListingNumberAndSuffix = NewListingNumber.ToString() + ListingSuffix;
 
-        if (SingleDigitListingWithSuffix().IsMatch(NewListingNumber.ToString()))
+        if (SingleDigitListingWithSuffix().IsMatch(paddedListingNumberAndSuffix))
         {
             //allows for keeping the original listing number with a suffix. e.g. "01A"   
-            paddedListingNumber = listingNumber.PadLeft(3, '0');
+            return paddedListingNumberAndSuffix.PadLeft(3, '0');
         }
         else
         {
-            paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
+            return paddedListingNumberAndSuffix.PadLeft(2, '0'); //default
         }
     }
 
     public string GetNewNamespace(bool chapterOnly)
     {
-        throw new NotImplementedException();
         string paddedChapterNumber = NewChapterNumber.ToString("00");
-        string paddedListingNumber = listingData.GetPaddedListingNumber();
+        string paddedListingNumber = GetPaddedListingNumberWithSuffix();
 
         return "AddisonWesley.Michaelis.EssentialCSharp" +
                               $".Chapter{paddedChapterNumber}" +
@@ -105,12 +104,14 @@ public partial class ListingInformation
 
     public string GetNewFileName(bool chapterOnly)
     {
-        string newFileNameTemplate = "Listing{0}.{1}{2}" + listingData.ListingExtension;
+        string newFileNameTemplate = "Listing{0}.{1}{2}" + ListingExtension;
+        string paddedChapterNumber = NewChapterNumber.ToString("00");
+        string paddedListingNumber = GetPaddedListingNumberWithSuffix();
 
-        string.Format(newFileNameTemplate,
+        return string.Format(newFileNameTemplate,
             paddedChapterNumber,
             paddedListingNumber,
-            string.IsNullOrWhiteSpace(listingData.ListingDescription) ? "" : $".{listingData.ListingDescription}");
+            string.IsNullOrWhiteSpace(ListingDescription) ? "" : $".{ListingDescription}");
     }
 
     [GeneratedRegex(@"\d{1}[A-Za-z]")]
