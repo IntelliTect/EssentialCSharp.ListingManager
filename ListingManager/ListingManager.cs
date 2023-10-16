@@ -90,26 +90,18 @@ public partial class ListingManager
                 continue;
             } //default
 
-            string completeListingNumber = listingNumber + ""; //default
-            int listingChapterNumber = curListingData.OriginalChapterNumber; //default
-
-            if (chapterOnly)
-            {
-                completeListingNumber = curListingData.OriginalListingNumber + curListingData.ListingSuffix + "";
-            }
-            else
+            if (!chapterOnly)
             {
                 curListingData.NewListingNumber = listingNumber;
             }
 
             if (byFolder)
             {
-                listingChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
+                curListingData.NewChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
             }
 
-            UpdateListingNamespace(curListingData, listingChapterNumber,
-                completeListingNumber,
-                verbose, preview);
+            UpdateListingNamespace(curListingData, chapterOnly, verbose,
+                preview);
 
             if (testListingData.Where(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
             {
@@ -187,36 +179,13 @@ public partial class ListingManager
     /// Updates the namespace and file name of the listing at <paramref name="path"/>
     /// </summary>
     /// <param name="listingData">The name of the listing to be included in the namespace/path</param>
-    /// <param name="chapterNumber">The chapter the listing belongs to</param>
-    /// <param name="listingNumber">The updated listing number</param>
+    /// <param name="chapterOnly">Changes only the chapter of the listing, leaving the listing number unchanged. Use with <paramref name="byFolder"/></param>
     /// <param name="verbose">When true, enables verbose console output</param>
     /// <param name="preview">When true, leaves files in place and only print console output</param>
-    /// 
-    private static void UpdateListingNamespace(ListingInformation listingData, int chapterNumber, string listingNumber,
-        bool verbose = false, bool preview = false)
+    private static void UpdateListingNamespace(ListingInformation listingData, bool chapterOnly, bool verbose = false, bool preview = false)
     {
-        string paddedChapterNumber = chapterNumber.ToString("00");
-
-        string paddedListingNumber;
-        if (SingleDigitListingWithSuffix().IsMatch(listingNumber))
-        {
-            //allows for keeping the original listing number with a suffix. e.g. "01A"   
-            paddedListingNumber = listingNumber.PadLeft(3, '0');
-        }
-        else
-        {
-            paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
-        }
-
-        string newFileNameTemplate = "Listing{0}.{1}{2}" + listingData.ListingExtension;
-        string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
-                              $".Chapter{paddedChapterNumber}" +
-                              $".Listing{paddedChapterNumber}_" +
-                              paddedListingNumber;
-        string newFileName = string.Format(newFileNameTemplate,
-            paddedChapterNumber,
-            paddedListingNumber,
-            string.IsNullOrWhiteSpace(listingData.ListingDescription) ? "" : $".{listingData.ListingDescription}");
+        string newNamespace = listingData.GetNewNamespace(chapterOnly);
+        string newFileName = listingData.GetNewFileName(chapterOnly);
 
         Console.WriteLine($"Corrective action. {Path.GetFileName(listingData.Path)} rename to {newFileName}");
 
@@ -343,8 +312,6 @@ public partial class ListingManager
         return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
     }
 
-    [GeneratedRegex(@"\d{1}[A-Za-z]")]
-    private static partial Regex SingleDigitListingWithSuffix();
     [GeneratedRegex("((Listing\\d{2}\\.\\d{2})([A-Z]?)((\\.Tests)?)).*\\.cs.tmp$")]
     private static partial Regex TemporaryListingTestFile();
 }
