@@ -160,6 +160,13 @@ public partial class ListingManager
         if (listingInformation.Changed)
         {
             StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformation.GetNewFileName(ChapterOnly)));
+            if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest is not null)
+            {
+                if (listingTest.Changed)
+                {
+                    StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTest.GetNewFileName(ChapterOnly)));
+                }
+            }
         }
     }
 

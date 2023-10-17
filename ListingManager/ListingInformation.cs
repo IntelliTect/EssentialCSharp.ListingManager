@@ -10,13 +10,11 @@ public partial class ListingInformation
 {
     public static IReadOnlyList<string> ApprovedFileTypes { get; } = new[] { ".cs", ".xml" };
     public const string TemporaryExtension = ".tmp";
-    private string newListingNumberSuffix;
-    private int newListingNumber;
-    private int newChapterNumber;
 
     public bool Changed { get; private set; }
+
     public int OriginalChapterNumber { get; }
-    public int OriginalListingNumber { get; }
+    private int newChapterNumber;
     public int NewChapterNumber
     {
         get => newChapterNumber;
@@ -27,8 +25,15 @@ public partial class ListingInformation
                 Changed = true;
             }
             newChapterNumber = value;
+            if (AssociatedTest is not null)
+            {
+                AssociatedTest.NewChapterNumber = value;
+            }
         }
     }
+
+    public int OriginalListingNumber { get; }
+    private int newListingNumber;
     public int NewListingNumber
     {
         get => newListingNumber;
@@ -39,9 +44,15 @@ public partial class ListingInformation
                 Changed = true;
             }
             newListingNumber = value;
+            if (AssociatedTest is not null)
+            {
+                AssociatedTest.NewListingNumber = value;
+            }
         }
     }
+
     public string OriginalListingNumberSuffix { get; }
+    private string newListingNumberSuffix;
     public string NewListingNumberSuffix
     {
         get => newListingNumberSuffix;
@@ -52,9 +63,13 @@ public partial class ListingInformation
                 Changed = true;
             }
             newListingNumberSuffix = value;
+            if (AssociatedTest is not null)
+            {
+                AssociatedTest.NewListingNumberSuffix = value;
+            }
         }
     }
-    public string ListingDescription { get; }
+    public string Caption { get; }
     public string TemporaryPath => Path + TemporaryExtension;
     public string Path { get; }
     public string ParentDir { get; }
@@ -63,6 +78,7 @@ public partial class ListingInformation
     public string FileContents { get; set; }
     public ListingInformation? AssociatedTest { get; set; }
     public bool IsTest { get; }
+    private string FullCaption { get; }
 
     public ListingInformation(string listingPath, bool isTest = false)
     {
@@ -79,12 +95,13 @@ public partial class ListingInformation
             OriginalChapterNumber = newChapterNumber = chapterNumber;
             OriginalListingNumber = newListingNumber = listingNumber;
             OriginalListingNumberSuffix = newListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : string.Empty;
-            ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : string.Empty;
-            IsTest = isTest || (!string.IsNullOrWhiteSpace(matches.Groups[4].Value) ? matches.Groups[4].Value : string.Empty).EndsWith(".Tests");
+            Caption = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : string.Empty;
+            FullCaption = matches.Groups[4].Value;
+            IsTest = isTest || (!string.IsNullOrWhiteSpace(FullCaption) ? FullCaption : string.Empty).EndsWith(".Tests");
             Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
             FileContents = System.IO.File.ReadAllText(listingPath);
-            ParentDir = new FileInfo(listingPath).Directory?.FullName ?? throw new InvalidOperationException("Path is unexpectidly null");
+            ParentDir = new FileInfo(listingPath).Directory?.FullName ?? throw new InvalidOperationException("Path is unexpectedly null");
         }
         else
         {
@@ -114,14 +131,14 @@ public partial class ListingInformation
 
     public string GetNewFileName(bool chapterOnly)
     {
-        string newFileNameTemplate = "Listing{0}.{1}{2}" + (IsTest ? ".Tests" : string.Empty) + ListingExtension;
+        string newFileNameTemplate = "Listing{0}.{1}{2}" + (IsTest && !FullCaption.EndsWith(".Tests") ? ".Tests" : string.Empty) + ListingExtension;
         string paddedChapterNumber = NewChapterNumber.ToString("00");
         string paddedListingNumber = GetPaddedListingNumberWithSuffix();
 
         return string.Format(newFileNameTemplate,
             paddedChapterNumber,
             paddedListingNumber,
-            string.IsNullOrWhiteSpace(ListingDescription) ? "" : $".{ListingDescription}");
+            string.IsNullOrWhiteSpace(Caption) ? "" : $".{Caption}");
     }
 
     [GeneratedRegex(@"\d{1}[A-Za-z]")]

@@ -16,7 +16,7 @@ public class ListingInformationTests : TempFileTestBase
     [DataRow("Listing05.04.Something.cs", 5, 4, null, "Something")]
     [DataRow("Listing09.13.Some.Parse.cs", 9, 13, null, "Some.Parse")]
     public void Constructor_GivenValidListings_PropertiesPopulatedSuccessfully(string listing,
-        int chapterNumber, int listingNumber, string suffix, string description)
+        int chapterNumber, int listingNumber, string suffix, string caption)
     {
         List<string> filesToMake = new()
         {
@@ -41,11 +41,17 @@ public class ListingInformationTests : TempFileTestBase
         ListingInformation listingInformation = new(writtenFiles.First().FullName);
 
         Assert.AreEqual(chapterNumber, listingInformation.OriginalChapterNumber);
+        Assert.AreEqual(listingInformation.NewChapterNumber, listingInformation.OriginalChapterNumber);
+
         Assert.AreEqual(listingNumber, listingInformation.OriginalListingNumber);
+        Assert.AreEqual(listingInformation.NewListingNumber, listingInformation.OriginalListingNumber);
 
         Assert.AreEqual(suffix ?? "", listingInformation.OriginalListingNumberSuffix);
+        Assert.AreEqual(listingInformation.NewListingNumberSuffix, listingInformation.OriginalListingNumberSuffix);
 
-        Assert.AreEqual(description ?? "", listingInformation.ListingDescription);
+        Assert.AreEqual(caption ?? "", listingInformation.Caption);
+
+        Assert.IsFalse(listingInformation.Changed);
     }
 
     [TestMethod]
