@@ -588,8 +588,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true, chapterOnly: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager(), chapterOnly: true);
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -728,7 +728,7 @@ public class ListingManagerTests : TempFileTestBase
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingNumberSuffix, listing.AssociatedTest!.ListingNumberSuffix));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
 
@@ -774,7 +774,7 @@ public class ListingManagerTests : TempFileTestBase
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingNumberSuffix, listing.AssociatedTest!.ListingNumberSuffix));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
     #endregion PopulateListingDataFromPath

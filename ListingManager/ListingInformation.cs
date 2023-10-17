@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -9,6 +10,7 @@ public partial class ListingInformation
 {
     public static IReadOnlyList<string> ApprovedFileTypes { get; } = new[] { ".cs", ".xml" };
     public const string TemporaryExtension = ".tmp";
+    private string newListingNumberSuffix;
     private int newListingNumber;
     private int newChapterNumber;
 
@@ -39,10 +41,23 @@ public partial class ListingInformation
             newListingNumber = value;
         }
     }
-    public string ListingNumberSuffix { get; }
+    public string OriginalListingNumberSuffix { get; }
+    public string NewListingNumberSuffix
+    {
+        get => newListingNumberSuffix;
+        set
+        {
+            if (value != OriginalListingNumberSuffix)
+            {
+                Changed = true;
+            }
+            newListingNumberSuffix = value;
+        }
+    }
     public string ListingDescription { get; }
     public string TemporaryPath => Path + TemporaryExtension;
     public string Path { get; }
+    public string ParentDir { get; }
     public string NamespacePrefix => "AddisonWesley.Michaelis.EssentialCSharp";
     public string ListingExtension { get; }
     public string FileContents { get; set; }
@@ -61,14 +76,15 @@ public partial class ListingInformation
             && int.TryParse(matches.Groups[2].Value, out int listingNumber)
             && matches.Success)
         {
-            OriginalChapterNumber = NewChapterNumber = chapterNumber;
-            OriginalListingNumber = NewListingNumber = listingNumber;
-            ListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : string.Empty;
+            OriginalChapterNumber = newChapterNumber = chapterNumber;
+            OriginalListingNumber = newListingNumber = listingNumber;
+            OriginalListingNumberSuffix = newListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : string.Empty;
             ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : string.Empty;
             IsTest = isTest || (!string.IsNullOrWhiteSpace(matches.Groups[4].Value) ? matches.Groups[4].Value : string.Empty).EndsWith(".Tests");
             Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
             FileContents = System.IO.File.ReadAllText(listingPath);
+            ParentDir = new FileInfo(listingPath).Directory?.FullName ?? throw new InvalidOperationException("Path is unexpectidly null");
         }
         else
         {
@@ -81,8 +97,8 @@ public partial class ListingInformation
 
     public string GetPaddedListingNumberWithSuffix(bool originalListingNumber = false)
     {
-        if (!originalListingNumber) return NewListingNumber.ToString("D2") + ListingNumberSuffix;
-        else return (OriginalListingNumber.ToString("D2") + ListingNumberSuffix);
+        if (!originalListingNumber) return NewListingNumber.ToString("D2") + NewListingNumberSuffix;
+        else return (OriginalListingNumber.ToString("D2") + NewListingNumberSuffix);
 
     }
     public string GetNewNamespace(bool chapterOnly)

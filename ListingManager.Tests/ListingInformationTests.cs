@@ -43,7 +43,7 @@ public class ListingInformationTests : TempFileTestBase
         Assert.AreEqual(chapterNumber, listingInformation.OriginalChapterNumber);
         Assert.AreEqual(listingNumber, listingInformation.OriginalListingNumber);
 
-        Assert.AreEqual(suffix ?? "", listingInformation.ListingNumberSuffix);
+        Assert.AreEqual(suffix ?? "", listingInformation.OriginalListingNumberSuffix);
 
         Assert.AreEqual(description ?? "", listingInformation.ListingDescription);
     }
@@ -77,6 +77,7 @@ public class ListingInformationTests : TempFileTestBase
         ListingInformation listingInformation = new(writtenFiles.First().FullName);
         Assert.IsNotNull(listingInformation);
         Assert.AreEqual(Path.GetExtension(listing), listingInformation.ListingExtension);
+        Assert.IsFalse(listingInformation.Changed);
     }    [TestMethod]
     [DataRow("Listing01.01.cs", false, false)]
     [DataRow("Listing01.01.Something.Tests.cs", false, true)]
