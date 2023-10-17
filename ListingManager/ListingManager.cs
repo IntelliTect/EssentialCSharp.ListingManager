@@ -72,26 +72,9 @@ public partial class ListingManager
         bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
     {
         List<ListingInformation> listingData = PopulateListingDataFromPath(pathToChapter, singleDir);
-        //List<string> allListings = new();
-        //List<ListingInformation> testListingData = new();
-        //List<string> allTestListings = new();
         for (int i = 0, listingNumber = 1; i < listingData.Count; i++, listingNumber++)
         {
-            //string cur = allListings[i];
-
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
-
-            if (!ChapterOnly && !byFolder && listingNumber == curListingData.OriginalListingNumber)
-            {
-                // TODO: redo renaming logic to handle using StorageManager.Move
-                //File.Copy(curListingData.TemporaryPath, curListingData.Path, true);
-                //.Move(curListingData.TemporaryPath, curListingData.Path);
-                //if (testListingData.FirstOrDefault(x => x?.ListingNumber == curListingData.ListingNumber && x.ListingSuffix == curListingData.ListingSuffix) is ListingInformation currentTestListingData)
-                //{
-                    //StorageManager.Move(currentTestListingData.TemporaryPath, currentTestListingData.Path);
-                //}
-                continue;
-            } //default
 
             if (!ChapterOnly)
             {
@@ -134,17 +117,6 @@ public partial class ListingManager
         }
 
         MoveListing(listingData);
-        //foreach (string path in allListings)
-        //{
-        //    File.Delete(path);
-        //}
-        //if (!singleDir)
-        //{
-        //    foreach (string path in allTestListings)
-        //    {
-        //        File.Delete(path);
-        //    }
-        //}
     }
 
     public void MoveListing(IEnumerable<ListingInformation> listingData)

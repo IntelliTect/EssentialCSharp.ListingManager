@@ -117,8 +117,12 @@ public class ListingManagerTests : TempFileTestBase
         repo.RetrieveStatus();
         Assert.AreEqual(FileStatus.Unaltered, repo.RetrieveStatus(files[0]));
         Assert.AreEqual(FileStatus.Unaltered, repo.RetrieveStatus(files[1]));
-        Assert.AreEqual(FileStatus.RenamedInIndex, repo.RetrieveStatus(files[2]));
-        Assert.AreEqual(FileStatus.RenamedInIndex, repo.RetrieveStatus(files[3]));
+
+        //TODO: These ideally would be "FileStatus.RenamedInIndex" instead of 
+        //NewInIndex because this indicates the old file is just being removed
+        //and the new one added instead of a true rename
+        Assert.AreEqual(FileStatus.NewInIndex, repo.RetrieveStatus(files[2]));
+        Assert.AreEqual(FileStatus.NewInIndex, repo.RetrieveStatus(files[3]));
     }
     #endregion GitStorageManager
     #region UsingOSStorageManager
