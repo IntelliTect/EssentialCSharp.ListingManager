@@ -51,7 +51,6 @@ public partial class ListingInformation
 
     public ListingInformation(string listingPath, bool isTest = false)
     {
-        IsTest = isTest;
         Regex regex = ExtractListingNameFromAnyApprovedFileTypes();
 
         var matches = regex.Match(listingPath);
@@ -64,8 +63,9 @@ public partial class ListingInformation
         {
             OriginalChapterNumber = NewChapterNumber = chapterNumber;
             OriginalListingNumber = NewListingNumber = listingNumber;
-            ListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
-            ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : "";
+            ListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : string.Empty;
+            ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : string.Empty;
+            IsTest = isTest || (!string.IsNullOrWhiteSpace(matches.Groups[4].Value) ? matches.Groups[4].Value : string.Empty).EndsWith(".Tests");
             Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
             FileContents = System.IO.File.ReadAllText(listingPath);
@@ -98,7 +98,7 @@ public partial class ListingInformation
 
     public string GetNewFileName(bool chapterOnly)
     {
-        string newFileNameTemplate = "Listing{0}.{1}{2}" + ListingExtension;
+        string newFileNameTemplate = "Listing{0}.{1}{2}" + (IsTest ? ".Tests" : string.Empty) + ListingExtension;
         string paddedChapterNumber = NewChapterNumber.ToString("00");
         string paddedListingNumber = GetPaddedListingNumberWithSuffix();
 

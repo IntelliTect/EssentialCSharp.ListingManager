@@ -731,6 +731,52 @@ public class ListingManagerTests : TempFileTestBase
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingNumberSuffix, listing.AssociatedTest!.ListingNumberSuffix));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
+
+    [TestMethod]
+    public void PopulateListingDataFromPath_GivenSingleDirectoryOfListingsAndTests_AssociateTestWithProperListing()
+    {
+        List<string> filesToMake = new()
+        {
+            @"Chapter18.csproj",
+            @"Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
+            @"Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
+            @"Listing18.03.csproj.xml",
+            @"Listing18.04.DeclaringTheStackClass.cs",
+            @"Listing18.05.ReflectionWithGenerics.cs",
+            @"Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
+            @"Listing18.02.Tests.cs",
+            @"Listing18.05.ReflectionWithGenerics.Tests.cs",
+        };
+        List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
+        Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        WriteFiles(tempDir, filesToMake, toWrite);
+
+        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName, true);
+        Xunit.Assert.Equal(5, listingInformation.Count);
+        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(18, item.OriginalChapterNumber));
+        Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
+        Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+
+        IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
+        Xunit.Assert.Equal(3, listingsWithTests.Count);
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingNumberSuffix, listing.AssociatedTest!.ListingNumberSuffix));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
+    }
     #endregion PopulateListingDataFromPath
 
     [TestMethod]

@@ -76,7 +76,41 @@ public class ListingInformationTests : TempFileTestBase
 
         ListingInformation listingInformation = new(writtenFiles.First().FullName);
         Assert.IsNotNull(listingInformation);
-        Assert.AreEqual(System.IO.Path.GetExtension(listing), listingInformation.ListingExtension);
+        Assert.AreEqual(Path.GetExtension(listing), listingInformation.ListingExtension);
+    }    [TestMethod]
+    [DataRow("Listing01.01.cs", false, false)]
+    [DataRow("Listing01.01.Something.Tests.cs", false, true)]
+    [DataRow("Listing01.01.Tests.cs", false, true)]
+    [DataRow("Listing01.01.Tests.cs", true, true)]
+    [DataRow("Listing05.04.Something.xml", false, false)]
+    [DataRow("Listing05.04.Something.XML", false, false)]
+    public void Constructor_GivenACodeFileOrTest_CorrectlyIdentifiesTestOrNot(string listing, bool isTest, bool expectedIsTestResult)
+    {
+        List<string> filesToMake = new()
+        {
+            listing
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
+        WriteFiles(tempDir, filesToMake, toWrite);
+        var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
+        Xunit.Assert.Single(writtenFiles);
+
+        ListingInformation listingInformation = new(writtenFiles.First().FullName, isTest);
+        Assert.IsNotNull(listingInformation);
+        Assert.AreEqual(Path.GetExtension(listing), listingInformation.ListingExtension);
+
+        Assert.AreEqual(expectedIsTestResult, listingInformation.IsTest);
     }
     [TestMethod]
     [DataRow("Listing01.02.something.txt")]
@@ -171,5 +205,32 @@ public class ListingInformationTests : TempFileTestBase
         Xunit.Assert.Single(writtenFiles);
 
         Assert.AreEqual(expected, new ListingInformation(writtenFiles.First().FullName, isTest).GetNewNamespace(chapterOnly));
+    }
+
+    [TestMethod]
+    [DataRow("Listing01.01.cs", "Listing01.01.cs", false, false)]
+    public void GetNewFileName_FileName_ReturnCorrectNewFileName(string expected, string listingPath, bool chapterOnly, bool isTest)
+    {
+        List<string> filesToMake = new()
+        {
+            listingPath
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
+        WriteFiles(tempDir, filesToMake, toWrite);
+        var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
+        Xunit.Assert.Single(writtenFiles);
+
+        Assert.AreEqual(expected, new ListingInformation(writtenFiles.First().FullName, isTest).GetNewFileName(chapterOnly));
     }
 }
