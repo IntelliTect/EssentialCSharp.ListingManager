@@ -69,7 +69,7 @@ public partial class ListingInformation
             }
         }
     }
-    public string Caption { get; }
+    public string Caption { get; set; }
     public string TemporaryPath => Path + TemporaryExtension;
     public string Path { get; }
     public string ParentDir { get; }

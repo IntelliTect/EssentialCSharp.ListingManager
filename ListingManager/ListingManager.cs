@@ -285,7 +285,12 @@ public partial class ListingManager
         }
         foreach (ListingInformation testListingInformation in testListingData)
         {
-            listingData.Where(x => x.OriginalListingNumber == testListingInformation.OriginalListingNumber && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix).First().AssociatedTest = testListingInformation;
+            ListingInformation listingInformation = listingData.Where(x => x.OriginalListingNumber == testListingInformation.OriginalListingNumber && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix).First();
+            if (testListingInformation.Caption.ToLowerInvariant() == "Tests".ToLowerInvariant() && listingInformation.Caption != string.Empty)
+            {
+                testListingInformation.Caption = listingInformation.Caption + ".Tests";
+            }
+            listingInformation.AssociatedTest = testListingInformation;
         }
         return listingData;
     }
