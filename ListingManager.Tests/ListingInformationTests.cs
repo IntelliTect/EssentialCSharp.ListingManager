@@ -43,7 +43,7 @@ public class ListingInformationTests : TempFileTestBase
         Assert.AreEqual(chapterNumber, listingInformation.OriginalChapterNumber);
         Assert.AreEqual(listingNumber, listingInformation.OriginalListingNumber);
 
-        Assert.AreEqual(suffix ?? "", listingInformation.ListingSuffix);
+        Assert.AreEqual(suffix ?? "", listingInformation.ListingNumberSuffix);
 
         Assert.AreEqual(description ?? "", listingInformation.ListingDescription);
     }
@@ -139,13 +139,16 @@ public class ListingInformationTests : TempFileTestBase
     }
 
     [TestMethod]
-    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01", "Listing01.01.cs", false)]
-    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_05", "Listing01.05.cs", false)]
-    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04", "Listing01.04a.cs", false)]
-    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", true)]
-    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_06", "Listing01.06B.cs", false)]
-    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C", "Listing01.07C.cs", true)]
-    public void GetNewNamespace_Namespace_ReturnCorrectNewNamespace(string expected, string listingPath, bool chapterOnly)
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01", "Listing01.01.cs", false, false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_05", "Listing01.05.cs", false, false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", false, false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", true, false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_06B", "Listing01.06B.cs", false, false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C", "Listing01.07C.cs", true, false)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C.Tests", "Listing01.07C.Tests.cs", true, true)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_08.Tests", "Listing01.08.Tests.cs", true, true)]
+    [DataRow("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_10.Tests", "Listing01.10.Tests.cs", true, true)]
+    public void GetNewNamespace_Namespace_ReturnCorrectNewNamespace(string expected, string listingPath, bool chapterOnly, bool isTest)
     {
         List<string> filesToMake = new()
         {
@@ -167,6 +170,6 @@ public class ListingInformationTests : TempFileTestBase
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         Xunit.Assert.Single(writtenFiles);
 
-        Assert.AreEqual(expected, (new ListingInformation(writtenFiles.First().FullName)).GetNewNamespace(chapterOnly));
+        Assert.AreEqual(expected, new ListingInformation(writtenFiles.First().FullName, isTest).GetNewNamespace(chapterOnly));
     }
 }

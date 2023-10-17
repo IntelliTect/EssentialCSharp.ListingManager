@@ -17,7 +17,7 @@ public partial class ListingInformation
     public int OriginalListingNumber { get; }
     public int NewChapterNumber
     {
-        get => newChapterNumber; 
+        get => newChapterNumber;
         set
         {
             if (value != OriginalChapterNumber)
@@ -27,8 +27,9 @@ public partial class ListingInformation
             newChapterNumber = value;
         }
     }
-    public int NewListingNumber {
-        get => newListingNumber; 
+    public int NewListingNumber
+    {
+        get => newListingNumber;
         set
         {
             if (value != OriginalListingNumber)
@@ -38,17 +39,19 @@ public partial class ListingInformation
             newListingNumber = value;
         }
     }
-    public string ListingSuffix { get; }
+    public string ListingNumberSuffix { get; }
     public string ListingDescription { get; }
     public string TemporaryPath => Path + TemporaryExtension;
     public string Path { get; }
-    public string Namespace => "AddisonWesley.";
+    public string NamespacePrefix => "AddisonWesley.Michaelis.EssentialCSharp";
     public string ListingExtension { get; }
     public string FileContents { get; set; }
     public ListingInformation? AssociatedTest { get; set; }
+    public bool IsTest { get; }
 
-    public ListingInformation(string listingPath)
+    public ListingInformation(string listingPath, bool isTest = false)
     {
+        IsTest = isTest;
         Regex regex = ExtractListingNameFromAnyApprovedFileTypes();
 
         var matches = regex.Match(listingPath);
@@ -61,7 +64,7 @@ public partial class ListingInformation
         {
             OriginalChapterNumber = NewChapterNumber = chapterNumber;
             OriginalListingNumber = NewListingNumber = listingNumber;
-            ListingSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
+            ListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : "";
             ListingDescription = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : "";
             Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
@@ -76,30 +79,21 @@ public partial class ListingInformation
     [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.(\\w+))$")]
     private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
 
-    public string GetPaddedListingNumberWithSuffix()
+    public string GetPaddedListingNumberWithSuffix(bool originalListingNumber = false)
     {
-        string paddedListingNumberAndSuffix = NewListingNumber.ToString() + ListingSuffix;
+        if (!originalListingNumber) return NewListingNumber.ToString("D2") + ListingNumberSuffix;
+        else return (OriginalListingNumber.ToString("D2") + ListingNumberSuffix);
 
-        if (SingleDigitListingWithSuffix().IsMatch(paddedListingNumberAndSuffix))
-        {
-            //allows for keeping the original listing number with a suffix. e.g. "01A"   
-            return paddedListingNumberAndSuffix.PadLeft(3, '0');
-        }
-        else
-        {
-            return paddedListingNumberAndSuffix.PadLeft(2, '0'); //default
-        }
     }
-
     public string GetNewNamespace(bool chapterOnly)
     {
-        string paddedChapterNumber = NewChapterNumber.ToString("00");
-        string paddedListingNumber = GetPaddedListingNumberWithSuffix();
+        string paddedChapterNumber = NewChapterNumber.ToString("D2");
+        string paddedListingNumber = GetPaddedListingNumberWithSuffix(chapterOnly);
 
-        return "AddisonWesley.Michaelis.EssentialCSharp" +
-                              $".Chapter{paddedChapterNumber}" +
-                              $".Listing{paddedChapterNumber}_" +
-                              paddedListingNumber;
+        return NamespacePrefix
+               + $".Chapter{paddedChapterNumber}"
+               + $".Listing{paddedChapterNumber}_"
+               + paddedListingNumber + (IsTest ? ".Tests" : string.Empty);
     }
 
     public string GetNewFileName(bool chapterOnly)

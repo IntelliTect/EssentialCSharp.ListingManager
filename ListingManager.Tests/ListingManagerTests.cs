@@ -728,7 +728,7 @@ public class ListingManagerTests : TempFileTestBase
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingSuffix, listing.AssociatedTest!.ListingSuffix));
+        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.ListingNumberSuffix, listing.AssociatedTest!.ListingNumberSuffix));
         Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
     #endregion PopulateListingDataFromPath

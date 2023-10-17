@@ -37,7 +37,7 @@ public partial class ListingManager
         }
     }
 
-    private static bool TryGetListing(string listingPath, out ListingInformation? listingData)
+    private static bool TryGetListing(string listingPath, out ListingInformation? listingData, bool isTest = false)
     {
         listingData = null;
 
@@ -45,7 +45,7 @@ public partial class ListingManager
 
         try
         {
-            listingData = new ListingInformation(listingPath);
+            listingData = new ListingInformation(listingPath, isTest);
         }
         catch (Exception) // don't care about the type of exception here. If things didn't go perfectly, abort
         {
@@ -103,7 +103,7 @@ public partial class ListingManager
             UpdateListingNamespace(curListingData, chapterOnly, verbose,
                 preview);
 
-            if (testListingData.Where(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.ListingSuffix == curListingData.ListingSuffix).FirstOrDefault() is ListingInformation curTestListingData)
+            if (testListingData.Where(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.ListingNumberSuffix == curListingData.ListingNumberSuffix).FirstOrDefault() is ListingInformation curTestListingData)
             {
                 if (verbose)
                 {
@@ -144,27 +144,16 @@ public partial class ListingManager
     {
         string paddedChapterNumber = chapterNumber.ToString("00");
 
-        string regexSingleDigitListingWithSuffix = @"\d{1}[A-Za-z]";
-        string paddedListingNumber;
-        if (Regex.IsMatch(listingNumber, regexSingleDigitListingWithSuffix))
-        { //allows for keeping the original listing number with a suffix. e.g. "01A"   
-            paddedListingNumber = listingNumber.PadLeft(3, '0');
-        }
-        else
-        {
-            paddedListingNumber = listingNumber.PadLeft(2, '0'); //default
-        }
-
         string newFileNameTemplate = "Listing{0}.{1}{2}.cs";
         string newNamespace = "AddisonWesley.Michaelis.EssentialCSharp" +
                               $".Chapter{paddedChapterNumber}" +
-                              $".Listing{paddedChapterNumber}_" +
-                              $"{paddedListingNumber}.Tests";
+                              $".Listing{paddedChapterNumber}_";
+                              //$"{paddedListingNumber}.Tests"
 
         string suffix = string.IsNullOrEmpty(listingData) ? "Tests" : listingData + ".Tests";
         string newFileName = string.Format(newFileNameTemplate,
             paddedChapterNumber,
-            paddedListingNumber,
+            //paddedListingNumber,
             $".{suffix}");
 
         Console.WriteLine($"Corrective action. {Path.GetFileName(path)} rename to {newFileName}");
@@ -283,12 +272,12 @@ public partial class ListingManager
     .OrderBy(x => x).ToList();
             foreach (string fileName in listingTestFiles)
             {
-                bool result = TryGetListing(fileName, out ListingInformation? data);
+                bool result = TryGetListing(fileName, out ListingInformation? data, true);
                 if (result)
                 {
                     if (data is not null)
                     {
-                        ListingInformation? associatedListing = listingData.Where(x => x?.OriginalListingNumber == data?.OriginalListingNumber && x?.OriginalChapterNumber == data?.OriginalChapterNumber).First().AssociatedTest = data;
+                        listingData.Where(x => x?.OriginalListingNumber == data?.OriginalListingNumber && x?.OriginalChapterNumber == data?.OriginalChapterNumber).First().AssociatedTest = data;
                     }
                     else
                     {
