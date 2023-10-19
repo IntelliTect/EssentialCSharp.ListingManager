@@ -22,6 +22,18 @@ jobs:
         dotnet-version: | 
             3.1.x
             6.x
+    - name: Setup Dependency Caching
+      uses: actions/cache@v3
+      id: nuget-cache
+      with:
+        path: |
+          ~/.nuget/packages
+          ${{ github.workspace }}/**/obj/project.assets.json
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          ${{ runner.os }}-nuget-
+
     - name: Restore dependencies
       run: dotnet restore
     - name: Set Version
