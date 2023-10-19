@@ -1,28 +1,27 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
-[TestClass]
 public class FileManagerTests : TempFileTestBase
 {
-    [TestMethod]
-    [DataRow("Chapter01", 01)]
-    [DataRow("asdasdsad/asd/asd/asd/Chapter42", 42)]
+    [Theory]
+    [InlineData("Chapter01", 01)]
+    [InlineData("asdasdsad/asd/asd/asd/Chapter42", 42)]
     public void GetFolderChapterNumber(string chapterFilePath, int expectedChapterNum)
     {
-        Assert.AreEqual(expectedChapterNum, FileManager.GetFolderChapterNumber(chapterFilePath));
+        Assert.Equal(expectedChapterNum, FileManager.GetFolderChapterNumber(chapterFilePath));
     }
-    [TestMethod]
-    [DataRow("Chapter01", 01)]
-    [DataRow("asdasdsad/asd/asd/asd/Chapter42", 42)]
+    [Theory]
+    [InlineData("Chapter01", 01)]
+    [InlineData("asdasdsad/asd/asd/asd/Chapter42", 42)]
     public void GetFolderChapterNumber_VerifyMatchesListingInformationLogic(string chapterFilePath, int expectedChapterNum)
     {
         List<string> filesToMake = new()
         {
-            Path.Combine(chapterFilePath,$"Listing{expectedChapterNum.ToString("D2")}.01.cs"),
+            Path.Combine(chapterFilePath,$"Listing{expectedChapterNum:D2}.01.cs"),
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -38,8 +37,8 @@ public class FileManagerTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
         CreateTempDirectory(tempDir, name: chapterFilePath);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Xunit.Assert.Single(writtenFiles);
+        Assert.Single(writtenFiles);
 
-        Xunit.Assert.Equal(expectedChapterNum, (new ListingInformation(writtenFiles.First().FullName)).OriginalChapterNumber);
+        Assert.Equal(expectedChapterNum, (new ListingInformation(writtenFiles.First().FullName)).OriginalChapterNumber);
     }
 }

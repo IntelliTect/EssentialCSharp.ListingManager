@@ -1,5 +1,5 @@
 using LibGit2Sharp;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,28 +8,27 @@ using System.Linq;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
-[TestClass]
 public class ListingManagerTests : TempFileTestBase
 {
     // Create the committer's signature and commit
     Signature author = new("IntellitectTestingBot", "info@intellitect.com", DateTime.Now);
 
     #region IsExtraListing
-    [TestMethod]
-    [DataRow("Listing02.01.SpecifyingLiteralValues.cs", false)]
-    [DataRow("Listing02.01A.SpecifyingLiteralValues.cs", true)]
-    [DataRow("Listing02.01.cs", false)]
+    [Theory]
+    [InlineData("Listing02.01.SpecifyingLiteralValues.cs", false)]
+    [InlineData("Listing02.01A.SpecifyingLiteralValues.cs", true)]
+    [InlineData("Listing02.01.cs", false)]
     public void IsIncorrectListingFromPath_FindsIncorrectListing(string fileName, bool expectedResult)
     {
         string path = Path.Combine(TempDirectory.ToString(), fileName);
 
         bool actualResult = ListingManager.IsExtraListing(path);
 
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.Equal(expectedResult, actualResult);
     }
 
-    [TestMethod]
-    [DataRow("/Chapter02.Tests", "Listing02.01A.SpecifyingLiteralValues.cs", false)]
+    [Theory]
+    [InlineData("/Chapter02.Tests", "Listing02.01A.SpecifyingLiteralValues.cs", false)]
     public void ListingsInTestDirectories_AreNotCountedAsExtraListings(string parentDirectory, string fileName,
         bool expectedResult)
     {
@@ -39,11 +38,11 @@ public class ListingManagerTests : TempFileTestBase
 
         bool actualResult = ListingManager.IsExtraListing(path);
 
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.Equal(expectedResult, actualResult);
     }
     #endregion IsExtraListing
 
-    [TestMethod]
+    [Fact]
     public void GetAllExtraListings_ExtraListingsReturned()
     {
         ICollection<string> filesToMake = new List<string>
@@ -62,12 +61,12 @@ public class ListingManagerTests : TempFileTestBase
 
         var extraListings = ListingManager.GetAllExtraListings(tempDir.FullName).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, extraListings);
+        Assert.Equal(expectedFiles, extraListings);
     }
 
     #region UpdateChapterListingNumbers
     #region GitStorageManager
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_GitStorageManager_ListingsWithinListMissing_ListingsRenumbered()
     {
         List<string> filesToMake = new()
@@ -99,7 +98,7 @@ public class ListingManagerTests : TempFileTestBase
         expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
         string rootedPath = Repository.Init(TempDirectory.FullName);
-        //Assert.AreEqual(rootedPath, TempDirectory.FullName);
+        //Assert.Equal(rootedPath, TempDirectory.FullName);
         using var repo = new Repository(TempDirectory.FullName);
 
         Commands.Stage(repo, "*");
@@ -111,22 +110,22 @@ public class ListingManagerTests : TempFileTestBase
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-        CollectionAssert.AreEquivalent(expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
 
         Commands.Stage(repo, "*");
         repo.RetrieveStatus();
-        Assert.AreEqual(FileStatus.Unaltered, repo.RetrieveStatus(files[0]));
-        Assert.AreEqual(FileStatus.Unaltered, repo.RetrieveStatus(files[1]));
+        Assert.Equal(FileStatus.Unaltered, repo.RetrieveStatus(files[0]));
+        Assert.Equal(FileStatus.Unaltered, repo.RetrieveStatus(files[1]));
 
         //TODO: These ideally would be "FileStatus.RenamedInIndex" instead of 
         //NewInIndex because this indicates the old file is just being removed
         //and the new one added instead of a true rename
-        Assert.AreEqual(FileStatus.NewInIndex, repo.RetrieveStatus(files[2]));
-        Assert.AreEqual(FileStatus.NewInIndex, repo.RetrieveStatus(files[3]));
+        Assert.Equal(FileStatus.NewInIndex, repo.RetrieveStatus(files[2]));
+        Assert.Equal(FileStatus.NewInIndex, repo.RetrieveStatus(files[3]));
     }
     #endregion GitStorageManager
     #region UsingOSStorageManager
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
     {
         List<string> filesToMake = new()
@@ -162,10 +161,10 @@ public class ListingManagerTests : TempFileTestBase
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-        CollectionAssert.AreEquivalent(expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_ListingAtBeginningOfListMissing_ListingsRenumbered()
     {
         ICollection<string> filesToMake = new List<string>
@@ -200,10 +199,10 @@ public class ListingManagerTests : TempFileTestBase
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_MultipleListingsMissing_ListingsRenumbered()
     {
         ICollection<string> filesToMake = new List<string>
@@ -266,10 +265,10 @@ public class ListingManagerTests : TempFileTestBase
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_AdditionalListings_ListingsRenumbered()
     {
         ICollection<string> filesToMake = new List<string>
@@ -310,10 +309,10 @@ public class ListingManagerTests : TempFileTestBase
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
     {
         ICollection<string> filesToMake = new List<string>
@@ -365,10 +364,10 @@ public class ListingManagerTests : TempFileTestBase
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void
         UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
     {
@@ -422,10 +421,10 @@ public class ListingManagerTests : TempFileTestBase
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void
     UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestAndListingPairingIsMaintained_ListingsAndTestsUpdated()
     {
@@ -541,10 +540,10 @@ public class ListingManagerTests : TempFileTestBase
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void
         UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
     {
@@ -599,10 +598,10 @@ public class ListingManagerTests : TempFileTestBase
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void RenumberAllFilesIncludingXML_DontChangeFiles_ListingsAndTestsUpdated()
     {
         // Make sure csproj file is created, but doesn't get renumbered (is ignored)
@@ -619,7 +618,7 @@ public class ListingManagerTests : TempFileTestBase
             @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
-        Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
 
         IEnumerable<string> toWrite = new List<string>
         {
@@ -644,13 +643,13 @@ public class ListingManagerTests : TempFileTestBase
             .Where(x => ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent(expectedFiles, files, $"Files are in dir: {tempDir}");
+        Assert.Equivalent(expectedFiles, files);
     }
     #endregion UsingOSStorageManager
     #endregion UpdateChapterListingNumbers
 
     #region PopulateListingDataFromPath
-    [TestMethod]
+    [Fact]
     public void PopulateListingDataFromPath_GivenDirectoryOfListings_PopulateListingInformation()
     {
         List<string> filesToMake = new()
@@ -682,13 +681,13 @@ public class ListingManagerTests : TempFileTestBase
         expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(TempDirectory.FullName, true);
-        Xunit.Assert.Equal(4, listingInformation.Count);
-        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(01, item.OriginalChapterNumber));
-        Xunit.Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0], listingInformation[0].Path);
-        Xunit.Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+        Assert.Equal(4, listingInformation.Count);
+        Assert.All(listingInformation, item => Assert.Equal(01, item.OriginalChapterNumber));
+        Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0], listingInformation[0].Path);
+        Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
     }
 
-    [TestMethod]
+    [Fact]
     public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_AssociateTestWithProperListing()
     {
         List<string> filesToMake = new()
@@ -704,7 +703,7 @@ public class ListingManagerTests : TempFileTestBase
             @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
-        Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
 
         IEnumerable<string> toWrite = new List<string>
         {
@@ -722,24 +721,24 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
-        Xunit.Assert.Equal(5, listingInformation.Count);
-        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(18, item.OriginalChapterNumber));
-        Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
-        Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+        Assert.Equal(5, listingInformation.Count);
+        Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
 
         IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
-        Xunit.Assert.Equal(3, listingsWithTests.Count);
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
+        Assert.Equal(3, listingsWithTests.Count);
+        Assert.All(listingsWithTests, listing => Assert.NotNull(listing.AssociatedTest));
+        Assert.All(listingsWithTests, listing => Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
 
-    [TestMethod]
-    [DataRow(@"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs", @"Chapter18.Tests\Listing18.01.Tests.cs", "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
-    [DataRow(@"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs", @"Chapter18.Tests\Listing18.02.Tests.cs", "UsingTypeofToCreateASystem.TypeInstance.Tests")]
-    [DataRow(@"Chapter18\Listing18.05.ReflectionWithGenerics.cs", @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs", "ReflectionWithGenerics.Tests")]
+    [Theory]
+    [InlineData(@"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs", @"Chapter18.Tests\Listing18.01.Tests.cs", "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
+    [InlineData(@"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs", @"Chapter18.Tests\Listing18.02.Tests.cs", "UsingTypeofToCreateASystem.TypeInstance.Tests")]
+    [InlineData(@"Chapter18\Listing18.05.ReflectionWithGenerics.cs", @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs", "ReflectionWithGenerics.Tests")]
     public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_UpdateTestWithListingCaption(string listingPath, string testPath, string expected)
     {
         List<string> filesToMake = new()
@@ -748,7 +747,7 @@ public class ListingManagerTests : TempFileTestBase
             testPath
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
-        Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
 
         IEnumerable<string> toWrite = new List<string>
         {
@@ -766,12 +765,12 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
-        Xunit.Assert.Single(listingInformation);
-        Xunit.Assert.NotNull(listingInformation.First().AssociatedTest);
-        Xunit.Assert.Equal(expected, listingInformation.First().AssociatedTest!.Caption);
+        Assert.Single(listingInformation);
+        Assert.NotNull(listingInformation.First().AssociatedTest);
+        Assert.Equal(expected, listingInformation.First().AssociatedTest!.Caption);
     }
 
-    [TestMethod]
+    [Fact]
     public void PopulateListingDataFromPath_GivenSingleDirectoryOfListingsAndTests_AssociateTestWithProperListing()
     {
         List<string> filesToMake = new()
@@ -787,7 +786,7 @@ public class ListingManagerTests : TempFileTestBase
             @"Listing18.05.ReflectionWithGenerics.Tests.cs",
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
-        Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
 
         IEnumerable<string> toWrite = new List<string>
         {
@@ -803,26 +802,26 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName, true);
-        Xunit.Assert.Equal(5, listingInformation.Count);
-        Xunit.Assert.All(listingInformation, item => Xunit.Assert.Equal(18, item.OriginalChapterNumber));
-        Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
-        Xunit.Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+        Assert.Equal(5, listingInformation.Count);
+        Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
 
         IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
-        Xunit.Assert.Equal(3, listingsWithTests.Count);
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.NotNull(listing.AssociatedTest));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
-        Xunit.Assert.All(listingsWithTests, listing => Xunit.Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
+        Assert.Equal(3, listingsWithTests.Count);
+        Assert.All(listingsWithTests, listing => Assert.NotNull(listing.AssociatedTest));
+        Assert.All(listingsWithTests, listing => Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
     }
     #endregion PopulateListingDataFromPath
 
-    [TestMethod]
-    [DataRow("Chapter01", "Listing01.01A.cs")]
-    [DataRow("Chapter02", "Listing02.01.cs")]
-    [DataRow("Chapter01", "Listing01.01A.Something.cs")]
-    [DataRow("Chapter02", "Listing02.01.Something.cs")]
+    [Theory]
+    [InlineData("Chapter01", "Listing01.01A.cs")]
+    [InlineData("Chapter02", "Listing02.01.cs")]
+    [InlineData("Chapter01", "Listing01.01A.Something.cs")]
+    [InlineData("Chapter02", "Listing02.01.Something.cs")]
     public void GetPathToAccompanyingUnitTest_GivenListingWithNoTest_CorrectPathReturned(string chapter,
         string listingName)
     {
@@ -830,7 +829,7 @@ public class ListingManagerTests : TempFileTestBase
             ListingManager.GetPathToAccompanyingUnitTest(chapter + Path.DirectorySeparatorChar + listingName,
                 out string pathToTest);
         char directorySeparator = Path.DirectorySeparatorChar;
-        Assert.IsFalse(result);
-        Assert.AreEqual($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
+        Assert.False(result);
+        Assert.Equal($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
     }
 }

@@ -13,14 +13,13 @@
     <ItemGroup>
         <PackageReference Include="IntelliTect.TestTools.Console" Version="1.0.0-CI-20181030-214503" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
         <PackageReference Include="Polly" Version="8.0.0" />
-        <PackageReference Include="xunit" Version="2.5.1" />
+        <PackageReference Include="xunit" Version="2.5.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ListingManager\EssentialCSharp.ListingManager.csproj" />
+        <ProjectReference Include="..\ListingManager\EssentialCSharp.ListingManager.csproj" />
     </ItemGroup>
 
 </Project>

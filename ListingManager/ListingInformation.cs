@@ -100,7 +100,7 @@ public partial class ListingInformation
             IsTest = isTest || (!string.IsNullOrWhiteSpace(FullCaption) ? FullCaption : string.Empty).EndsWith(".Tests");
             Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
-            FileContents = System.IO.File.ReadAllText(listingPath);
+            FileContents = File.ReadAllText(listingPath);
             ParentDir = new FileInfo(listingPath).Directory?.FullName ?? throw new InvalidOperationException("Path is unexpectedly null");
         }
         else
