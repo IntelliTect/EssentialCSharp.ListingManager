@@ -6,8 +6,7 @@ internal static class FileSystemInfoExtensions
 {
     public static void DeleteReadOnly(this FileSystemInfo fileSystemInfo)
     {
-        DirectoryInfo? directoryInfo = fileSystemInfo as DirectoryInfo;
-        if (directoryInfo is not null)
+        if (fileSystemInfo is DirectoryInfo directoryInfo)
         {
             foreach (FileSystemInfo childInfo in directoryInfo.GetFileSystemInfos())
             {

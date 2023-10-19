@@ -9,11 +9,11 @@ namespace EssentialCSharp.ListingManager.Tests;
 public class ListingInformationTests : TempFileTestBase
 {
     [Theory]
-    [InlineData("Listing01.01.cs", 1, 1, null, null)]
-    [InlineData("Listing01.02A.cs", 1, 2, "A", null)]
-    [InlineData("Listing01.02.something.cs", 1, 2, null, "something")]
-    [InlineData("Listing05.04.Something.cs", 5, 4, null, "Something")]
-    [InlineData("Listing09.13.Some.Parse.cs", 9, 13, null, "Some.Parse")]
+    [InlineData("Listing01.01.cs", 1, 1, "", "")]
+    [InlineData("Listing01.02A.cs", 1, 2, "A", "")]
+    [InlineData("Listing01.02.something.cs", 1, 2, "", "something")]
+    [InlineData("Listing05.04.Something.cs", 5, 4, "", "Something")]
+    [InlineData("Listing09.13.Some.Parse.cs", 9, 13, "", "Some.Parse")]
     public void Constructor_GivenValidListings_PropertiesPopulatedSuccessfully(string listing,
         int chapterNumber, int listingNumber, string suffix, string caption)
     {
@@ -45,10 +45,10 @@ public class ListingInformationTests : TempFileTestBase
         Assert.Equal(listingNumber, listingInformation.OriginalListingNumber);
         Assert.Equal(listingInformation.NewListingNumber, listingInformation.OriginalListingNumber);
 
-        Assert.Equal(suffix ?? "", listingInformation.OriginalListingNumberSuffix);
+        Assert.Equal(suffix, listingInformation.OriginalListingNumberSuffix);
         Assert.Equal(listingInformation.NewListingNumberSuffix, listingInformation.OriginalListingNumberSuffix);
 
-        Assert.Equal(caption ?? "", listingInformation.Caption);
+        Assert.Equal(caption, listingInformation.Caption);
 
         Assert.False(listingInformation.Changed);
     }
