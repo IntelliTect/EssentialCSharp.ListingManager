@@ -94,14 +94,10 @@ public abstract class TempFileTestBase : IDisposable
     public IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
         DirectoryInfo? targetDirectory)
     {
-        var fullPaths = new List<string>();
-
         foreach (string fileName in fileNamesToConvert)
         {
-            fullPaths.Add(Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName));
+            yield return Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName);
         }
-
-        return fullPaths;
     }
 
     public FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)

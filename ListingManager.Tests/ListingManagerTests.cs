@@ -95,7 +95,7 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
         WriteFiles(TempDirectory, filesToMake, toWrite);
-        expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
         string rootedPath = Repository.Init(TempDirectory.FullName);
         //Assert.Equal(rootedPath, TempDirectory.FullName);
@@ -154,7 +154,7 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
         WriteFiles(TempDirectory, filesToMake, toWrite);
-        expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
         ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
@@ -678,7 +678,7 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
         WriteFiles(TempDirectory, filesToMake, toWrite);
-        expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(TempDirectory.FullName, true);
         Assert.Equal(4, listingInformation.Count);
