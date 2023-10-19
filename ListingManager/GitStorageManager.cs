@@ -1,16 +1,12 @@
 ﻿using LibGit2Sharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EssentialCSharp.ListingManager;
 
 public class GitStorageManager : IStorageManager, IDisposable
 {
-    private bool disposedValue;
-    public Repository Repository { get; }
+    private bool _DisposedValue;
+    private Repository Repository { get; }
 
     public GitStorageManager(string repoPath)
     {
@@ -25,7 +21,7 @@ public class GitStorageManager : IStorageManager, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_DisposedValue)
         {
             if (disposing)
             {
@@ -34,7 +30,7 @@ public class GitStorageManager : IStorageManager, IDisposable
 
             // TODO: free unmanaged resources (unmanaged objects) and override finalizer
             // TODO: set large fields to null
-            disposedValue = true;
+            _DisposedValue = true;
         }
     }
 

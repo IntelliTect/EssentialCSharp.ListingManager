@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using LibGit2Sharp;
 
@@ -40,7 +39,7 @@ public partial class ListingManager
         }
     }
 
-    private static bool TryGetListing(string listingPath, out ListingInformation? listingData, bool isTest = false)
+    private static bool TryGetListing(string listingPath, [NotNullWhen(true)] out ListingInformation? listingData, bool isTest = false)
     {
         listingData = null;
 
@@ -132,7 +131,7 @@ public partial class ListingManager
         if (listingInformation.Changed)
         {
             StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformation.GetNewFileName(ChapterOnly)));
-            if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest is not null)
+            if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
                 if (listingTest.Changed)
                 {

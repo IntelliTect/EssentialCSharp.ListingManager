@@ -1,7 +1,6 @@
 using LibGit2Sharp;
 using Xunit;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace EssentialCSharp.ListingManager.Tests;
 public class ListingManagerTests : TempFileTestBase
 {
     // Create the committer's signature and commit
-    Signature author = new("IntellitectTestingBot", "info@intellitect.com", DateTime.Now);
+    private Signature Author { get; } = new("IntellitectTestingBot", "info@intellitect.com", DateTime.Now);
 
     #region IsExtraListing
     [Theory]
@@ -104,7 +103,7 @@ public class ListingManagerTests : TempFileTestBase
         Commands.Stage(repo, "*");
 
         // Commit to the repository
-        repo.Commit("Here's a commit i made!", author, author);
+        repo.Commit("Here's a commit i made!", Author, Author);
 
         ListingManager listingManager = new(TempDirectory.FullName, new GitStorageManager(TempDirectory.FullName));
         listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
@@ -760,7 +759,7 @@ public class ListingManagerTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory();
-        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
+        CreateTempDirectory(tempDir, name: "Chapter18");
         CreateTempDirectory(tempDir, name: "Chapter18.Tests");
         WriteFiles(tempDir, filesToMake, toWrite);
 

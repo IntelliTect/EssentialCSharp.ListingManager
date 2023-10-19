@@ -14,17 +14,17 @@ public partial class ListingInformation
     public bool Changed { get; private set; }
 
     public int OriginalChapterNumber { get; }
-    private int newChapterNumber;
+    private int _NewChapterNumber;
     public int NewChapterNumber
     {
-        get => newChapterNumber;
+        get => _NewChapterNumber;
         set
         {
             if (value != OriginalChapterNumber)
             {
                 Changed = true;
             }
-            newChapterNumber = value;
+            _NewChapterNumber = value;
             if (AssociatedTest is not null)
             {
                 AssociatedTest.NewChapterNumber = value;
@@ -33,17 +33,17 @@ public partial class ListingInformation
     }
 
     public int OriginalListingNumber { get; }
-    private int newListingNumber;
+    private int _NewListingNumber;
     public int NewListingNumber
     {
-        get => newListingNumber;
+        get => _NewListingNumber;
         set
         {
             if (value != OriginalListingNumber)
             {
                 Changed = true;
             }
-            newListingNumber = value;
+            _NewListingNumber = value;
             if (AssociatedTest is not null)
             {
                 AssociatedTest.NewListingNumber = value;
@@ -52,17 +52,17 @@ public partial class ListingInformation
     }
 
     public string OriginalListingNumberSuffix { get; }
-    private string newListingNumberSuffix;
+    private string _NewListingNumberSuffix;
     public string NewListingNumberSuffix
     {
-        get => newListingNumberSuffix;
+        get => _NewListingNumberSuffix;
         set
         {
             if (value != OriginalListingNumberSuffix)
             {
                 Changed = true;
             }
-            newListingNumberSuffix = value;
+            _NewListingNumberSuffix = value;
             if (AssociatedTest is not null)
             {
                 AssociatedTest.NewListingNumberSuffix = value;
@@ -92,9 +92,9 @@ public partial class ListingInformation
             && int.TryParse(matches.Groups[2].Value, out int listingNumber)
             && matches.Success)
         {
-            OriginalChapterNumber = newChapterNumber = chapterNumber;
-            OriginalListingNumber = newListingNumber = listingNumber;
-            OriginalListingNumberSuffix = newListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : string.Empty;
+            OriginalChapterNumber = _NewChapterNumber = chapterNumber;
+            OriginalListingNumber = _NewListingNumber = listingNumber;
+            OriginalListingNumberSuffix = _NewListingNumberSuffix = !string.IsNullOrWhiteSpace(matches.Groups[3].Value) ? matches.Groups[3].Value : string.Empty;
             Caption = !string.IsNullOrWhiteSpace(matches.Groups[5].Value) ? matches.Groups[5].Value : string.Empty;
             FullCaption = matches.Groups[4].Value;
             IsTest = isTest || (!string.IsNullOrWhiteSpace(FullCaption) ? FullCaption : string.Empty).EndsWith(".Tests");

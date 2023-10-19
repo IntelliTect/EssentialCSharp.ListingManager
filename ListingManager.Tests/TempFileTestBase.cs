@@ -1,5 +1,4 @@
-﻿using Polly;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -127,8 +126,6 @@ public abstract class TempFileTestBase : IDisposable
         }
 
         _Disposed = true;
-
-        ExceptionAggregator aggregator = new();
 
         IEnumerable<FileSystemInfo> items = _TempFiles
             .Cast<FileSystemInfo>()
