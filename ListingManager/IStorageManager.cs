@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EssentialCSharp.ListingManager
+namespace EssentialCSharp.ListingManager;
+
+public interface IStorageManager
 {
-    public interface IStorageManager
-    {
-        public void Move(string oldPath, string newPath);
-    }
+    public void Move(string oldPath, string newPath);
 }

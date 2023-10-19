@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EssentialCSharp.ListingManager
+namespace EssentialCSharp.ListingManager;
+
+public class OSStorageManager : IStorageManager
 {
-    public class OSStorageManager : IStorageManager
+    public void Move(string oldPath, string newPath)
     {
-        public void Move(string oldPath, string newPath)
-        {
-            File.Copy(oldPath, newPath, false);
-            File.Delete(oldPath);
-        }
+        File.Copy(oldPath, newPath, false);
+        File.Delete(oldPath);
     }
 }
