@@ -5,42 +5,17 @@
         <TargetFramework>net7.0</TargetFramework>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>ListingManager</ToolCommandName>
-		<RepositoryType>git</RepositoryType>
-		<Deterministic>true</Deterministic>
-		<PackageTags>IntelliTect, EssentialCSharp, ListingManager</PackageTags>
+		    <RepositoryType>git</RepositoryType>
+		    <Deterministic>true</Deterministic>
+		    <PackageTags>IntelliTect, EssentialCSharp, ListingManager</PackageTags>
         <Authors>IntelliTect</Authors>
         <Version>0.1.5</Version>
         <PackageId>IntelliTect.EssentialCSharp.ListingManager</PackageId>
         <Description>Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators</Description>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <LangVersion>11</LangVersion>
-        <Nullable>enable</Nullable>
         <NoWarn>CS1591</NoWarn>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/IntelliTect/ListingManager</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/IntelliTect/ListingManager</RepositoryUrl>
-		<!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<!-- Embed source files that are not tracked by the source control manager in the PDB -->
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-
-		<!-- Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
-	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-	</PropertyGroup>
-	<ItemGroup>
-		<None Include="../README.md" Pack="true" PackagePath="\" />
-		<SourceRoot Include="$(MSBuildThisFileDirectory)/" />
-		<PackageReference Include="LibGit2Sharp" Version="0.27.2" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-    <ItemGroup>
+	  <ItemGroup>
+		  <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
       <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
     </ItemGroup>
 
