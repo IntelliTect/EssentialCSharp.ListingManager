@@ -210,26 +210,18 @@ public partial class ListingManager
         List<ListingInformation> listingData = new();
         List<ListingInformation> testListingData = new();
         var listingFiles = FileManager.GetAllFilesAtPath(pathToChapter)
-            .OrderBy(x => x).ToList();
+            .OrderBy(x => x);
         foreach (string fileName in listingFiles)
         {
-            bool result = TryGetListing(fileName, out ListingInformation? data);
-            if (result)
+            if (TryGetListing(fileName, out ListingInformation? data))
             {
-                if (data is not null)
+                if (data.IsTest)
                 {
-                    if (data.IsTest)
-                    {
-                        testListingData.Add(data);
-                    }
-                    else
-                    {
-                        listingData.Add(data);
-                    }
+                    testListingData.Add(data);
                 }
                 else
                 {
-                    throw new InvalidOperationException("Listing data is unexpectedly null with a successful result");
+                    listingData.Add(data);
                 }
             }
         }
@@ -237,27 +229,23 @@ public partial class ListingManager
         if (!singleDir)
         {
             var listingTestFiles = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-    .OrderBy(x => x).ToList();
+    .OrderBy(x => x);
             foreach (string fileName in listingTestFiles)
             {
-                bool result = TryGetListing(fileName, out ListingInformation? data, true);
-                if (result)
+                if (TryGetListing(fileName, out ListingInformation? data, true))
                 {
-                    if (data is not null)
-                    {
-                        testListingData.Add(data);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Listing data is unexpectedly null with a successful result");
-                    }
+
+                    testListingData.Add(data);
+
                 }
             }
         }
         foreach (ListingInformation testListingInformation in testListingData)
         {
-            ListingInformation listingInformation = listingData.Where(x => x.OriginalListingNumber == testListingInformation.OriginalListingNumber && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix).First();
-            if (testListingInformation.Caption.ToLowerInvariant() == "Tests".ToLowerInvariant() && listingInformation.Caption != string.Empty)
+            ListingInformation listingInformation = listingData.First(x => x.OriginalListingNumber == testListingInformation.OriginalListingNumber
+                                                                                && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber
+                                                                                && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix);
+            if (string.Equals(testListingInformation.Caption, "Tests", StringComparison.InvariantCultureIgnoreCase) && listingInformation.Caption != string.Empty)
             {
                 testListingInformation.Caption = listingInformation.Caption + ".Tests";
             }
