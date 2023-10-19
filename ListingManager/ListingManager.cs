@@ -39,7 +39,12 @@ public partial class ListingManager
         }
     }
 
-    private static bool TryGetListing(string listingPath, [NotNullWhen(true)] out ListingInformation? listingData, bool isTest = false)
+    private static bool TryGetListing(string listingPath, [NotNullWhen(true)] out ListingInformation? listingData)
+    {
+        return TryGetListing(listingPath, out listingData, false);
+    }
+
+    private static bool TryGetListing(string listingPath, [NotNullWhen(true)] out ListingInformation? listingData, bool isTest)
     {
         listingData = null;
 
