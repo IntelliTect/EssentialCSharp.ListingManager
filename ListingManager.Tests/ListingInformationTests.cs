@@ -34,9 +34,9 @@ public class ListingInformationTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
         WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
+        var writtenFile = Assert.Single(writtenFiles);
 
-        ListingInformation listingInformation = new(writtenFiles.First().FullName);
+        ListingInformation listingInformation = new(writtenFile.FullName);
 
         Assert.Equal(chapterNumber, listingInformation.OriginalChapterNumber);
         Assert.Equal(listingInformation.NewChapterNumber, listingInformation.OriginalChapterNumber);
@@ -76,9 +76,9 @@ public class ListingInformationTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
         WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
+        var writtenFile = Assert.Single(writtenFiles);
 
-        ListingInformation listingInformation = new(writtenFiles.First().FullName);
+        ListingInformation listingInformation = new(writtenFile.FullName);
         Assert.NotNull(listingInformation);
         Assert.Equal(Path.GetExtension(listing), listingInformation.ListingExtension);
         Assert.False(listingInformation.Changed);
@@ -109,9 +109,9 @@ public class ListingInformationTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
         WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
+        var writtenFile = Assert.Single(writtenFiles);
 
-        ListingInformation listingInformation = new(writtenFiles.First().FullName, isTest);
+        ListingInformation listingInformation = new(writtenFile.FullName, isTest);
         Assert.NotNull(listingInformation);
         Assert.Equal(Path.GetExtension(listing), listingInformation.ListingExtension);
 
@@ -138,11 +138,9 @@ public class ListingInformationTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
-        WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
-
-        Assert.Throws<System.ArgumentException>(() => new ListingInformation(writtenFiles.First().FullName));
+        var writtenFile = Assert.Single(writtenFiles);
+        Assert.Throws<System.ArgumentException>(() => new ListingInformation(writtenFile.FullName));
     }
     [Theory]
     [InlineData("01", "Listing01.01.cs")]
@@ -170,11 +168,9 @@ public class ListingInformationTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
-        WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
-
-        Assert.Equal(expected, (new ListingInformation(writtenFiles.First().FullName)).GetPaddedListingNumberWithSuffix());
+        var writtenFile = Assert.Single(writtenFiles);
+        Assert.Equal(expected, (new ListingInformation(writtenFile.FullName)).GetPaddedListingNumberWithSuffix());
     }
 
     [Theory]
@@ -205,11 +201,10 @@ public class ListingInformationTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
-        WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
+        var writtenFile = Assert.Single(writtenFiles);
 
-        Assert.Equal(expected, new ListingInformation(writtenFiles.First().FullName, isTest).GetNewNamespace(chapterOnly));
+        Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewNamespace(chapterOnly));
     }
 
     [Theory]
@@ -232,10 +227,9 @@ public class ListingInformationTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
-        WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
+        var writtenFile = Assert.Single(writtenFiles);
 
-        Assert.Equal(expected, new ListingInformation(writtenFiles.First().FullName, isTest).GetNewFileName(chapterOnly));
+        Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewFileName(chapterOnly));
     }
 }

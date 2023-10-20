@@ -98,7 +98,7 @@ public partial class ListingManager
 
             if (!preview) UpdateNamespaceOfPath(curListingData.Path, newNamespace, newFileName);
 
-            if (listingData.Where(item => item.AssociatedTest is not null).Where(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.OriginalListingNumberSuffix == curListingData.OriginalListingNumberSuffix).FirstOrDefault() is ListingInformation curTestListingData)
+            if (listingData.Where(item => item.AssociatedTest is not null).FirstOrDefault(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.OriginalListingNumberSuffix == curListingData.OriginalListingNumberSuffix) is ListingInformation curTestListingData)
             {
                 if (verbose)
                 {

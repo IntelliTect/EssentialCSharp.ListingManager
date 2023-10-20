@@ -37,8 +37,8 @@ public class FileManagerTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
         CreateTempDirectory(tempDir, name: chapterFilePath);
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
-        Assert.Single(writtenFiles);
+        var writtenFile = Assert.Single(writtenFiles);
 
-        Assert.Equal(expectedChapterNum, (new ListingInformation(writtenFiles.First().FullName)).OriginalChapterNumber);
+        Assert.Equal(expectedChapterNum, (new ListingInformation(writtenFile.FullName)).OriginalChapterNumber);
     }
 }
