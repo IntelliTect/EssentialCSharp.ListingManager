@@ -91,8 +91,7 @@ public partial class ListingManager
             string newFileName = curListingData.GetNewFileName(ChapterOnly);
 
             Console.WriteLine($"Corrective action. {Path.GetFileName(curListingData.Path)} rename to {newFileName}");
-
-            if (!preview) UpdateNamespaceOfPath(curListingData.Path, newNamespace, newFileName);
+            curListingData.UpdateNamespaceInFileContents(ChapterOnly);
 
             if (listingData.Where(item => item.AssociatedTest is not null).FirstOrDefault(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.OriginalListingNumberSuffix == curListingData.OriginalListingNumberSuffix) is ListingInformation curTestListingData)
             {
@@ -106,17 +105,34 @@ public partial class ListingManager
 
                     if (!preview)
                     {
-                        UpdateNamespaceOfPath(curListingData.Path, newNamespace, newFileName);
-                        if (curListingData.AssociatedTest is not null)
-                        {
-                            UpdateNamespaceOfPath(curListingData.AssociatedTest.Path, curListingData.AssociatedTest.GetNewNamespace(ChapterOnly), curListingData.AssociatedTest.GetNewFileName(ChapterOnly));
-                        }
+                        curListingData.AssociatedTest?.UpdateNamespaceInFileContents(ChapterOnly);
                     }
                 }
             }
         }
 
         MoveListing(listingData);
+        UpdateFileContents(listingData);
+    }
+
+    private void UpdateFileContents(List<ListingInformation> listingData)
+    {
+       foreach (ListingInformation listingInformation in listingData)
+        {
+            UpdateFileContents(listingInformation);
+        }
+    }
+
+    private void UpdateFileContents(ListingInformation listingInformation)
+    {
+        if (listingInformation.FileContentsChanged)
+        {
+            File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingInformation.Path), listingInformation.FileContents);
+            if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
+            {
+                File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingTest.Path), listingTest.FileContents);
+            }
+        }
     }
 
     public void MoveListing(IEnumerable<ListingInformation> listingData)
@@ -131,46 +147,17 @@ public partial class ListingManager
     {
         if (listingInformation.Changed)
         {
-            StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformation.GetNewFileName(ChapterOnly)));
+            string listingInformationFileName = listingInformation.GetNewFileName(ChapterOnly);
+            StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformationFileName));
+            listingInformation.Path = listingInformationFileName;
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
                 if (listingTest.Changed)
                 {
-                    StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTest.GetNewFileName(ChapterOnly)));
+                    string listingTestInformationFileName = listingTest.GetNewFileName(ChapterOnly);
+                    StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTestInformationFileName));
+                    listingTest.Path = listingTestInformationFileName;
                 }
-            }
-        }
-    }
-
-    private static void UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
-    {
-        if (Path.GetExtension(path) != ".tmp")
-        {
-            return;
-        }
-
-        // read file into memory
-        string[] allLinesInFile = File.ReadAllLines(path);
-
-        string targetPath = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, newFileName) ?? path;
-
-        using TextWriter textWriter = new StreamWriter(targetPath, true);
-        foreach (string line in allLinesInFile)
-        {
-            if (line.StartsWith("namespace"))
-            {
-                if (line.TrimEnd().EndsWith(";"))
-                {
-                    textWriter.WriteLine("namespace " + newNamespace + ";");
-                }
-                else
-                {
-                    textWriter.WriteLine("namespace " + newNamespace);
-                }
-            }
-            else
-            {
-                textWriter.WriteLine(line);
             }
         }
     }

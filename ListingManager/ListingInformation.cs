@@ -8,6 +8,7 @@ public partial class ListingInformation
     public const string TemporaryExtension = ".tmp";
 
     public bool Changed { get; private set; }
+    public bool FileContentsChanged { get; private set; }
 
     public int OriginalChapterNumber { get; }
     private int _NewChapterNumber;
@@ -67,11 +68,11 @@ public partial class ListingInformation
     }
     public string Caption { get; set; }
     public string TemporaryPath => Path + TemporaryExtension;
-    public string Path { get; }
+    public string Path { get; set; }
     public string ParentDir { get; }
     public string NamespacePrefix => "AddisonWesley.Michaelis.EssentialCSharp";
     public string ListingExtension { get; }
-    public string FileContents { get; set; }
+    public List<string> FileContents { get; set; }
     public ListingInformation? AssociatedTest { get; set; }
     public bool IsTest { get; }
     private string FullCaption { get; }
@@ -96,7 +97,7 @@ public partial class ListingInformation
             IsTest = isTest || (!string.IsNullOrWhiteSpace(FullCaption) ? FullCaption : string.Empty).EndsWith(".Tests");
             Path = listingPath;
             ListingExtension = matches.Groups[6].Value;
-            FileContents = File.ReadAllText(listingPath);
+            FileContents = File.ReadAllLines(listingPath).ToList();
             ParentDir = new FileInfo(listingPath).Directory?.FullName ?? throw new InvalidOperationException("Path is unexpectedly null");
         }
         else
@@ -123,6 +124,26 @@ public partial class ListingInformation
                + $".Chapter{paddedChapterNumber}"
                + $".Listing{paddedChapterNumber}_"
                + paddedListingNumber + (IsTest ? ".Tests" : string.Empty);
+    }
+
+    public bool UpdateNamespaceInFileContents(bool chapterOnly)
+    {
+        return UpdateNamespaceInFileContents(GetNewNamespace(chapterOnly));
+    }
+
+    public bool UpdateNamespaceInFileContents(string newNamespace)
+    {
+        bool updated = false;
+        for (int i = 0; i < FileContents.Count; i++)
+        {
+            if (FileContents[i].TrimStart().StartsWith("namespace"))
+            {
+                FileContents[i] = $"namespace {newNamespace}";
+                updated = true;
+                FileContentsChanged = true;
+            }
+        }
+        return updated;
     }
 
     public string GetNewFileName(bool chapterOnly)
