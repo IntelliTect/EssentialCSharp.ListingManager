@@ -146,6 +146,21 @@ public partial class ListingInformation
         return updated;
     }
 
+    public void UpdateReferencesInFile(List<ListingInformation> listingData)
+    {
+        for (int i = 0; i < FileContents.Count; i++)
+        {
+            if (new Regex("using Listing\\d{2}_\\d{2};").IsMatch(FileContents[i]))
+            {
+                int chapterNumber = int.Parse(FileContents[i].Substring(12, 2));
+                int listingNumber = int.Parse(FileContents[i].Substring(15, 2));
+                ListingInformation referencedListingInformation = listingData.First(item => item.OriginalChapterNumber == chapterNumber && item.OriginalListingNumber == listingNumber);
+                FileContents[i] = $"using Listing{referencedListingInformation.NewChapterNumber:D2}_{referencedListingInformation.NewListingNumber:D2};";
+                FileContentsChanged = true;
+            }
+        }
+    }
+
     public string GetNewFileName()
     {
         string newFileNameTemplate = "Listing{0}.{1}{2}" + (IsTest && !FullCaption.EndsWith(".Tests") ? ".Tests" : string.Empty) + ListingExtension;
@@ -161,4 +176,3 @@ public partial class ListingInformation
     [GeneratedRegex(@"\d{1}[A-Za-z]")]
     private static partial Regex SingleDigitListingWithSuffix();
 }
-
