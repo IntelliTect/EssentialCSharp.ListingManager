@@ -1,9 +1,5 @@
 using LibGit2Sharp;
 using Xunit;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
@@ -742,7 +738,7 @@ public class ListingManagerTests : TempFileTestBase
     {
         List<string> filesToMake = new()
         {
-            listingPath, 
+            listingPath,
             testPath
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);

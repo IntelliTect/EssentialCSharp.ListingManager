@@ -1,7 +1,4 @@
 using Xunit;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
@@ -82,7 +79,9 @@ public class ListingInformationTests : TempFileTestBase
         Assert.NotNull(listingInformation);
         Assert.Equal(Path.GetExtension(listing), listingInformation.ListingExtension);
         Assert.False(listingInformation.Changed);
-    }    [Theory]
+    }
+
+    [Theory]
     [InlineData("Listing01.01.cs", false, false)]
     [InlineData("Listing01.01.Something.Tests.cs", false, true)]
     [InlineData("Listing01.01.Tests.cs", false, true)]
@@ -140,7 +139,7 @@ public class ListingInformationTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
-        Assert.Throws<System.ArgumentException>(() => new ListingInformation(writtenFile.FullName));
+        Assert.Throws<ArgumentException>(() => new ListingInformation(writtenFile.FullName));
     }
     [Theory]
     [InlineData("01", "Listing01.01.cs")]

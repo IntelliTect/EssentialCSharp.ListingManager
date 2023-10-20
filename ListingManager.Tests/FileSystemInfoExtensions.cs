@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace EssentialCSharp.ListingManager.Tests;
+﻿namespace EssentialCSharp.ListingManager.Tests;
 
 internal static class FileSystemInfoExtensions
 {

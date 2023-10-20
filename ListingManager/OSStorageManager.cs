@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace EssentialCSharp.ListingManager;
+﻿namespace EssentialCSharp.ListingManager;
 
 public class OSStorageManager : IStorageManager
 {
