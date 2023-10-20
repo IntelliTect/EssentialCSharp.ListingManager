@@ -86,7 +86,6 @@ public partial class ListingManager
 
             Console.WriteLine($"Corrective action. {Path.GetFileName(curListingData.Path)} rename to {newFileName}");
             curListingData.UpdateNamespaceInFileContents();
-            curListingData.UpdateReferencesInFile(listingData);
 
             if (listingData.Where(item => item.AssociatedTest is not null).FirstOrDefault(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.OriginalListingNumberSuffix == curListingData.OriginalListingNumberSuffix) is ListingInformation curTestListingData)
             {
@@ -106,6 +105,7 @@ public partial class ListingManager
             }
         }
 
+        listingData.ForEach(item => item.UpdateReferencesInFile(listingData));
         MoveListing(listingData);
         UpdateFileContents(listingData);
     }

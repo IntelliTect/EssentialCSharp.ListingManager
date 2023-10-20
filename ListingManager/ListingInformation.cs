@@ -79,9 +79,7 @@ public partial class ListingInformation
 
     public ListingInformation(string listingPath, bool isTest = false)
     {
-        Regex regex = ExtractListingNameFromAnyApprovedFileTypes();
-
-        var matches = regex.Match(listingPath);
+        Match matches = ExtractListingNameFromAnyApprovedFileTypes().Match(listingPath);
 
         if (ApprovedFileTypes.Contains(matches.Groups[6].Value.ToLower()) is false) throw new ArgumentException("Listing path is not of an approved file type.", nameof(listingPath));
 
@@ -105,16 +103,13 @@ public partial class ListingInformation
             throw new ArgumentException("Listing information not successfully able to be parsed from listing path.", nameof(listingPath));
         }
     }
-    // Match any approved files regex: regexr.com/7lfi2
-    [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.(\\w+))$")]
-    private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
 
     public string GetPaddedListingNumberWithSuffix(bool originalListingNumber = false)
     {
         if (!originalListingNumber) return NewListingNumber.ToString("D2") + NewListingNumberSuffix;
         else return (OriginalListingNumber.ToString("D2") + NewListingNumberSuffix);
-
     }
+
     public string GetNewNamespace()
     {
         string paddedChapterNumber = NewChapterNumber.ToString("D2");
@@ -150,12 +145,21 @@ public partial class ListingInformation
     {
         for (int i = 0; i < FileContents.Count; i++)
         {
-            if (new Regex("using Listing\\d{2}_\\d{2};").IsMatch(FileContents[i]))
+            if (ListingReference().IsMatch(FileContents[i]))
             {
-                int chapterNumber = int.Parse(FileContents[i].Substring(12, 2));
-                int listingNumber = int.Parse(FileContents[i].Substring(15, 2));
-                ListingInformation referencedListingInformation = listingData.First(item => item.OriginalChapterNumber == chapterNumber && item.OriginalListingNumber == listingNumber);
-                FileContents[i] = $"using Listing{referencedListingInformation.NewChapterNumber:D2}_{referencedListingInformation.NewListingNumber:D2};";
+                MatchCollection matches = ListingReference().Matches(FileContents[i]);
+                for (int j = 0; j < matches.Count; j++)
+                {
+                    int chapterNumber = int.Parse(matches[j].Groups[1].Value);
+                    string chapterListingDeliminator = matches[j].Groups[2].Value;
+                    int listingNumber = int.Parse(matches[j].Groups[3].Value);
+                    ListingInformation? referencedListingInformation = listingData.FirstOrDefault(item => item.OriginalChapterNumber == chapterNumber && item.OriginalListingNumber == listingNumber);
+                    if (referencedListingInformation is not null)
+                    {
+                        string replacementListingReference = matches[j].Groups[0].Value.Replace($"{chapterNumber:D2}{matches[j].Groups[2].Value}{listingNumber:D2}", $"{referencedListingInformation.NewChapterNumber:D2}{matches[j].Groups[2].Value}{referencedListingInformation.NewListingNumber:D2}");
+                        FileContents[i] = FileContents[i].Replace(matches[j].Groups[0].Value, replacementListingReference);
+                    }
+                }
                 FileContentsChanged = true;
             }
         }
@@ -173,6 +177,11 @@ public partial class ListingInformation
             string.IsNullOrWhiteSpace(Caption) ? "" : $".{Caption}");
     }
 
+    // Match any approved files regex: regexr.com/7lfi2
+    [GeneratedRegex("Listing(\\d{2}).(\\d{2})([A-Za-z]*)(\\.{1}(.*))*(\\.(\\w+))$")]
+    private static partial Regex ExtractListingNameFromAnyApprovedFileTypes();
     [GeneratedRegex(@"\d{1}[A-Za-z]")]
     private static partial Regex SingleDigitListingWithSuffix();
+    [GeneratedRegex("Listing(\\d{2})([_.])(\\d{2})")]
+    private static partial Regex ListingReference();
 }
