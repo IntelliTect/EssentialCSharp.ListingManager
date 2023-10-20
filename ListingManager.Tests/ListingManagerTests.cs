@@ -539,64 +539,6 @@ public class ListingManagerTests : TempFileTestBase
     }
 
     [Fact]
-    public void
-        UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
-    {
-        ICollection<string> filesToMake = new List<string>
-        {
-            "Chapter42/Listing01.01.cs",
-            "Chapter42/Listing01.01A.Some.cs",
-            "Chapter42/Listing01.01B.cs",
-            "Chapter42/Listing01.01C.cs",
-            "Chapter42/Listing01.05.cs",
-            "Chapter42.Tests/Listing01.01.Tests.cs",
-            "Chapter42.Tests/Listing01.01A.Some.Tests.cs",
-            "Chapter42.Tests/Listing01.01B.Tests.cs",
-            "Chapter42.Tests/Listing01.01C.Tests.cs",
-            "Chapter42.Tests/Listing01.05.Tests.cs"
-        };
-
-        ICollection<string> expectedFiles = new List<string>
-        {
-            @"Chapter42\Listing42.01.cs",
-            @"Chapter42\Listing42.01A.Some.cs",
-            @"Chapter42\Listing42.01B.cs",
-            @"Chapter42\Listing42.01C.cs",
-            @"Chapter42\Listing42.05.cs",
-            @"Chapter42.Tests\Listing42.01.Tests.cs",
-            @"Chapter42.Tests\Listing42.01A.Some.Tests.cs",
-            @"Chapter42.Tests\Listing42.01B.Tests.cs",
-            @"Chapter42.Tests\Listing42.01C.Tests.cs",
-            @"Chapter42.Tests\Listing42.05.Tests.cs"
-        };
-
-        IEnumerable<string> toWrite = new List<string>
-        {
-            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
-            "{",
-            "    using System;",
-            "    using System.Reflection;",
-            "    public class Program { }",
-            "}"
-        };
-
-        DirectoryInfo tempDir = CreateTempDirectory();
-        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
-        CreateTempDirectory(tempDir, name: "Chapter42.Tests");
-        WriteFiles(tempDir, filesToMake, toWrite);
-        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
-
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager(), chapterOnly: true);
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
-
-        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
-            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-
-        // Assert
-        Assert.Equivalent(expectedFiles, files);
-    }
-
-    [Fact]
     public void RenumberAllFilesIncludingXML_DontChangeFiles_ListingsAndTestsUpdated()
     {
         // Make sure csproj file is created, but doesn't get renumbered (is ignored)

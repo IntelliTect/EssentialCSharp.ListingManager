@@ -115,10 +115,10 @@ public partial class ListingInformation
         else return (OriginalListingNumber.ToString("D2") + NewListingNumberSuffix);
 
     }
-    public string GetNewNamespace(bool chapterOnly)
+    public string GetNewNamespace()
     {
         string paddedChapterNumber = NewChapterNumber.ToString("D2");
-        string paddedListingNumber = GetPaddedListingNumberWithSuffix(chapterOnly);
+        string paddedListingNumber = GetPaddedListingNumberWithSuffix();
 
         return NamespacePrefix
                + $".Chapter{paddedChapterNumber}"
@@ -126,9 +126,9 @@ public partial class ListingInformation
                + paddedListingNumber + (IsTest ? ".Tests" : string.Empty);
     }
 
-    public bool UpdateNamespaceInFileContents(bool chapterOnly)
+    public bool UpdateNamespaceInFileContents()
     {
-        return UpdateNamespaceInFileContents(GetNewNamespace(chapterOnly));
+        return UpdateNamespaceInFileContents(GetNewNamespace());
     }
 
     public bool UpdateNamespaceInFileContents(string newNamespace)
@@ -146,7 +146,7 @@ public partial class ListingInformation
         return updated;
     }
 
-    public string GetNewFileName(bool chapterOnly)
+    public string GetNewFileName()
     {
         string newFileNameTemplate = "Listing{0}.{1}{2}" + (IsTest && !FullCaption.EndsWith(".Tests") ? ".Tests" : string.Empty) + ListingExtension;
         string paddedChapterNumber = NewChapterNumber.ToString("00");

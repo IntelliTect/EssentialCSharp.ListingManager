@@ -10,18 +10,15 @@ namespace EssentialCSharp.ListingManager;
 public partial class ListingManager
 {
     public IStorageManager StorageManager { get; }
-    public bool ChapterOnly { get; }
 
-    public ListingManager(string pathToChapter, bool chapterOnly = false)
+    public ListingManager(string pathToChapter)
     {
         StorageManager = Repository.IsValid(pathToChapter) ? new GitStorageManager(pathToChapter) : new OSStorageManager();
-        ChapterOnly = chapterOnly;
     }
 
-    public ListingManager(string pathToChapter, IStorageManager storageManager, bool chapterOnly = false)
+    public ListingManager(string pathToChapter, IStorageManager storageManager)
     {
         StorageManager = storageManager;
-        ChapterOnly = chapterOnly;
     }
 
     public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
@@ -76,22 +73,19 @@ public partial class ListingManager
         {
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
 
-            if (!ChapterOnly)
-            {
-                curListingData.NewListingNumber = listingNumber;
-                curListingData.NewListingNumberSuffix = string.Empty;
-            }
+            curListingData.NewListingNumber = listingNumber;
+            curListingData.NewListingNumberSuffix = string.Empty;
 
             if (byFolder)
             {
                 curListingData.NewChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
             }
 
-            string newNamespace = curListingData.GetNewNamespace(ChapterOnly);
-            string newFileName = curListingData.GetNewFileName(ChapterOnly);
+            string newNamespace = curListingData.GetNewNamespace();
+            string newFileName = curListingData.GetNewFileName();
 
             Console.WriteLine($"Corrective action. {Path.GetFileName(curListingData.Path)} rename to {newFileName}");
-            curListingData.UpdateNamespaceInFileContents(ChapterOnly);
+            curListingData.UpdateNamespaceInFileContents();
 
             if (listingData.Where(item => item.AssociatedTest is not null).FirstOrDefault(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.OriginalListingNumberSuffix == curListingData.OriginalListingNumberSuffix) is ListingInformation curTestListingData)
             {
@@ -105,7 +99,7 @@ public partial class ListingManager
 
                     if (!preview)
                     {
-                        curListingData.AssociatedTest?.UpdateNamespaceInFileContents(ChapterOnly);
+                        curListingData.AssociatedTest?.UpdateNamespaceInFileContents();
                     }
                 }
             }
@@ -117,7 +111,7 @@ public partial class ListingManager
 
     private void UpdateFileContents(List<ListingInformation> listingData)
     {
-       foreach (ListingInformation listingInformation in listingData)
+        foreach (ListingInformation listingInformation in listingData)
         {
             UpdateFileContents(listingInformation);
         }
@@ -147,14 +141,14 @@ public partial class ListingManager
     {
         if (listingInformation.Changed)
         {
-            string listingInformationFileName = listingInformation.GetNewFileName(ChapterOnly);
+            string listingInformationFileName = listingInformation.GetNewFileName();
             StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformationFileName));
             listingInformation.Path = listingInformationFileName;
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
                 if (listingTest.Changed)
                 {
-                    string listingTestInformationFileName = listingTest.GetNewFileName(ChapterOnly);
+                    string listingTestInformationFileName = listingTest.GetNewFileName();
                     StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTestInformationFileName));
                     listingTest.Path = listingTestInformationFileName;
                 }

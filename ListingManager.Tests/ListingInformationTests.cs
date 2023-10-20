@@ -174,16 +174,15 @@ public class ListingInformationTests : TempFileTestBase
     }
 
     [Theory]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01", "Listing01.01.cs", false, false)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_05", "Listing01.05.cs", false, false)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", false, false)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", true, false)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_06B", "Listing01.06B.cs", false, false)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C", "Listing01.07C.cs", true, false)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C.Tests", "Listing01.07C.Tests.cs", true, true)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_08.Tests", "Listing01.08.Tests.cs", true, true)]
-    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_10.Tests", "Listing01.10.Tests.cs", true, true)]
-    public void GetNewNamespace_Namespace_ReturnCorrectNewNamespace(string expected, string listingPath, bool chapterOnly, bool isTest)
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01", "Listing01.01.cs", false)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_05", "Listing01.05.cs", false)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_04a", "Listing01.04a.cs", false)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_06B", "Listing01.06B.cs", false)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C", "Listing01.07C.cs", false)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_07C.Tests", "Listing01.07C.Tests.cs", true)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_08.Tests", "Listing01.08.Tests.cs", true)]
+    [InlineData("AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_10.Tests", "Listing01.10.Tests.cs", true)]
+    public void GetNewNamespace_Namespace_ReturnCorrectNewNamespace(string expected, string listingPath, bool isTest)
     {
         List<string> filesToMake = new()
         {
@@ -204,12 +203,12 @@ public class ListingInformationTests : TempFileTestBase
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
 
-        Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewNamespace(chapterOnly));
+        Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewNamespace());
     }
 
     [Theory]
-    [InlineData("Listing01.01.cs", "Listing01.01.cs", false, false)]
-    public void GetNewFileName_FileName_ReturnCorrectNewFileName(string expected, string listingPath, bool chapterOnly, bool isTest)
+    [InlineData("Listing01.01.cs", "Listing01.01.cs", false)]
+    public void GetNewFileName_FileName_ReturnCorrectNewFileName(string expected, string listingPath, bool isTest)
     {
         List<string> filesToMake = new()
         {
@@ -230,6 +229,6 @@ public class ListingInformationTests : TempFileTestBase
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
 
-        Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewFileName(chapterOnly));
+        Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewFileName());
     }
 }
