@@ -75,8 +75,10 @@ public class ListingInformationTests : TempFileTestBase
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
 
-        ListingInformation listingInformation = new(writtenFile.FullName);
-        Assert.NotNull(listingInformation);
+        ListingInformation listingInformation = new(writtenFile.FullName);
+
+        Assert.NotNull(listingInformation);
+
         Assert.Equal(Path.GetExtension(listing), listingInformation.ListingExtension);
         Assert.False(listingInformation.Changed);
     }
@@ -115,7 +117,8 @@ public class ListingInformationTests : TempFileTestBase
         Assert.Equal(Path.GetExtension(listing), listingInformation.ListingExtension);
 
         Assert.Equal(expectedIsTestResult, listingInformation.IsTest);
-    }
+    }
+
     [Theory]
     [InlineData("Listing01.02.something.txt")]
     [InlineData("Listing01.02A.csproj")]
@@ -140,7 +143,8 @@ public class ListingInformationTests : TempFileTestBase
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
         Assert.Throws<ArgumentException>(() => new ListingInformation(writtenFile.FullName));
-    }
+    }
+
     [Theory]
     [InlineData("01", "Listing01.01.cs")]
     [InlineData("03", "Listing01.03.cs")]
