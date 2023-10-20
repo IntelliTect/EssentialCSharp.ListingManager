@@ -1,29 +1,29 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using LibGit2Sharp;
+using Xunit;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
-[TestClass]
 public class ListingManagerTests : TempFileTestBase
 {
-    [TestMethod]
-    [DataRow("Listing02.01.SpecifyingLiteralValues.cs", false)]
-    [DataRow("Listing02.01A.SpecifyingLiteralValues.cs", true)]
-    [DataRow("Listing02.01.cs", false)]
+    // Create the committer's signature and commit
+    private Signature Author { get; } = new("IntellitectTestingBot", "info@intellitect.com", DateTime.Now);
+
+    #region IsExtraListing
+    [Theory]
+    [InlineData("Listing02.01.SpecifyingLiteralValues.cs", false)]
+    [InlineData("Listing02.01A.SpecifyingLiteralValues.cs", true)]
+    [InlineData("Listing02.01.cs", false)]
     public void IsIncorrectListingFromPath_FindsIncorrectListing(string fileName, bool expectedResult)
     {
         string path = Path.Combine(TempDirectory.ToString(), fileName);
 
         bool actualResult = ListingManager.IsExtraListing(path);
 
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.Equal(expectedResult, actualResult);
     }
 
-    [TestMethod]
-    [DataRow("/Chapter02.Tests", "Listing02.01A.SpecifyingLiteralValues.cs", false)]
+    [Theory]
+    [InlineData("/Chapter02.Tests", "Listing02.01A.SpecifyingLiteralValues.cs", false)]
     public void ListingsInTestDirectories_AreNotCountedAsExtraListings(string parentDirectory, string fileName,
         bool expectedResult)
     {
@@ -33,10 +33,11 @@ public class ListingManagerTests : TempFileTestBase
 
         bool actualResult = ListingManager.IsExtraListing(path);
 
-        Assert.AreEqual(expectedResult, actualResult);
+        Assert.Equal(expectedResult, actualResult);
     }
+    #endregion IsExtraListing
 
-    [TestMethod]
+    [Fact]
     public void GetAllExtraListings_ExtraListingsReturned()
     {
         ICollection<string> filesToMake = new List<string>
@@ -55,10 +56,71 @@ public class ListingManagerTests : TempFileTestBase
 
         var extraListings = ListingManager.GetAllExtraListings(tempDir.FullName).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, extraListings);
+        Assert.Equal(expectedFiles, extraListings);
     }
 
-    [TestMethod]
+    #region UpdateChapterListingNumbers
+    #region GitStorageManager
+    [Fact]
+    public void UpdateChapterListingNumbers_GitStorageManager_ListingsWithinListMissing_ListingsRenumbered()
+    {
+        List<string> filesToMake = new()
+        {
+            "Listing01.01.SpecifyingLiteralValues.cs",
+            "Listing01.02.cs",
+            "Listing01.04.cs",
+            "Listing01.06.Something.cs"
+        };
+
+        List<string> expectedFiles = new()
+        {
+            "Listing01.01.SpecifyingLiteralValues.cs",
+            "Listing01.02.cs",
+            "Listing01.03.cs",
+            "Listing01.04.Something.cs"
+        };
+
+        List<string> toWrite = new()
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+        WriteFiles(TempDirectory, filesToMake, toWrite);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
+
+        string rootedPath = Repository.Init(TempDirectory.FullName);
+        //Assert.Equal(rootedPath, TempDirectory.FullName);
+        using var repo = new Repository(TempDirectory.FullName);
+
+        Commands.Stage(repo, "*");
+
+        // Commit to the repository
+        repo.Commit("Here's a commit i made!", Author, Author);
+
+        ListingManager listingManager = new(TempDirectory.FullName, new GitStorageManager(TempDirectory.FullName));
+        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+        Assert.Equal(expectedFiles, files);
+
+        Commands.Stage(repo, "*");
+        repo.RetrieveStatus();
+        Assert.Equal(FileStatus.Unaltered, repo.RetrieveStatus(files[0]));
+        Assert.Equal(FileStatus.Unaltered, repo.RetrieveStatus(files[1]));
+
+        //TODO: These ideally would be "FileStatus.RenamedInIndex" instead of 
+        //NewInIndex because this indicates the old file is just being removed
+        //and the new one added instead of a true rename
+        Assert.Equal(FileStatus.NewInIndex, repo.RetrieveStatus(files[2]));
+        Assert.Equal(FileStatus.NewInIndex, repo.RetrieveStatus(files[3]));
+    }
+    #endregion GitStorageManager
+    #region UsingOSStorageManager
+    [Fact]
     public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
     {
         List<string> filesToMake = new()
@@ -87,16 +149,17 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
         WriteFiles(TempDirectory, filesToMake, toWrite);
-        expectedFiles = (List<string>)ConvertFileNamesToFullPath(expectedFiles, null);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
-        CollectionAssert.AreEquivalent(expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_ListingAtBeginningOfListMissing_ListingsRenumbered()
     {
         ICollection<string> filesToMake = new List<string>
@@ -125,15 +188,16 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_MultipleListingsMissing_ListingsRenumbered()
     {
         ICollection<string> filesToMake = new List<string>
@@ -190,15 +254,16 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_AdditionalListings_ListingsRenumbered()
     {
         ICollection<string> filesToMake = new List<string>
@@ -233,15 +298,16 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equal(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void UpdateChapterListingNumbers_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
     {
         ICollection<string> filesToMake = new List<string>
@@ -287,16 +353,16 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-
-    [TestMethod]
+    [Fact]
     public void
         UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
     {
@@ -343,107 +409,108 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void
     UpdateChapterListingNumbersUsingChapterNumberFromFolder_UnitTestAndListingPairingIsMaintained_ListingsAndTestsUpdated()
     {
         ICollection<string> filesToMake = new List<string>
         {
-            @"Chapter01\Listing01.01.HelloWorldInC#.cs",
-            @"Chapter01\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
-            @"Chapter01\Listing01.02B.MultipleStatementsOneOneLine.cs",
-            @"Chapter01\Listing01.02C.MultipleStatementsOnSeparateLines.cs",
-            @"Chapter01\Listing01.02D.SplittingAStatementAcrossMultipleLines.cs",
-            @"Chapter01\Listing01.02E.HelloWorldInC#.cs",
-            @"Chapter01\Listing01.03.BasicClassDeclaration.cs",
-            @"Chapter01\Listing01.04.BreakingApartHelloWorld.cs",
-            @"Chapter01\Listing01.05.TheMainMethodWithParametersAndAReturn.cs",
-            @"Chapter01\Listing01.08.NoIndentationFormatting.cs",
-            @"Chapter01\Listing01.09.RemovingWhitespace.cs",
-            @"Chapter01\Listing01.10.DeclaringAndAssigningAVariable.cs",
-            @"Chapter01\Listing01.11.DeclaringTwoVariablesWithinOneStatement.cs",
-            @"Chapter01\Listing01.12.ChangingTheValueOfAVariable.cs",
-            @"Chapter01\Listing01.13.AssignmentReturningAValueThatCanBeassignedAgain.cs",
-            @"Chapter01\Listing01.14.UsingSystemConsoleReadLine.cs",
-            @"Chapter01\Listing01.15.UsingSystemConsoleRead.cs",
-            @"Chapter01\Listing01.16.FormattingUsingStringInterpolation.cs",
-            @"Chapter01\Listing01.17.FormattingUsingCompositeFormatting.cs",
-            @"Chapter01\Listing01.18.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
-            @"Chapter01\Listing01.19.CommentingYourCode.cs",
-            @"Chapter01\Listing01.20.SampleCILOutput.cs",
-            @"Chapter01.Tests\Listing01.01.Tests.cs",
-            @"Chapter01.Tests\Listing01.02B.Tests.cs",
-            @"Chapter01.Tests\Listing01.02C.Tests.cs",
-            @"Chapter01.Tests\Listing01.02D.Tests.cs",
-            @"Chapter01.Tests\Listing01.02E.Tests.cs",
-            @"Chapter01.Tests\Listing01.04.Tests.cs",
-            @"Chapter01.Tests\Listing01.05.Tests.cs",
-            @"Chapter01.Tests\Listing01.08.Tests.cs",
-            @"Chapter01.Tests\Listing01.09.Tests.cs",
-            @"Chapter01.Tests\Listing01.10.Tests.cs",
-            @"Chapter01.Tests\Listing01.11.Tests.cs",
-            @"Chapter01.Tests\Listing01.12.Tests.cs",
-            @"Chapter01.Tests\Listing01.13.Tests.cs",
-            @"Chapter01.Tests\Listing01.14.Tests.cs",
-            @"Chapter01.Tests\Listing01.15.Tests.cs",
-            @"Chapter01.Tests\Listing01.16.Tests.cs",
-            @"Chapter01.Tests\Listing01.17.Tests.cs",
-            @"Chapter01.Tests\Listing01.18.Tests.cs",
-            @"Chapter01.Tests\Listing01.19.Tests.cs"
+            @"Chapter02\Listing01.01.HelloWorldInC#.cs",
+            @"Chapter02\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
+            @"Chapter02\Listing01.02B.MultipleStatementsOneOneLine.cs",
+            @"Chapter02\Listing01.02C.MultipleStatementsOnSeparateLines.cs",
+            @"Chapter02\Listing01.02D.SplittingAStatementAcrossMultipleLines.cs",
+            @"Chapter02\Listing01.02E.HelloWorldInC#.cs",
+            @"Chapter02\Listing01.03.BasicClassDeclaration.cs",
+            @"Chapter02\Listing01.04.BreakingApartHelloWorld.cs",
+            @"Chapter02\Listing01.05.TheMainMethodWithParametersAndAReturn.cs",
+            @"Chapter02\Listing01.08.NoIndentationFormatting.cs",
+            @"Chapter02\Listing01.09.RemovingWhitespace.cs",
+            @"Chapter02\Listing01.10.DeclaringAndAssigningAVariable.cs",
+            @"Chapter02\Listing01.11.DeclaringTwoVariablesWithinOneStatement.cs",
+            @"Chapter02\Listing01.12.ChangingTheValueOfAVariable.cs",
+            @"Chapter02\Listing01.13.AssignmentReturningAValueThatCanBeassignedAgain.cs",
+            @"Chapter02\Listing01.14.UsingSystemConsoleReadLine.cs",
+            @"Chapter02\Listing01.15.UsingSystemConsoleRead.cs",
+            @"Chapter02\Listing01.16.FormattingUsingStringInterpolation.cs",
+            @"Chapter02\Listing01.17.FormattingUsingCompositeFormatting.cs",
+            @"Chapter02\Listing01.18.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
+            @"Chapter02\Listing01.19.CommentingYourCode.cs",
+            @"Chapter02\Listing01.20.SampleCILOutput.cs",
+            @"Chapter02.Tests\Listing01.01.Tests.cs",
+            @"Chapter02.Tests\Listing01.02B.Tests.cs",
+            @"Chapter02.Tests\Listing01.02C.Tests.cs",
+            @"Chapter02.Tests\Listing01.02D.Tests.cs",
+            @"Chapter02.Tests\Listing01.02E.Tests.cs",
+            @"Chapter02.Tests\Listing01.04.Tests.cs",
+            @"Chapter02.Tests\Listing01.05.Tests.cs",
+            @"Chapter02.Tests\Listing01.08.Tests.cs",
+            @"Chapter02.Tests\Listing01.09.Tests.cs",
+            @"Chapter02.Tests\Listing01.10.Tests.cs",
+            @"Chapter02.Tests\Listing01.11.Tests.cs",
+            @"Chapter02.Tests\Listing01.12.Tests.cs",
+            @"Chapter02.Tests\Listing01.13.Tests.cs",
+            @"Chapter02.Tests\Listing01.14.Tests.cs",
+            @"Chapter02.Tests\Listing01.15.Tests.cs",
+            @"Chapter02.Tests\Listing01.16.Tests.cs",
+            @"Chapter02.Tests\Listing01.17.Tests.cs",
+            @"Chapter02.Tests\Listing01.18.Tests.cs",
+            @"Chapter02.Tests\Listing01.19.Tests.cs"
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            @"Chapter01\Listing01.01.HelloWorldInC#.cs",
-            @"Chapter01\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
-            @"Chapter01\Listing01.03.MultipleStatementsOneOneLine.cs",
-            @"Chapter01\Listing01.04.MultipleStatementsOnSeparateLines.cs",
-            @"Chapter01\Listing01.05.SplittingAStatementAcrossMultipleLines.cs",
-            @"Chapter01\Listing01.06.HelloWorldInC#.cs",
-            @"Chapter01\Listing01.07.BasicClassDeclaration.cs",
-            @"Chapter01\Listing01.08.BreakingApartHelloWorld.cs",
-            @"Chapter01\Listing01.09.TheMainMethodWithParametersAndAReturn.cs",
-            @"Chapter01\Listing01.10.NoIndentationFormatting.cs",
-            @"Chapter01\Listing01.11.RemovingWhitespace.cs",
-            @"Chapter01\Listing01.12.DeclaringAndAssigningAVariable.cs",
-            @"Chapter01\Listing01.13.DeclaringTwoVariablesWithinOneStatement.cs",
-            @"Chapter01\Listing01.14.ChangingTheValueOfAVariable.cs",
-            @"Chapter01\Listing01.15.AssignmentReturningAValueThatCanBeassignedAgain.cs",
-            @"Chapter01\Listing01.16.UsingSystemConsoleReadLine.cs",
-            @"Chapter01\Listing01.17.UsingSystemConsoleRead.cs",
-            @"Chapter01\Listing01.18.FormattingUsingStringInterpolation.cs",
-            @"Chapter01\Listing01.19.FormattingUsingCompositeFormatting.cs",
-            @"Chapter01\Listing01.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
-            @"Chapter01\Listing01.21.CommentingYourCode.cs",
-            @"Chapter01\Listing01.22.SampleCILOutput.cs",
-            @"Chapter01.Tests\Listing01.01.HelloWorldInC#.Tests.cs",
-            @"Chapter01.Tests\Listing01.03.MultipleStatementsOneOneLine.Tests.cs",
-            @"Chapter01.Tests\Listing01.04.MultipleStatementsOnSeparateLines.Tests.cs",
-            @"Chapter01.Tests\Listing01.05.SplittingAStatementAcrossMultipleLines.Tests.cs",
-            @"Chapter01.Tests\Listing01.06.HelloWorldInC#.Tests.cs",
-            @"Chapter01.Tests\Listing01.08.BreakingApartHelloWorld.Tests.cs",
-            @"Chapter01.Tests\Listing01.09.TheMainMethodWithParametersAndAReturn.Tests.cs",
-            @"Chapter01.Tests\Listing01.10.NoIndentationFormatting.Tests.cs",
-            @"Chapter01.Tests\Listing01.11.RemovingWhitespace.Tests.cs",
-            @"Chapter01.Tests\Listing01.12.DeclaringAndAssigningAVariable.Tests.cs",
-            @"Chapter01.Tests\Listing01.13.DeclaringTwoVariablesWithinOneStatement.Tests.cs",
-            @"Chapter01.Tests\Listing01.14.ChangingTheValueOfAVariable.Tests.cs",
-            @"Chapter01.Tests\Listing01.15.AssignmentReturningAValueThatCanBeassignedAgain.Tests.cs",
-            @"Chapter01.Tests\Listing01.16.UsingSystemConsoleReadLine.Tests.cs",
-            @"Chapter01.Tests\Listing01.17.UsingSystemConsoleRead.Tests.cs",
-            @"Chapter01.Tests\Listing01.18.FormattingUsingStringInterpolation.Tests.cs",
-            @"Chapter01.Tests\Listing01.19.FormattingUsingCompositeFormatting.Tests.cs",
-            @"Chapter01.Tests\Listing01.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.Tests.cs",
-            @"Chapter01.Tests\Listing01.21.CommentingYourCode.Tests.cs",
+            @"Chapter02\Listing02.01.HelloWorldInC#.cs",
+            @"Chapter02\Listing02.02.SampleNETCoreConsoleProjectFile.cs",
+            @"Chapter02\Listing02.03.MultipleStatementsOneOneLine.cs",
+            @"Chapter02\Listing02.04.MultipleStatementsOnSeparateLines.cs",
+            @"Chapter02\Listing02.05.SplittingAStatementAcrossMultipleLines.cs",
+            @"Chapter02\Listing02.06.HelloWorldInC#.cs",
+            @"Chapter02\Listing02.07.BasicClassDeclaration.cs",
+            @"Chapter02\Listing02.08.BreakingApartHelloWorld.cs",
+            @"Chapter02\Listing02.09.TheMainMethodWithParametersAndAReturn.cs",
+            @"Chapter02\Listing02.10.NoIndentationFormatting.cs",
+            @"Chapter02\Listing02.11.RemovingWhitespace.cs",
+            @"Chapter02\Listing02.12.DeclaringAndAssigningAVariable.cs",
+            @"Chapter02\Listing02.13.DeclaringTwoVariablesWithinOneStatement.cs",
+            @"Chapter02\Listing02.14.ChangingTheValueOfAVariable.cs",
+            @"Chapter02\Listing02.15.AssignmentReturningAValueThatCanBeassignedAgain.cs",
+            @"Chapter02\Listing02.16.UsingSystemConsoleReadLine.cs",
+            @"Chapter02\Listing02.17.UsingSystemConsoleRead.cs",
+            @"Chapter02\Listing02.18.FormattingUsingStringInterpolation.cs",
+            @"Chapter02\Listing02.19.FormattingUsingCompositeFormatting.cs",
+            @"Chapter02\Listing02.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
+            @"Chapter02\Listing02.21.CommentingYourCode.cs",
+            @"Chapter02\Listing02.22.SampleCILOutput.cs",
+            @"Chapter02.Tests\Listing02.01.HelloWorldInC#.Tests.cs",
+            @"Chapter02.Tests\Listing02.03.MultipleStatementsOneOneLine.Tests.cs",
+            @"Chapter02.Tests\Listing02.04.MultipleStatementsOnSeparateLines.Tests.cs",
+            @"Chapter02.Tests\Listing02.05.SplittingAStatementAcrossMultipleLines.Tests.cs",
+            @"Chapter02.Tests\Listing02.06.HelloWorldInC#.Tests.cs",
+            @"Chapter02.Tests\Listing02.08.BreakingApartHelloWorld.Tests.cs",
+            @"Chapter02.Tests\Listing02.09.TheMainMethodWithParametersAndAReturn.Tests.cs",
+            @"Chapter02.Tests\Listing02.10.NoIndentationFormatting.Tests.cs",
+            @"Chapter02.Tests\Listing02.11.RemovingWhitespace.Tests.cs",
+            @"Chapter02.Tests\Listing02.12.DeclaringAndAssigningAVariable.Tests.cs",
+            @"Chapter02.Tests\Listing02.13.DeclaringTwoVariablesWithinOneStatement.Tests.cs",
+            @"Chapter02.Tests\Listing02.14.ChangingTheValueOfAVariable.Tests.cs",
+            @"Chapter02.Tests\Listing02.15.AssignmentReturningAValueThatCanBeassignedAgain.Tests.cs",
+            @"Chapter02.Tests\Listing02.16.UsingSystemConsoleReadLine.Tests.cs",
+            @"Chapter02.Tests\Listing02.17.UsingSystemConsoleRead.Tests.cs",
+            @"Chapter02.Tests\Listing02.18.FormattingUsingStringInterpolation.Tests.cs",
+            @"Chapter02.Tests\Listing02.19.FormattingUsingCompositeFormatting.Tests.cs",
+            @"Chapter02.Tests\Listing02.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.Tests.cs",
+            @"Chapter02.Tests\Listing02.21.CommentingYourCode.Tests.cs",
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -456,22 +523,22 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
         DirectoryInfo tempDir = CreateTempDirectory();
-        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter01");
-        CreateTempDirectory(tempDir, name: "Chapter01.Tests");
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter02");
+        CreateTempDirectory(tempDir, name: "Chapter02.Tests");
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-
-    [TestMethod]
+    [Fact]
     public void
         UpdateOnlyChapterNumberOfListingUsingChapterNumberFromFolder_UnitTestsAlsoUpdated_ListingsAndTestsUpdated()
     {
@@ -519,17 +586,17 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(chapterDir.FullName,
-            byFolder: true, chapterOnly: true);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager(), chapterOnly: true);
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent((ICollection)expectedFiles, files);
+        Assert.Equivalent(expectedFiles, files);
     }
 
-    [TestMethod]
+    [Fact]
     public void RenumberAllFilesIncludingXML_DontChangeFiles_ListingsAndTestsUpdated()
     {
         // Make sure csproj file is created, but doesn't get renumbered (is ignored)
@@ -546,7 +613,7 @@ public class ListingManagerTests : TempFileTestBase
             @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
-        Assert.AreEqual(filesToMake.Count - 1, expectedFiles.Count);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
 
         IEnumerable<string> toWrite = new List<string>
         {
@@ -564,20 +631,192 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
 
         // Assert
-        CollectionAssert.AreEquivalent(expectedFiles, files, $"Files are in dir: {tempDir}");
+        Assert.Equivalent(expectedFiles, files);
+    }
+    #endregion UsingOSStorageManager
+    #endregion UpdateChapterListingNumbers
+
+    #region PopulateListingDataFromPath
+    [Fact]
+    public void PopulateListingDataFromPath_GivenDirectoryOfListings_PopulateListingInformation()
+    {
+        List<string> filesToMake = new()
+        {
+            "Listing01.01.SpecifyingLiteralValues.cs",
+            "Listing01.02.cs",
+            "Listing01.04.cs",
+            "Listing01.06.Something.cs"
+        };
+
+        List<string> expectedFiles = new()
+        {
+            "Listing01.01.SpecifyingLiteralValues.cs",
+            "Listing01.02.cs",
+            "Listing01.03.cs",
+            "Listing01.04.Something.cs"
+        };
+
+        List<string> toWrite = new()
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+        WriteFiles(TempDirectory, filesToMake, toWrite);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
+
+        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(TempDirectory.FullName, true);
+        Assert.Equal(4, listingInformation.Count);
+        Assert.All(listingInformation, item => Assert.Equal(01, item.OriginalChapterNumber));
+        Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0], listingInformation[0].Path);
+        Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
     }
 
-    [TestMethod]
-    [DataRow("Chapter01", "Listing01.01A.cs")]
-    [DataRow("Chapter02", "Listing02.01.cs")]
-    [DataRow("Chapter01", "Listing01.01A.Something.cs")]
-    [DataRow("Chapter02", "Listing02.01.Something.cs")]
+    [Fact]
+    public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_AssociateTestWithProperListing()
+    {
+        List<string> filesToMake = new()
+        {
+            @"Chapter18.csproj",
+            @"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
+            @"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
+            @"Chapter18\Listing18.03.csproj.xml",
+            @"Chapter18\Listing18.04.DeclaringTheStackClass.cs",
+            @"Chapter18\Listing18.05.ReflectionWithGenerics.cs",
+            @"Chapter18.Tests\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
+            @"Chapter18.Tests\Listing18.02.Tests.cs",
+            @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
+        };
+        List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
+        CreateTempDirectory(tempDir, name: "Chapter18.Tests");
+        WriteFiles(tempDir, filesToMake, toWrite);
+
+        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
+        Assert.Equal(5, listingInformation.Count);
+        Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+
+        IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
+        Assert.Equal(3, listingsWithTests.Count);
+        Assert.All(listingsWithTests, listing => Assert.NotNull(listing.AssociatedTest));
+        Assert.All(listingsWithTests, listing => Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
+    }
+
+    [Theory]
+    [InlineData(@"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs", @"Chapter18.Tests\Listing18.01.Tests.cs", "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
+    [InlineData(@"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs", @"Chapter18.Tests\Listing18.02.Tests.cs", "UsingTypeofToCreateASystem.TypeInstance.Tests")]
+    [InlineData(@"Chapter18\Listing18.05.ReflectionWithGenerics.cs", @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs", "ReflectionWithGenerics.Tests")]
+    public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_UpdateTestWithListingCaption(string listingPath, string testPath, string expected)
+    {
+        List<string> filesToMake = new()
+        {
+            listingPath,
+            testPath
+        };
+        List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        CreateTempDirectory(tempDir, name: "Chapter18");
+        CreateTempDirectory(tempDir, name: "Chapter18.Tests");
+        WriteFiles(tempDir, filesToMake, toWrite);
+
+        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
+        Assert.Single(listingInformation);
+        Assert.NotNull(listingInformation.First().AssociatedTest);
+        Assert.Equal(expected, listingInformation.First().AssociatedTest!.Caption);
+    }
+
+    [Fact]
+    public void PopulateListingDataFromPath_GivenSingleDirectoryOfListingsAndTests_AssociateTestWithProperListing()
+    {
+        List<string> filesToMake = new()
+        {
+            @"Chapter18.csproj",
+            @"Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
+            @"Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
+            @"Listing18.03.csproj.xml",
+            @"Listing18.04.DeclaringTheStackClass.cs",
+            @"Listing18.05.ReflectionWithGenerics.cs",
+            @"Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
+            @"Listing18.02.Tests.cs",
+            @"Listing18.05.ReflectionWithGenerics.Tests.cs",
+        };
+        List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
+        Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        WriteFiles(tempDir, filesToMake, toWrite);
+
+        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName, true);
+        Assert.Equal(5, listingInformation.Count);
+        Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
+        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+
+        IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
+        Assert.Equal(3, listingsWithTests.Count);
+        Assert.All(listingsWithTests, listing => Assert.NotNull(listing.AssociatedTest));
+        Assert.All(listingsWithTests, listing => Assert.Equal(18, listing.AssociatedTest!.OriginalChapterNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumber, listing.AssociatedTest!.OriginalListingNumber));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalListingNumberSuffix, listing.AssociatedTest!.OriginalListingNumberSuffix));
+        Assert.All(listingsWithTests, listing => Assert.Equal(listing.OriginalChapterNumber, listing.AssociatedTest!.OriginalChapterNumber));
+    }
+    #endregion PopulateListingDataFromPath
+
+    [Theory]
+    [InlineData("Chapter01", "Listing01.01A.cs")]
+    [InlineData("Chapter02", "Listing02.01.cs")]
+    [InlineData("Chapter01", "Listing01.01A.Something.cs")]
+    [InlineData("Chapter02", "Listing02.01.Something.cs")]
     public void GetPathToAccompanyingUnitTest_GivenListingWithNoTest_CorrectPathReturned(string chapter,
         string listingName)
     {
@@ -585,39 +824,7 @@ public class ListingManagerTests : TempFileTestBase
             ListingManager.GetPathToAccompanyingUnitTest(chapter + Path.DirectorySeparatorChar + listingName,
                 out string pathToTest);
         char directorySeparator = Path.DirectorySeparatorChar;
-        Assert.IsFalse(result);
-        Assert.AreEqual($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
-    }
-
-    private IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
-        DirectoryInfo? targetDirectory)
-    {
-        var fullPaths = new List<string>();
-
-        foreach (string fileName in fileNamesToConvert)
-        {
-            fullPaths.Add(Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName));
-        }
-
-        return fullPaths;
-    }
-
-    private FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)
-    {
-        var ret = CreateTempFile(targetDirectory, name: fileName, contents: toWrite.ToString());
-        return ret;
-    }
-
-    private List<FileInfo> WriteFiles(DirectoryInfo targetDirectory, IEnumerable<string> fileNames,
-        IEnumerable<string>? toWrite)
-    {
-        List<string> filesToWrite = toWrite?.ToList() ?? new List<string>();
-        List<FileInfo> ret = new();
-        foreach (string file in fileNames)
-        {
-            ret.Add(WriteFile(targetDirectory, file, filesToWrite));
-        }
-
-        return ret;
+        Assert.False(result);
+        Assert.Equal($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
     }
 }

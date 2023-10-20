@@ -1,7 +1,4 @@
-using System;
 using System.CommandLine;
-using System.IO;
-using System.Linq;
 
 namespace EssentialCSharp.ListingManager;
 
@@ -68,7 +65,8 @@ public class Program
             Console.WriteLine($"Updating listing namespaces of: {directoryIn}");
             // TODO: Add option for last parameter
             // TODO: Change parameter to take a DirectoryInfo instead of a string: https://github.com/IntelliTect/ListingManager/issues/26
-            ListingManager.UpdateChapterListingNumbers(directoryIn!.FullName, verbose, preview, byFolder, chapterOnly, false);
+            ListingManager listingManager = new(directoryIn!.FullName, chapterOnly: chapterOnly);
+            listingManager.UpdateChapterListingNumbers(directoryIn.FullName, verbose, preview, byFolder, false);
         }, directoryIn, verboseOption, previewOption, byFolderOption, chapterOnlyOption);
 
         scanForMismatchedListings.SetHandler((directoryIn) =>

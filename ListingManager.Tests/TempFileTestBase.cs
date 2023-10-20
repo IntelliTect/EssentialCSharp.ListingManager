@@ -1,11 +1,4 @@
-﻿using Polly;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using Xunit.Sdk;
+﻿using System.Text;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
@@ -30,7 +23,6 @@ public abstract class TempFileTestBase : IDisposable
     private readonly List<DirectoryInfo> _TempDirectories = new();
     protected DirectoryInfo TempDirectory => _WorkingDirectory.Value;
     private bool _Disposed;
-
 
     private FileInfo CreateTempFileWithContent(DirectoryInfo? parentDirectory, string? name = null, byte[]? fileContents = null, string? extension = null)
     {
@@ -92,6 +84,34 @@ public abstract class TempFileTestBase : IDisposable
         return Path.Combine(directory.FullName, fileName);
     }
 
+    public IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
+        DirectoryInfo? targetDirectory)
+    {
+        foreach (string fileName in fileNamesToConvert)
+        {
+            yield return Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName);
+        }
+    }
+
+    public FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)
+    {
+        var ret = CreateTempFile(targetDirectory, name: fileName, contents: toWrite.ToString());
+        return ret;
+    }
+
+    public List<FileInfo> WriteFiles(DirectoryInfo targetDirectory, IEnumerable<string> fileNames,
+        IEnumerable<string>? toWrite)
+    {
+        List<string> filesToWrite = toWrite?.ToList() ?? new List<string>();
+        List<FileInfo> ret = new();
+        foreach (string file in fileNames)
+        {
+            ret.Add(WriteFile(targetDirectory, file, filesToWrite));
+        }
+
+        return ret;
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (_Disposed || !disposing)
@@ -100,8 +120,6 @@ public abstract class TempFileTestBase : IDisposable
         }
 
         _Disposed = true;
-
-        ExceptionAggregator aggregator = new();
 
         IEnumerable<FileSystemInfo> items = _TempFiles
             .Cast<FileSystemInfo>()
@@ -113,27 +131,7 @@ public abstract class TempFileTestBase : IDisposable
             fsi.Refresh();
             if (!fsi.Exists) continue;
 
-            Action? action = fsi switch
-            {
-                FileInfo file => () => file.Delete(),
-                DirectoryInfo dir => () => dir.Delete(recursive: true),
-                _ => null,
-            };
-
-            if (action is null) continue;
-
-            aggregator.Run(() =>
-            {
-                Policy
-                    .Handle<Exception>()
-                    .WaitAndRetry(retryCount: 100, _ => TimeSpan.FromMilliseconds(10))
-                    .Execute(action);
-            });
-        }
-
-        if (aggregator.HasExceptions)
-        {
-            throw aggregator.ToException();
+            fsi.DeleteReadOnly();
         }
     }
 
