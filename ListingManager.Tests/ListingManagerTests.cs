@@ -105,9 +105,9 @@ public class ListingManagerTests : TempFileTestBase
         // Commit to the repository
         repo.Commit("Here's a commit i made!", Author, Author);
 
-        ListingManager listingManager = new(tempDir.FullName, new GitStorageManager(tempDir.FullName));
+        ListingManager listingManager = new(tempDir, new GitStorageManager(tempDir.FullName));
 
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -163,8 +163,8 @@ public class ListingManagerTests : TempFileTestBase
         // Commit to the repository
         repo.Commit("Here's a commit i made!", Author, Author);
 
-        ListingManager listingManager = new(tempDir.FullName, new GitStorageManager(tempDir.FullName));
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+        ListingManager listingManager = new(tempDir, new GitStorageManager(tempDir.FullName));
+        listingManager.UpdateChapterListingNumbers(chapterDir);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -215,8 +215,8 @@ public class ListingManagerTests : TempFileTestBase
         // Commit to the repository
         repo.Commit("Here's a commit i made!", Author, Author);
 
-        ListingManager listingManager = new(TempDirectory.FullName, new GitStorageManager(TempDirectory.FullName));
-        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory, new GitStorageManager(TempDirectory.FullName));
+        listingManager.UpdateChapterListingNumbers(TempDirectory, singleDir: true);
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
         Assert.Equal(expectedFiles, files);
@@ -265,8 +265,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -302,8 +302,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -368,8 +368,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -412,8 +412,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(TempDirectory.FullName, singleDir: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(TempDirectory, singleDir: true);
 
         List<string> files = Directory.EnumerateFiles(TempDirectory.FullName)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -467,8 +467,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -523,8 +523,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -642,8 +642,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -687,8 +687,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+        ListingManager listingManager = new(chapterDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(x))).OrderBy(x => x).ToList();
@@ -735,8 +735,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName, byFolder: true);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
@@ -786,8 +786,8 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(tempDir, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
-        ListingManager listingManager = new(TempDirectory.FullName, new OSStorageManager());
-        listingManager.UpdateChapterListingNumbers(chapterDir.FullName);
+        ListingManager listingManager = new(TempDirectory, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir);
 
         List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
             .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();

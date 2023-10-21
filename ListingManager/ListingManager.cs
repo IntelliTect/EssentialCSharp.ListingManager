@@ -11,12 +11,12 @@ public partial class ListingManager
 {
     public IStorageManager StorageManager { get; }
 
-    public ListingManager(string pathToChapter)
+    public ListingManager(DirectoryInfo pathToChapter)
     {
-        StorageManager = Repository.IsValid(pathToChapter) ? new GitStorageManager(pathToChapter) : new OSStorageManager();
+        StorageManager = Repository.IsValid(pathToChapter.FullName) ? new GitStorageManager(pathToChapter.FullName) : new OSStorageManager();
     }
 
-    public ListingManager(string pathToChapter, IStorageManager storageManager)
+    public ListingManager(DirectoryInfo pathToChapter, IStorageManager storageManager)
     {
         StorageManager = storageManager;
     }
@@ -65,20 +65,19 @@ public partial class ListingManager
     /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
     /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
     /// 
-    public void UpdateChapterListingNumbers(string pathToChapter,
+    public void UpdateChapterListingNumbers(DirectoryInfo pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
     {
-        List<ListingInformation> listingData = PopulateListingDataFromPath(pathToChapter, singleDir);
+        List<ListingInformation> listingData = PopulateListingDataFromPath(pathToChapter.FullName, singleDir);
         for (int i = 0, listingNumber = 1; i < listingData.Count; i++, listingNumber++)
         {
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
-
             curListingData.NewListingNumber = listingNumber;
             curListingData.NewListingNumberSuffix = string.Empty;
 
             if (byFolder)
             {
-                curListingData.NewChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
+                curListingData.NewChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter.FullName);
             }
 
             string newNamespace = curListingData.GetNewNamespace();
@@ -96,7 +95,6 @@ public partial class ListingManager
                 if (!preview)
                 {
                     Console.WriteLine($"Corrective action. {Path.GetFileName(curListingData.Path)} rename to {newFileName}");
-
                     if (!preview)
                     {
                         curListingData.AssociatedTest?.UpdateNamespaceInFileContents();
@@ -123,6 +121,7 @@ public partial class ListingManager
         if (listingInformation.FileContentsChanged)
         {
             File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingInformation.Path), listingInformation.FileContents);
+
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
                 File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingTest.Path), listingTest.FileContents);
@@ -145,6 +144,7 @@ public partial class ListingManager
             string listingInformationFileName = listingInformation.GetNewFileName();
             StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformationFileName));
             listingInformation.Path = listingInformationFileName;
+
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
                 if (listingTest.Changed)
@@ -217,27 +217,28 @@ public partial class ListingManager
             {
                 if (TryGetListing(fileName, out ListingInformation? data, true))
                 {
-
                     testListingData.Add(data);
-
                 }
             }
         }
+
         foreach (ListingInformation testListingInformation in testListingData)
         {
             ListingInformation listingInformation = listingData.First(x => x.OriginalListingNumber == testListingInformation.OriginalListingNumber
-                                                                                && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber
-                                                                                && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix);
+                                                                        && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber
+                                                                        && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix);
+
             if (string.Equals(testListingInformation.Caption, "Tests", StringComparison.InvariantCultureIgnoreCase) && listingInformation.Caption != string.Empty)
             {
                 testListingInformation.Caption = listingInformation.Caption + ".Tests";
             }
             listingInformation.AssociatedTest = testListingInformation;
         }
+
         return listingData;
     }
-    public static bool IsExtraListing(string path,
-    string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
+
+    public static bool IsExtraListing(string path, string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
     {
         Regex fileNameRegex = new(regexNamespace);
 

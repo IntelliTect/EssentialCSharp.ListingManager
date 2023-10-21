@@ -5,15 +5,15 @@ namespace EssentialCSharp.ListingManager;
 public class Program
 {
     private const string IntelliTect =
-@" _____       _       _ _ _ _______        _   
-|_   _|     | |     | | (_)__   __|      | |  
-  | |  _ __ | |_ ___| | |_   | | ___  ___| |_ 
-  | | | '_ \| __/ _ \ | | |  | |/ _ \/ __| __|
- _| |_| | | | ||  __/ | | |  | |  __/ (__| |_ 
-|_____|_| |_|\__\___|_|_|_|  |_|\___|\___|\__|";
+@" _____       _       _ _    _______        _   
+  |_   _|     | |     | | ( )|__   __|      | |  
+    | |  _ __ | |_ ___| | |_    | | ___  ___| |_ 
+    | | | '_ \| __/ _ \ | | |   | |/ _ \/ __| __|
+   _| |_| | | | ||  __/ | | |   | |  __/ (__| |_ 
+  |_____|_| |_|\__\___|_|_|_|   |_|\___|\___|\__|";
     private static int Main(string[] args)
     {
-        var directoryIn = new Option<DirectoryInfo?>(
+        var directoryIn = new Option<DirectoryInfo>(
             name: "--path",
             description: "The directory of the chapter to update listings on.")
         { IsRequired = true };
@@ -32,12 +32,17 @@ public class Program
             name: "--byfolder",
             description: "");
 
-        var listingUpdating = new Command("update", "Updates namespaces and filenames for all lisitngs and accompanying tests within a chapter")
+        var singleDirOption = new Option<bool>(
+            name: "--singleDir",
+            description: "All listings are in a single directory and not separated into separate chapter and chapter test directories");
+
+        var listingUpdating = new Command("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter")
         {
             directoryIn,
             verboseOption,
             previewOption,
             byFolderOption,
+            singleDirOption
         };
 
         // Give better description when intent and functionality becomes more flushed out
@@ -46,22 +51,19 @@ public class Program
             directoryIn
         };
 
-
         var rootCommand = new RootCommand()
         {
             listingUpdating,
             scanForMismatchedListings
         };
 
-        listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder) =>
+        listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder, singleDir) =>
         {
             Console.WriteLine(IntelliTect);
-            Console.WriteLine($"Updating listing namespaces of: {directoryIn}");
-            // TODO: Add option for last parameter
-            // TODO: Change parameter to take a DirectoryInfo instead of a string: https://github.com/IntelliTect/ListingManager/issues/26
-            ListingManager listingManager = new(directoryIn!.FullName);
-            listingManager.UpdateChapterListingNumbers(directoryIn.FullName, verbose, preview, byFolder, false);
-        }, directoryIn, verboseOption, previewOption, byFolderOption);
+            Console.WriteLine($"Updating listings within: {directoryIn}");
+            ListingManager listingManager = new(directoryIn);
+            listingManager.UpdateChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);
+        }, directoryIn, verboseOption, previewOption, byFolderOption, singleDirOption);
 
         scanForMismatchedListings.SetHandler((directoryIn) =>
         {
