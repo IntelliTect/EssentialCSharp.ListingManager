@@ -32,18 +32,12 @@ public class Program
             name: "--byfolder",
             description: "");
 
-        // TODO: Add better descriptions when their functionality becomes clearer
-        var chapterOnlyOption = new Option<bool>(
-            name: "--chapteronly",
-            description: "");
-
         var listingUpdating = new Command("update", "Updates namespaces and filenames for all lisitngs and accompanying tests within a chapter")
         {
             directoryIn,
             verboseOption,
             previewOption,
             byFolderOption,
-            chapterOnlyOption
         };
 
         // Give better description when intent and functionality becomes more flushed out
@@ -59,15 +53,15 @@ public class Program
             scanForMismatchedListings
         };
 
-        listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder, chapterOnly) =>
+        listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder) =>
         {
             Console.WriteLine(IntelliTect);
             Console.WriteLine($"Updating listing namespaces of: {directoryIn}");
             // TODO: Add option for last parameter
             // TODO: Change parameter to take a DirectoryInfo instead of a string: https://github.com/IntelliTect/ListingManager/issues/26
-            ListingManager listingManager = new(directoryIn!.FullName, chapterOnly: chapterOnly);
+            ListingManager listingManager = new(directoryIn!.FullName);
             listingManager.UpdateChapterListingNumbers(directoryIn.FullName, verbose, preview, byFolder, false);
-        }, directoryIn, verboseOption, previewOption, byFolderOption, chapterOnlyOption);
+        }, directoryIn, verboseOption, previewOption, byFolderOption);
 
         scanForMismatchedListings.SetHandler((directoryIn) =>
         {

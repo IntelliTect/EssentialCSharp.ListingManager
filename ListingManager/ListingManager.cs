@@ -10,18 +10,15 @@ namespace EssentialCSharp.ListingManager;
 public partial class ListingManager
 {
     public IStorageManager StorageManager { get; }
-    public bool ChapterOnly { get; }
 
-    public ListingManager(string pathToChapter, bool chapterOnly = false)
+    public ListingManager(string pathToChapter)
     {
         StorageManager = Repository.IsValid(pathToChapter) ? new GitStorageManager(pathToChapter) : new OSStorageManager();
-        ChapterOnly = chapterOnly;
     }
 
-    public ListingManager(string pathToChapter, IStorageManager storageManager, bool chapterOnly = false)
+    public ListingManager(string pathToChapter, IStorageManager storageManager)
     {
         StorageManager = storageManager;
-        ChapterOnly = chapterOnly;
     }
 
     public static IEnumerable<string> GetAllExtraListings(string pathToStartFrom)
@@ -76,23 +73,19 @@ public partial class ListingManager
         {
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
 
-            if (!ChapterOnly)
-            {
-                curListingData.NewListingNumber = listingNumber;
-                curListingData.NewListingNumberSuffix = string.Empty;
-            }
+            curListingData.NewListingNumber = listingNumber;
+            curListingData.NewListingNumberSuffix = string.Empty;
 
             if (byFolder)
             {
                 curListingData.NewChapterNumber = FileManager.GetFolderChapterNumber(pathToChapter);
             }
 
-            string newNamespace = curListingData.GetNewNamespace(ChapterOnly);
-            string newFileName = curListingData.GetNewFileName(ChapterOnly);
+            string newNamespace = curListingData.GetNewNamespace();
+            string newFileName = curListingData.GetNewFileName();
 
             Console.WriteLine($"Corrective action. {Path.GetFileName(curListingData.Path)} rename to {newFileName}");
-
-            if (!preview) UpdateNamespaceOfPath(curListingData.Path, newNamespace, newFileName);
+            curListingData.UpdateNamespaceInFileContents();
 
             if (listingData.Where(item => item.AssociatedTest is not null).FirstOrDefault(x => x?.OriginalListingNumber == curListingData.OriginalListingNumber && x.OriginalListingNumberSuffix == curListingData.OriginalListingNumberSuffix) is ListingInformation curTestListingData)
             {
@@ -106,17 +99,35 @@ public partial class ListingManager
 
                     if (!preview)
                     {
-                        UpdateNamespaceOfPath(curListingData.Path, newNamespace, newFileName);
-                        if (curListingData.AssociatedTest is not null)
-                        {
-                            UpdateNamespaceOfPath(curListingData.AssociatedTest.Path, curListingData.AssociatedTest.GetNewNamespace(ChapterOnly), curListingData.AssociatedTest.GetNewFileName(ChapterOnly));
-                        }
+                        curListingData.AssociatedTest?.UpdateNamespaceInFileContents();
                     }
                 }
             }
         }
 
+        listingData.ForEach(item => item.UpdateReferencesInFile(listingData));
         MoveListing(listingData);
+        UpdateFileContents(listingData);
+    }
+
+    private void UpdateFileContents(List<ListingInformation> listingData)
+    {
+        foreach (ListingInformation listingInformation in listingData)
+        {
+            UpdateFileContents(listingInformation);
+        }
+    }
+
+    private void UpdateFileContents(ListingInformation listingInformation)
+    {
+        if (listingInformation.FileContentsChanged)
+        {
+            File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingInformation.Path), listingInformation.FileContents);
+            if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
+            {
+                File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingTest.Path), listingTest.FileContents);
+            }
+        }
     }
 
     public void MoveListing(IEnumerable<ListingInformation> listingData)
@@ -131,46 +142,17 @@ public partial class ListingManager
     {
         if (listingInformation.Changed)
         {
-            StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformation.GetNewFileName(ChapterOnly)));
+            string listingInformationFileName = listingInformation.GetNewFileName();
+            StorageManager.Move(listingInformation.Path, Path.Combine(listingInformation.ParentDir, listingInformationFileName));
+            listingInformation.Path = listingInformationFileName;
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
                 if (listingTest.Changed)
                 {
-                    StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTest.GetNewFileName(ChapterOnly)));
+                    string listingTestInformationFileName = listingTest.GetNewFileName();
+                    StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTestInformationFileName));
+                    listingTest.Path = listingTestInformationFileName;
                 }
-            }
-        }
-    }
-
-    private static void UpdateNamespaceOfPath(string path, string newNamespace, string newFileName = "")
-    {
-        if (Path.GetExtension(path) != ".tmp")
-        {
-            return;
-        }
-
-        // read file into memory
-        string[] allLinesInFile = File.ReadAllLines(path);
-
-        string targetPath = Path.Combine(Path.GetDirectoryName(path) ?? string.Empty, newFileName) ?? path;
-
-        using TextWriter textWriter = new StreamWriter(targetPath, true);
-        foreach (string line in allLinesInFile)
-        {
-            if (line.StartsWith("namespace"))
-            {
-                if (line.TrimEnd().EndsWith(";"))
-                {
-                    textWriter.WriteLine("namespace " + newNamespace + ";");
-                }
-                else
-                {
-                    textWriter.WriteLine("namespace " + newNamespace);
-                }
-            }
-            else
-            {
-                textWriter.WriteLine(line);
             }
         }
     }

@@ -95,7 +95,7 @@ public abstract class TempFileTestBase : IDisposable
 
     public FileInfo WriteFile(DirectoryInfo targetDirectory, string fileName, List<string> toWrite)
     {
-        var ret = CreateTempFile(targetDirectory, name: fileName, contents: toWrite.ToString());
+        var ret = CreateTempFile(targetDirectory, name: fileName, contents: string.Join(Environment.NewLine, toWrite));
         return ret;
     }
 
