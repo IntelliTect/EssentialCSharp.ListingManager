@@ -34,7 +34,7 @@ public class Program
 
         var singleDirOption = new Option<bool>(
             name: "--singleDir",
-            description: "All listings are in a single directory and not separated into separate chapter and chapter test directories");
+            description: "All listings are in a single directory and not separated into chapter and chapter test directories");
 
         var listingUpdating = new Command("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter")
         {

@@ -17,6 +17,7 @@ public partial class ListingManager
     }
 
     public ListingManager(DirectoryInfo pathToChapter, IStorageManager storageManager)
+        : this(pathToChapter)
     {
         StorageManager = storageManager;
     }
@@ -108,7 +109,7 @@ public partial class ListingManager
         UpdateFileContents(listingData);
     }
 
-    private void UpdateFileContents(List<ListingInformation> listingData)
+    private void UpdateFileContents(IEnumerable<ListingInformation> listingData)
     {
         foreach (ListingInformation listingInformation in listingData)
         {
@@ -147,12 +148,9 @@ public partial class ListingManager
 
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
-                if (listingTest.Changed)
-                {
-                    string listingTestInformationFileName = listingTest.GetNewFileName();
-                    StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTestInformationFileName));
-                    listingTest.Path = listingTestInformationFileName;
-                }
+                string listingTestInformationFileName = listingTest.GetNewFileName();
+                StorageManager.Move(listingTest.Path, Path.Combine(listingTest.ParentDir, listingTestInformationFileName));
+                listingTest.Path = listingTestInformationFileName;
             }
         }
     }
