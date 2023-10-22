@@ -141,12 +141,16 @@ public partial class ListingInformation
         return updated;
     }
 
-    public void UpdateReferencesInFile(List<ListingInformation> listingData)
+    public void UpdateReferencesInFileAndTest(List<ListingInformation> listingData)
     {
         for (int i = 0; i < FileContents.Count; i++)
         {
             if (ListingReference().IsMatch(FileContents[i]))
             {
+                if (FileContents[i].TrimStart().StartsWith("namespace"))
+                {
+                    continue;
+                }
                 MatchCollection matches = ListingReference().Matches(FileContents[i]);
                 for (int j = 0; j < matches.Count; j++)
                 {
@@ -162,6 +166,10 @@ public partial class ListingInformation
                 }
                 FileContentsChanged = true;
             }
+        }
+        if (AssociatedTest is ListingInformation listingTest && listingTest is not null)
+        {
+            listingTest.UpdateReferencesInFileAndTest(listingData);
         }
     }
 

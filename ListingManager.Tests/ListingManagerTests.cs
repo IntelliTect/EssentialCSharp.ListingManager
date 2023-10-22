@@ -985,4 +985,316 @@ public class ListingManagerTests : TempFileTestBase
         Assert.False(result);
         Assert.Equal($"{chapter}.Tests{directorySeparator}{listingName}", pathToTest);
     }
+
+    #region UpdateAllListingAndTestReferences
+    [Fact]
+    public void UpdateChapterListingNumbers_UsingStatement_ListingReferencesUpdated()
+    {
+        List<string> filesToMake = new()
+        {
+            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Join("Chapter18","Listing18.04.UsingTypeofToCreateASystem.TypeInstance.cs"),
+        };
+        ICollection<string> expectedFiles = new List<string>
+        {
+            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_04",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        IEnumerable<string> toWriteAlso = new List<string>
+        {
+            "using Listing18_04;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        IEnumerable<string> expectedFileContents = new List<string>
+        {
+            "using Listing18_02;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
+        CreateTempDirectory(tempDir, name: "Chapter18.Tests");
+        WriteFile(tempDir, filesToMake.Last(), toWrite.ToList());
+        WriteFile(tempDir, filesToMake.First(), toWriteAlso.ToList());
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
+
+        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+        // Assert
+        Assert.Equal(2, files.Count);
+        Assert.Equivalent(expectedFiles, files);
+
+        Assert.Equal(string.Join(Environment.NewLine, expectedFileContents) + Environment.NewLine, File.ReadAllText(expectedFiles.First()));
+    }
+
+    [Fact]
+    public void UpdateChapterListingNumbers_StringListingReference_ReferencesUpdated()
+    {
+        List<string> filesToMake = new()
+        {
+            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Join("Chapter18","Listing18.04.UsingTypeofToCreateASystem.TypeInstance.cs"),
+        };
+        ICollection<string> expectedFiles = new List<string>
+        {
+            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_04",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        IEnumerable<string> toWriteAlso = new List<string>
+        {
+            "using Listing18_04;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { " +
+            "    static string Ps1Path { get; } =",
+            "    Path.GetFullPath(",
+            "    Path.Join(Ps1DirectoryPath, \"Listing18.04.HelloWorldInC#.ps1\"), \"Listing18.04.HelloWorldInC#.ps1\");",
+            "   }",
+            "}"
+        };
+
+        IEnumerable<string> expectedFileContents = new List<string>
+        {
+            "using Listing18_02;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { " +
+            "    static string Ps1Path { get; } =",
+            "    Path.GetFullPath(",
+            "    Path.Join(Ps1DirectoryPath, \"Listing18.02.HelloWorldInC#.ps1\"), \"Listing18.02.HelloWorldInC#.ps1\");",
+            "   }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
+        CreateTempDirectory(tempDir, name: "Chapter18.Tests");
+        WriteFile(tempDir, filesToMake.Last(), toWrite.ToList());
+        WriteFile(tempDir, filesToMake.First(), toWriteAlso.ToList());
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
+
+        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+        // Assert
+        Assert.Equal(2, files.Count);
+        Assert.Equivalent(expectedFiles, files);
+
+        Assert.Equal(string.Join(Environment.NewLine, expectedFileContents) + Environment.NewLine, File.ReadAllText(expectedFiles.First()));
+    }
+
+    [Fact]
+    public void UpdateChapterListingNumbers_StringListingReference_TestsUpdated()
+    {
+        List<string> filesToMake = new()
+        {
+            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Join("Chapter18","Listing18.03.UsingTypeofToCreateASystem1.TypeInstance.cs"),
+            Path.Join("Chapter18","Listing18.06.UsingTypeofToCreateASystem2.TypeInstance.cs"),
+            Path.Join("Chapter18.Tests","Listing18.06.UsingTypeofToCreateASystem2.TypeInstance.Tests.cs"),
+        };
+        List<string> expectedFiles = new()
+        {
+            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem1.TypeInstance.cs"),
+            Path.Join("Chapter18","Listing18.03.UsingTypeofToCreateASystem2.TypeInstance.cs"),
+            Path.Join("Chapter18.Tests","Listing18.03.UsingTypeofToCreateASystem2.TypeInstance.Tests.cs"),
+        };
+
+        IEnumerable<string> toWrite1801 = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        IEnumerable<string> toWrite1803 = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_03",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        IEnumerable<string> toWrite1806 = new List<string>
+        {
+            "using Listing18_03;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { " +
+            "    static string Ps1Path { get; } =",
+            "    Path.GetFullPath(",
+            "    Path.Join(Ps1DirectoryPath, \"Listing18.03.HelloWorldInC#.ps1\"), \"Listing18.03.HelloWorldInC#.ps1\");",
+            "   }",
+            "}"
+        };
+
+        IEnumerable<string> toWrite1806Test = new List<string>
+        {
+            "using Listing18_03;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06.Tests",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { " +
+            "    static string Ps1Path { get; } =",
+            "    Path.GetFullPath(",
+            "    Path.Join(Ps1DirectoryPath, \"Listing18.03.HelloWorldInC#.ps1\"), \"Listing18.03.HelloWorldInC#.ps1\");",
+            "   }",
+            "}"
+        };
+
+        IEnumerable<string> expected1806FileContents = new List<string>
+        {
+            "using Listing18_02;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_03",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { " +
+            "    static string Ps1Path { get; } =",
+            "    Path.GetFullPath(",
+            "    Path.Join(Ps1DirectoryPath, \"Listing18.02.HelloWorldInC#.ps1\"), \"Listing18.02.HelloWorldInC#.ps1\");",
+            "   }",
+            "}"
+        };
+
+        IEnumerable<string> expected1806Test = new List<string>
+        {
+            "using Listing18_02;",
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_03.Tests",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { " +
+            "    static string Ps1Path { get; } =",
+            "    Path.GetFullPath(",
+            "    Path.Join(Ps1DirectoryPath, \"Listing18.02.HelloWorldInC#.ps1\"), \"Listing18.02.HelloWorldInC#.ps1\");",
+            "   }",
+            "}"
+        };
+
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
+        CreateTempDirectory(tempDir, name: "Chapter18.Tests");
+        WriteFile(tempDir, filesToMake[0], toWrite1801.ToList());
+        WriteFile(tempDir, filesToMake[1], toWrite1803.ToList());
+        WriteFile(tempDir, filesToMake[2], toWrite1806.ToList());
+        WriteFile(tempDir, filesToMake[3], toWrite1806Test.ToList());
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir, byFolder: true);
+
+        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+        // Assert
+        Assert.Equal(4, files.Count);
+        Assert.Equivalent(expectedFiles, files);
+
+        Assert.Equal(string.Join(Environment.NewLine, expected1806FileContents) + Environment.NewLine, File.ReadAllText(expectedFiles[2]));
+        Assert.Equal(string.Join(Environment.NewLine, expected1806Test) + Environment.NewLine, File.ReadAllText(expectedFiles[3]));
+    }
+    #endregion UpdateAllListingAndTestReferences
+
+    #region UpdateAllChaptersListingNumbers
+    [Fact]
+    public void UpdateAllChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
+    {
+        List<string> filesToMake = new()
+        {
+            Path.Combine("Chapter01","Listing01.01.SpecifyingLiteralValues.cs"),
+            Path.Combine("Chapter01","Listing01.03.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.03.Tests.cs"),
+            Path.Combine("Chapter02","Listing02.04.cs"),
+            Path.Combine("Chapter02","Listing02.06.Something.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.06.Something.Tests.cs")
+        };
+
+        List<string> expectedFiles = new()
+        {
+            Path.Combine("Chapter01","Listing01.01.SpecifyingLiteralValues.cs"),
+            Path.Combine("Chapter01","Listing01.02.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.02.Tests.cs"),
+            Path.Combine("Chapter02","Listing02.01.cs"),
+            Path.Combine("Chapter02","Listing02.02.Something.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.02.Something.Tests.cs")
+        };
+
+        List<string> toWrite = new()
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01",
+            "{",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+        DirectoryInfo tempDir = CreateTempDirectory();
+        CreateTempDirectory(tempDir, "Chapter01");
+        CreateTempDirectory(tempDir, "Chapter01.Tests");
+        CreateTempDirectory(tempDir, "Chapter02");
+        CreateTempDirectory(tempDir, "Chapter02.Tests");
+        WriteFiles(tempDir, filesToMake, toWrite);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).OrderBy(x => x).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateAllChapterListingNumbers(tempDir);
+        List<string> files = Directory.GetFiles(tempDir.FullName, "*.cs", SearchOption.AllDirectories).OrderBy(x => x).ToList();
+        Assert.Equal(expectedFiles.Count, files.Count);
+        Assert.Equivalent(expectedFiles, files);
+    }
+    #endregion UpdateAllChaptersListingNumbers
 }
