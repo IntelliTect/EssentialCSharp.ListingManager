@@ -167,7 +167,7 @@ public partial class ListingInformation
                 FileContentsChanged = true;
             }
         }
-        if (AssociatedTest is ListingInformation listingTest && listingTest is not null)
+        if (AssociatedTest is ListingInformation listingTest)
         {
             listingTest.UpdateReferencesInFileAndTest(listingData);
         }

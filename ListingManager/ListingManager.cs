@@ -251,8 +251,7 @@ public partial class ListingManager
     public void UpdateAllChapterListingNumbers(DirectoryInfo pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
     {
-        string[] strings = Directory.GetDirectories(pathToChapter.FullName);
-        IEnumerable<DirectoryInfo> directoryInfos = strings
+        IEnumerable<DirectoryInfo> directoryInfos = Directory.EnumerateDirectories(pathToChapter.FullName)
             .Select(x => new DirectoryInfo(x))
             .Where(x => ChapterDir().IsMatch(x.Name));
 

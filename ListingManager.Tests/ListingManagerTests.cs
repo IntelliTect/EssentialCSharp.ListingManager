@@ -1001,7 +1001,7 @@ public class ListingManagerTests : TempFileTestBase
             Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
         };
 
-        IEnumerable<string> toWrite = new List<string>
+        List<string> toWrite = new()
         {
             "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_04",
             "{",
@@ -1011,7 +1011,7 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
 
-        IEnumerable<string> toWriteAlso = new List<string>
+        List<string> toWriteAlso = new()
         {
             "using Listing18_04;",
             "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
@@ -1036,8 +1036,8 @@ public class ListingManagerTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory();
         DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
         CreateTempDirectory(tempDir, name: "Chapter18.Tests");
-        WriteFile(tempDir, filesToMake.Last(), toWrite.ToList());
-        WriteFile(tempDir, filesToMake.First(), toWriteAlso.ToList());
+        WriteFile(tempDir, filesToMake.Last(), toWrite);
+        WriteFile(tempDir, filesToMake.First(), toWriteAlso);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
         ListingManager listingManager = new(tempDir, new OSStorageManager());
@@ -1067,7 +1067,7 @@ public class ListingManagerTests : TempFileTestBase
             Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
         };
 
-        IEnumerable<string> toWrite = new List<string>
+        List<string> toWrite = new()
         {
             "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_04",
             "{",
@@ -1077,7 +1077,7 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
 
-        IEnumerable<string> toWriteAlso = new List<string>
+        List<string> toWriteAlso = new()
         {
             "using Listing18_04;",
             "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
@@ -1092,7 +1092,7 @@ public class ListingManagerTests : TempFileTestBase
             "}"
         };
 
-        IEnumerable<string> expectedFileContents = new List<string>
+        List<string> expectedFileContents = new()
         {
             "using Listing18_02;",
             "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_01",
@@ -1110,8 +1110,8 @@ public class ListingManagerTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory();
         DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter18");
         CreateTempDirectory(tempDir, name: "Chapter18.Tests");
-        WriteFile(tempDir, filesToMake.Last(), toWrite.ToList());
-        WriteFile(tempDir, filesToMake.First(), toWriteAlso.ToList());
+        WriteFile(tempDir, filesToMake.Last(), toWrite);
+        WriteFile(tempDir, filesToMake.First(), toWriteAlso);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
 
         ListingManager listingManager = new(tempDir, new OSStorageManager());
