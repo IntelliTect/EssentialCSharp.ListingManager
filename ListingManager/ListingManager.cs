@@ -65,7 +65,6 @@ public partial class ListingManager
     /// <param name="preview">When true, leaves files in place and only print console output</param>
     /// <param name="byFolder">Changes a listing's chapter based on the chapter number in the chapter's path</param>
     /// <param name="singleDir">Indicates whether the listing and test files are in a single directory under <paramref name="pathToChapter"/> (true) or if they are in separate dirs for listing and tests (false)</param>
-    /// 
     public void UpdateChapterListingNumbers(DirectoryInfo pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
     {
@@ -104,7 +103,7 @@ public partial class ListingManager
             }
         }
 
-        listingData.ForEach(item => item.UpdateReferencesInFile(listingData));
+        listingData.ForEach(item => item.UpdateReferencesInFileAndTest(listingData));
         MoveListing(listingData);
         UpdateFileContents(listingData);
     }
@@ -125,7 +124,7 @@ public partial class ListingManager
 
             if (listingInformation.AssociatedTest is ListingInformation listingTest && listingTest.Changed)
             {
-                File.WriteAllLines(Path.Combine(listingInformation.ParentDir, listingTest.Path), listingTest.FileContents);
+                File.WriteAllLines(Path.Combine(listingTest.ParentDir, listingTest.Path), listingTest.FileContents);
             }
         }
     }
@@ -248,4 +247,19 @@ public partial class ListingManager
 
     [GeneratedRegex("((Listing\\d{2}\\.\\d{2})([A-Z]?)((\\.Tests)?)).*\\.cs.tmp$")]
     private static partial Regex TemporaryListingTestFile();
+
+    public void UpdateAllChapterListingNumbers(DirectoryInfo pathToChapter,
+        bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
+    {
+        IEnumerable<DirectoryInfo> directoryInfos = Directory.EnumerateDirectories(pathToChapter.FullName)
+            .Select(x => new DirectoryInfo(x))
+            .Where(x => ChapterDir().IsMatch(x.Name));
+
+        foreach (DirectoryInfo directoryInfo in directoryInfos)
+        {
+            UpdateChapterListingNumbers(directoryInfo, verbose, preview, byFolder, singleDir);
+        }
+    }
+    [GeneratedRegex("^Chapter\\d{2}$")]
+    private static partial Regex ChapterDir();
 }
