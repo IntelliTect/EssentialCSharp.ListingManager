@@ -9,7 +9,7 @@ public class FileManagerTests : TempFileTestBase
     [InlineData(new string[] { "asdasdsad","asd","asd","asd","Chapter42" }, 42)]
     public void GetFolderChapterNumber(string[] chapterFilePath, int expectedChapterNum)
     {
-        Assert.Equal(expectedChapterNum, FileManager.GetFolderChapterNumber(Path.Combine(chapterFilePath)));
+        Assert.Equal(expectedChapterNum, FileManager.GetFolderChapterNumber(Path.Join(chapterFilePath)));
     }
     [Theory]
     [InlineData(new string[] { "Chapter01" }, 01)]
@@ -18,7 +18,7 @@ public class FileManagerTests : TempFileTestBase
     {
         List<string> filesToMake = new()
         {
-            Path.Combine(Path.Combine(chapterFilePath),$"Listing{expectedChapterNum:D2}.01.cs"),
+            Path.Join(Path.Join(chapterFilePath),$"Listing{expectedChapterNum:D2}.01.cs"),
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -32,7 +32,7 @@ public class FileManagerTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
-        CreateTempDirectory(tempDir, name: Path.Combine(chapterFilePath));
+        CreateTempDirectory(tempDir, name: Path.Join(chapterFilePath));
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
 
