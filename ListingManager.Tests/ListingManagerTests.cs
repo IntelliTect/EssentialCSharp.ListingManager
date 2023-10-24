@@ -42,9 +42,9 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            @"Listing02.01B.Something.cs",
-            @"Listing02.02.cs",
-            @"Listing02.03C.cs"
+            "Listing02.01B.Something.cs",
+            "Listing02.02.cs",
+            "Listing02.03C.cs"
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(name: "Chapter02");
@@ -66,12 +66,12 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            Path.Join("Chapter42","Listing18.06.cs"),
+            Path.Combine("Chapter42","Listing18.06.cs"),
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            Path.Join("Chapter42","Listing42.01.cs")
+            Path.Combine("Chapter42","Listing42.01.cs")
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -124,12 +124,12 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            Path.Join("Chapter42","Listing42.06.cs"),
+            Path.Combine("Chapter42","Listing42.06.cs"),
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            Path.Join("Chapter42","Listing42.01.cs")
+            Path.Combine("Chapter42","Listing42.01.cs")
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -331,7 +331,7 @@ public class ListingManagerTests : TempFileTestBase
             "Listing09.14.ConvertingAStringToAnEnumUsingEnum.TryParse.cs",
             "Listing09.15.UsingEnumsAsFlags.cs",
             "Listing09.16.UsingBitwiseORandANDWithFlagEnums.cs",
-            "Listing09.17.DefiningEnumValuesforFrequentCombinations.cs",
+            "Listing09.17.DefiningEnumValuesForFrequentCombinations.cs",
             "Listing09.18.UsingFlagsAttribute.cs"
         };
 
@@ -352,7 +352,7 @@ public class ListingManagerTests : TempFileTestBase
             "Listing09.13.ConvertingAStringToAnEnumUsingEnum.TryParse.cs",
             "Listing09.14.UsingEnumsAsFlags.cs",
             "Listing09.15.UsingBitwiseORandANDWithFlagEnums.cs",
-            "Listing09.16.DefiningEnumValuesforFrequentCombinations.cs",
+            "Listing09.16.DefiningEnumValuesForFrequentCombinations.cs",
             "Listing09.17.UsingFlagsAttribute.cs"
         };
 
@@ -426,30 +426,30 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            "Chapter01/Listing01.01.cs",
-            "Chapter01/Listing01.01A.Some.cs",
-            "Chapter01/Listing01.01B.cs",
-            "Chapter01/Listing01.01C.cs",
-            "Chapter01/Listing01.05.cs",
-            "Chapter01.Tests/Listing01.01.Tests.cs",
-            "Chapter01.Tests/Listing01.01A.Some.Tests.cs",
-            "Chapter01.Tests/Listing01.01B.Tests.cs",
-            "Chapter01.Tests/Listing01.01C.Tests.cs",
-            "Chapter01.Tests/Listing01.05.Tests.cs"
+            Path.Combine("Chapter01","Listing01.01.cs"),
+            Path.Combine("Chapter01","Listing01.01A.Some.cs"),
+            Path.Combine("Chapter01","Listing01.01B.cs"),
+            Path.Combine("Chapter01","Listing01.01C.cs"),
+            Path.Combine("Chapter01","Listing01.05.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.01.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.01A.Some.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.01B.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.01C.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.05.Tests.cs")
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            @"Chapter01\Listing01.01.cs",
-            @"Chapter01\Listing01.02.Some.cs",
-            @"Chapter01\Listing01.03.cs",
-            @"Chapter01\Listing01.04.cs",
-            @"Chapter01\Listing01.05.cs",
-            @"Chapter01.Tests\Listing01.01.Tests.cs",
-            @"Chapter01.Tests\Listing01.02.Some.Tests.cs",
-            @"Chapter01.Tests\Listing01.03.Tests.cs",
-            @"Chapter01.Tests\Listing01.04.Tests.cs",
-            @"Chapter01.Tests\Listing01.05.Tests.cs"
+            Path.Combine("Chapter01","Listing01.01.cs"),
+            Path.Combine("Chapter01","Listing01.02.Some.cs"),
+            Path.Combine("Chapter01","Listing01.03.cs"),
+            Path.Combine("Chapter01","Listing01.04.cs"),
+            Path.Combine("Chapter01","Listing01.05.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.01.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.02.Some.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.03.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.04.Tests.cs"),
+            Path.Combine("Chapter01.Tests","Listing01.05.Tests.cs")
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -482,30 +482,30 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            "Chapter42/Listing01.01.cs",
-            "Chapter42/Listing01.01A.Some.cs",
-            "Chapter42/Listing01.01B.cs",
-            "Chapter42/Listing01.01C.cs",
-            "Chapter42/Listing01.05.cs",
-            "Chapter42.Tests/Listing01.01.Tests.cs",
-            "Chapter42.Tests/Listing01.01A.Some.Tests.cs",
-            "Chapter42.Tests/Listing01.01B.Tests.cs",
-            "Chapter42.Tests/Listing01.01C.Tests.cs",
-            "Chapter42.Tests/Listing01.05.Tests.cs"
+            Path.Combine("Chapter42","Listing01.01.cs"),
+            Path.Combine("Chapter42","Listing01.01A.Some.cs"),
+            Path.Combine("Chapter42","Listing01.01B.cs"),
+            Path.Combine("Chapter42","Listing01.01C.cs"),
+            Path.Combine("Chapter42","Listing01.05.cs"),
+            Path.Combine("Chapter42.Tests","Listing01.01.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing01.01A.Some.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing01.01B.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing01.01C.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing01.05.Tests.cs")
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            @"Chapter42\Listing42.01.cs",
-            @"Chapter42\Listing42.02.Some.cs",
-            @"Chapter42\Listing42.03.cs",
-            @"Chapter42\Listing42.04.cs",
-            @"Chapter42\Listing42.05.cs",
-            @"Chapter42.Tests\Listing42.01.Tests.cs",
-            @"Chapter42.Tests\Listing42.02.Some.Tests.cs",
-            @"Chapter42.Tests\Listing42.03.Tests.cs",
-            @"Chapter42.Tests\Listing42.04.Tests.cs",
-            @"Chapter42.Tests\Listing42.05.Tests.cs"
+            Path.Combine("Chapter42","Listing42.01.cs"),
+            Path.Combine("Chapter42","Listing42.02.Some.cs"),
+            Path.Combine("Chapter42","Listing42.03.cs"),
+            Path.Combine("Chapter42","Listing42.04.cs"),
+            Path.Combine("Chapter42","Listing42.05.cs"),
+            Path.Combine("Chapter42.Tests","Listing42.01.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing42.02.Some.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing42.03.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing42.04.Tests.cs"),
+            Path.Combine("Chapter42.Tests","Listing42.05.Tests.cs")
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -539,92 +539,92 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            @"Chapter02\Listing01.01.HelloWorldInC#.cs",
-            @"Chapter02\Listing01.02.SampleNETCoreConsoleProjectFile.cs",
-            @"Chapter02\Listing01.02B.MultipleStatementsOneOneLine.cs",
-            @"Chapter02\Listing01.02C.MultipleStatementsOnSeparateLines.cs",
-            @"Chapter02\Listing01.02D.SplittingAStatementAcrossMultipleLines.cs",
-            @"Chapter02\Listing01.02E.HelloWorldInC#.cs",
-            @"Chapter02\Listing01.03.BasicClassDeclaration.cs",
-            @"Chapter02\Listing01.04.BreakingApartHelloWorld.cs",
-            @"Chapter02\Listing01.05.TheMainMethodWithParametersAndAReturn.cs",
-            @"Chapter02\Listing01.08.NoIndentationFormatting.cs",
-            @"Chapter02\Listing01.09.RemovingWhitespace.cs",
-            @"Chapter02\Listing01.10.DeclaringAndAssigningAVariable.cs",
-            @"Chapter02\Listing01.11.DeclaringTwoVariablesWithinOneStatement.cs",
-            @"Chapter02\Listing01.12.ChangingTheValueOfAVariable.cs",
-            @"Chapter02\Listing01.13.AssignmentReturningAValueThatCanBeassignedAgain.cs",
-            @"Chapter02\Listing01.14.UsingSystemConsoleReadLine.cs",
-            @"Chapter02\Listing01.15.UsingSystemConsoleRead.cs",
-            @"Chapter02\Listing01.16.FormattingUsingStringInterpolation.cs",
-            @"Chapter02\Listing01.17.FormattingUsingCompositeFormatting.cs",
-            @"Chapter02\Listing01.18.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
-            @"Chapter02\Listing01.19.CommentingYourCode.cs",
-            @"Chapter02\Listing01.20.SampleCILOutput.cs",
-            @"Chapter02.Tests\Listing01.01.Tests.cs",
-            @"Chapter02.Tests\Listing01.02B.Tests.cs",
-            @"Chapter02.Tests\Listing01.02C.Tests.cs",
-            @"Chapter02.Tests\Listing01.02D.Tests.cs",
-            @"Chapter02.Tests\Listing01.02E.Tests.cs",
-            @"Chapter02.Tests\Listing01.04.Tests.cs",
-            @"Chapter02.Tests\Listing01.05.Tests.cs",
-            @"Chapter02.Tests\Listing01.08.Tests.cs",
-            @"Chapter02.Tests\Listing01.09.Tests.cs",
-            @"Chapter02.Tests\Listing01.10.Tests.cs",
-            @"Chapter02.Tests\Listing01.11.Tests.cs",
-            @"Chapter02.Tests\Listing01.12.Tests.cs",
-            @"Chapter02.Tests\Listing01.13.Tests.cs",
-            @"Chapter02.Tests\Listing01.14.Tests.cs",
-            @"Chapter02.Tests\Listing01.15.Tests.cs",
-            @"Chapter02.Tests\Listing01.16.Tests.cs",
-            @"Chapter02.Tests\Listing01.17.Tests.cs",
-            @"Chapter02.Tests\Listing01.18.Tests.cs",
-            @"Chapter02.Tests\Listing01.19.Tests.cs"
+            Path.Combine("Chapter02","Listing01.01.HelloWorldInC#.cs"),
+            Path.Combine("Chapter02","Listing01.02.SampleNETCoreConsoleProjectFile.cs"),
+            Path.Combine("Chapter02","Listing01.02B.MultipleStatementsOneOneLine.cs"),
+            Path.Combine("Chapter02","Listing01.02C.MultipleStatementsOnSeparateLines.cs"),
+            Path.Combine("Chapter02","Listing01.02D.SplittingAStatementAcrossMultipleLines.cs"),
+            Path.Combine("Chapter02","Listing01.02E.HelloWorldInC#.cs"),
+            Path.Combine("Chapter02","Listing01.03.BasicClassDeclaration.cs"),
+            Path.Combine("Chapter02","Listing01.04.BreakingApartHelloWorld.cs"),
+            Path.Combine("Chapter02","Listing01.05.TheMainMethodWithParametersAndAReturn.cs"),
+            Path.Combine("Chapter02","Listing01.08.NoIndentationFormatting.cs"),
+            Path.Combine("Chapter02","Listing01.09.RemovingWhitespace.cs"),
+            Path.Combine("Chapter02","Listing01.10.DeclaringAndAssigningAVariable.cs"),
+            Path.Combine("Chapter02","Listing01.11.DeclaringTwoVariablesWithinOneStatement.cs"),
+            Path.Combine("Chapter02","Listing01.12.ChangingTheValueOfAVariable.cs"),
+            Path.Combine("Chapter02","Listing01.13.AssignmentReturningAValueThatCanBeAssignedAgain.cs"),
+            Path.Combine("Chapter02","Listing01.14.UsingSystemConsoleReadLine.cs"),
+            Path.Combine("Chapter02","Listing01.15.UsingSystemConsoleRead.cs"),
+            Path.Combine("Chapter02","Listing01.16.FormattingUsingStringInterpolation.cs"),
+            Path.Combine("Chapter02","Listing01.17.FormattingUsingCompositeFormatting.cs"),
+            Path.Combine("Chapter02","Listing01.18.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs"),
+            Path.Combine("Chapter02","Listing01.19.CommentingYourCode.cs"),
+            Path.Combine("Chapter02","Listing01.20.SampleCILOutput.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.01.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.02B.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.02C.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.02D.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.02E.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.04.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.05.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.08.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.09.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.10.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.11.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.12.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.13.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.14.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.15.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.16.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.17.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.18.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing01.19.Tests.cs")
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            @"Chapter02\Listing02.01.HelloWorldInC#.cs",
-            @"Chapter02\Listing02.02.SampleNETCoreConsoleProjectFile.cs",
-            @"Chapter02\Listing02.03.MultipleStatementsOneOneLine.cs",
-            @"Chapter02\Listing02.04.MultipleStatementsOnSeparateLines.cs",
-            @"Chapter02\Listing02.05.SplittingAStatementAcrossMultipleLines.cs",
-            @"Chapter02\Listing02.06.HelloWorldInC#.cs",
-            @"Chapter02\Listing02.07.BasicClassDeclaration.cs",
-            @"Chapter02\Listing02.08.BreakingApartHelloWorld.cs",
-            @"Chapter02\Listing02.09.TheMainMethodWithParametersAndAReturn.cs",
-            @"Chapter02\Listing02.10.NoIndentationFormatting.cs",
-            @"Chapter02\Listing02.11.RemovingWhitespace.cs",
-            @"Chapter02\Listing02.12.DeclaringAndAssigningAVariable.cs",
-            @"Chapter02\Listing02.13.DeclaringTwoVariablesWithinOneStatement.cs",
-            @"Chapter02\Listing02.14.ChangingTheValueOfAVariable.cs",
-            @"Chapter02\Listing02.15.AssignmentReturningAValueThatCanBeassignedAgain.cs",
-            @"Chapter02\Listing02.16.UsingSystemConsoleReadLine.cs",
-            @"Chapter02\Listing02.17.UsingSystemConsoleRead.cs",
-            @"Chapter02\Listing02.18.FormattingUsingStringInterpolation.cs",
-            @"Chapter02\Listing02.19.FormattingUsingCompositeFormatting.cs",
-            @"Chapter02\Listing02.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs",
-            @"Chapter02\Listing02.21.CommentingYourCode.cs",
-            @"Chapter02\Listing02.22.SampleCILOutput.cs",
-            @"Chapter02.Tests\Listing02.01.HelloWorldInC#.Tests.cs",
-            @"Chapter02.Tests\Listing02.03.MultipleStatementsOneOneLine.Tests.cs",
-            @"Chapter02.Tests\Listing02.04.MultipleStatementsOnSeparateLines.Tests.cs",
-            @"Chapter02.Tests\Listing02.05.SplittingAStatementAcrossMultipleLines.Tests.cs",
-            @"Chapter02.Tests\Listing02.06.HelloWorldInC#.Tests.cs",
-            @"Chapter02.Tests\Listing02.08.BreakingApartHelloWorld.Tests.cs",
-            @"Chapter02.Tests\Listing02.09.TheMainMethodWithParametersAndAReturn.Tests.cs",
-            @"Chapter02.Tests\Listing02.10.NoIndentationFormatting.Tests.cs",
-            @"Chapter02.Tests\Listing02.11.RemovingWhitespace.Tests.cs",
-            @"Chapter02.Tests\Listing02.12.DeclaringAndAssigningAVariable.Tests.cs",
-            @"Chapter02.Tests\Listing02.13.DeclaringTwoVariablesWithinOneStatement.Tests.cs",
-            @"Chapter02.Tests\Listing02.14.ChangingTheValueOfAVariable.Tests.cs",
-            @"Chapter02.Tests\Listing02.15.AssignmentReturningAValueThatCanBeassignedAgain.Tests.cs",
-            @"Chapter02.Tests\Listing02.16.UsingSystemConsoleReadLine.Tests.cs",
-            @"Chapter02.Tests\Listing02.17.UsingSystemConsoleRead.Tests.cs",
-            @"Chapter02.Tests\Listing02.18.FormattingUsingStringInterpolation.Tests.cs",
-            @"Chapter02.Tests\Listing02.19.FormattingUsingCompositeFormatting.Tests.cs",
-            @"Chapter02.Tests\Listing02.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.Tests.cs",
-            @"Chapter02.Tests\Listing02.21.CommentingYourCode.Tests.cs",
+            Path.Combine("Chapter02","Listing02.01.HelloWorldInC#.cs"),
+            Path.Combine("Chapter02","Listing02.02.SampleNETCoreConsoleProjectFile.cs"),
+            Path.Combine("Chapter02","Listing02.03.MultipleStatementsOneOneLine.cs"),
+            Path.Combine("Chapter02","Listing02.04.MultipleStatementsOnSeparateLines.cs"),
+            Path.Combine("Chapter02","Listing02.05.SplittingAStatementAcrossMultipleLines.cs"),
+            Path.Combine("Chapter02","Listing02.06.HelloWorldInC#.cs"),
+            Path.Combine("Chapter02","Listing02.07.BasicClassDeclaration.cs"),
+            Path.Combine("Chapter02","Listing02.08.BreakingApartHelloWorld.cs"),
+            Path.Combine("Chapter02","Listing02.09.TheMainMethodWithParametersAndAReturn.cs"),
+            Path.Combine("Chapter02","Listing02.10.NoIndentationFormatting.cs"),
+            Path.Combine("Chapter02","Listing02.11.RemovingWhitespace.cs"),
+            Path.Combine("Chapter02","Listing02.12.DeclaringAndAssigningAVariable.cs"),
+            Path.Combine("Chapter02","Listing02.13.DeclaringTwoVariablesWithinOneStatement.cs"),
+            Path.Combine("Chapter02","Listing02.14.ChangingTheValueOfAVariable.cs"),
+            Path.Combine("Chapter02","Listing02.15.AssignmentReturningAValueThatCanBeAssignedAgain.cs"),
+            Path.Combine("Chapter02","Listing02.16.UsingSystemConsoleReadLine.cs"),
+            Path.Combine("Chapter02","Listing02.17.UsingSystemConsoleRead.cs"),
+            Path.Combine("Chapter02","Listing02.18.FormattingUsingStringInterpolation.cs"),
+            Path.Combine("Chapter02","Listing02.19.FormattingUsingCompositeFormatting.cs"),
+            Path.Combine("Chapter02","Listing02.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.cs"),
+            Path.Combine("Chapter02","Listing02.21.CommentingYourCode.cs"),
+            Path.Combine("Chapter02","Listing02.22.SampleCILOutput.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.01.HelloWorldInC#.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.03.MultipleStatementsOneOneLine.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.04.MultipleStatementsOnSeparateLines.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.05.SplittingAStatementAcrossMultipleLines.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.06.HelloWorldInC#.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.08.BreakingApartHelloWorld.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.09.TheMainMethodWithParametersAndAReturn.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.10.NoIndentationFormatting.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.11.RemovingWhitespace.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.12.DeclaringAndAssigningAVariable.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.13.DeclaringTwoVariablesWithinOneStatement.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.14.ChangingTheValueOfAVariable.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.15.AssignmentReturningAValueThatCanBeAssignedAgain.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.16.UsingSystemConsoleReadLine.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.17.UsingSystemConsoleRead.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.18.FormattingUsingStringInterpolation.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.19.FormattingUsingCompositeFormatting.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.20.SwappingTheIndexedPlaceholdersAndCorrespondingVariables.Tests.cs"),
+            Path.Combine("Chapter02.Tests","Listing02.21.CommentingYourCode.Tests.cs"),
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -658,15 +658,15 @@ public class ListingManagerTests : TempFileTestBase
         // Make sure csproj file is created, but doesn't get renumbered (is ignored)
         List<string> filesToMake = new()
         {
-            @"Chapter18.csproj",
-            @"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
-            @"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
-            @"Chapter18\Listing18.03.csproj.xml",
-            @"Chapter18\Listing18.04.DeclaringTheStackClass.cs",
-            @"Chapter18\Listing18.05.ReflectionWithGenerics.cs",
-            @"Chapter18.Tests\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
-            @"Chapter18.Tests\Listing18.02.Tests.cs",
-            @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
+            "Chapter18.csproj",
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs"),
+            Path.Combine("Chapter18","Listing18.03.csproj.xml"),
+            Path.Combine("Chapter18","Listing18.04.DeclaringTheStackClass.cs"),
+            Path.Combine("Chapter18","Listing18.05.ReflectionWithGenerics.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.02.Tests.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.05.ReflectionWithGenerics.Tests.cs"),
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
         Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
@@ -702,12 +702,12 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            Path.Join("Chapter42","Listing18.06.cs"),
+            Path.Combine("Chapter42","Listing18.06.cs"),
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            Path.Join("Chapter42","Listing42.01.cs")
+            Path.Combine("Chapter42","Listing42.01.cs")
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -753,12 +753,12 @@ public class ListingManagerTests : TempFileTestBase
     {
         ICollection<string> filesToMake = new List<string>
         {
-            Path.Join("Chapter42","Listing42.06.cs"),
+            Path.Combine("Chapter42","Listing42.06.cs"),
         };
 
         ICollection<string> expectedFiles = new List<string>
         {
-            Path.Join("Chapter42","Listing42.01.cs")
+            Path.Combine("Chapter42","Listing42.01.cs")
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -836,8 +836,8 @@ public class ListingManagerTests : TempFileTestBase
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(TempDirectory.FullName, true);
         Assert.Equal(4, listingInformation.Count);
         Assert.All(listingInformation, item => Assert.Equal(01, item.OriginalChapterNumber));
-        Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0], listingInformation[0].Path);
-        Assert.Equal(TempDirectory.FullName + "\\" + filesToMake[0] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+        Assert.Equal(Path.Combine(TempDirectory.FullName, filesToMake[0]), listingInformation[0].Path);
+        Assert.Equal(Path.Combine(TempDirectory.FullName, filesToMake[0] + ListingInformation.TemporaryExtension), listingInformation[0].TemporaryPath);
     }
 
     [Fact]
@@ -845,15 +845,15 @@ public class ListingManagerTests : TempFileTestBase
     {
         List<string> filesToMake = new()
         {
-            @"Chapter18.csproj",
-            @"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs",
-            @"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs",
-            @"Chapter18\Listing18.03.csproj.xml",
-            @"Chapter18\Listing18.04.DeclaringTheStackClass.cs",
-            @"Chapter18\Listing18.05.ReflectionWithGenerics.cs",
-            @"Chapter18.Tests\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs",
-            @"Chapter18.Tests\Listing18.02.Tests.cs",
-            @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs",
+            "Chapter18.csproj",
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs"),
+            Path.Combine("Chapter18","Listing18.03.csproj.xml"),
+            Path.Combine("Chapter18","Listing18.04.DeclaringTheStackClass.cs"),
+            Path.Combine("Chapter18","Listing18.05.ReflectionWithGenerics.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.02.Tests.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.05.ReflectionWithGenerics.Tests.cs"),
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
         Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
@@ -876,8 +876,8 @@ public class ListingManagerTests : TempFileTestBase
         List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
         Assert.Equal(5, listingInformation.Count);
         Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
-        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);
-        Assert.Equal(tempDir.FullName + "\\" + filesToMake[1] + ListingInformation.TemporaryExtension, listingInformation[0].TemporaryPath);
+        Assert.Equal(Path.Combine(tempDir.FullName, filesToMake[1]), listingInformation[0].Path);
+        Assert.Equal(Path.Combine(tempDir.FullName, filesToMake[1] + ListingInformation.TemporaryExtension), listingInformation[0].TemporaryPath);
 
         IReadOnlyList<ListingInformation> listingsWithTests = listingInformation.Where(listing => listing.AssociatedTest is not null).ToList();
         Assert.Equal(3, listingsWithTests.Count);
@@ -889,15 +889,15 @@ public class ListingManagerTests : TempFileTestBase
     }
 
     [Theory]
-    [InlineData(@"Chapter18\Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs", @"Chapter18.Tests\Listing18.01.Tests.cs", "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
-    [InlineData(@"Chapter18\Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs", @"Chapter18.Tests\Listing18.02.Tests.cs", "UsingTypeofToCreateASystem.TypeInstance.Tests")]
-    [InlineData(@"Chapter18\Listing18.05.ReflectionWithGenerics.cs", @"Chapter18.Tests\Listing18.05.ReflectionWithGenerics.Tests.cs", "ReflectionWithGenerics.Tests")]
-    public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_UpdateTestWithListingCaption(string listingPath, string testPath, string expected)
+    [InlineData(new string[]{"Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"}, new string[] { "Chapter18.Tests","Listing18.01.Tests.cs" }, "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
+    [InlineData(new string[] { "Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs" }, new string[] { "Chapter18.Tests","Listing18.02.Tests.cs" }, "UsingTypeofToCreateASystem.TypeInstance.Tests")]
+    [InlineData(new string[] { "Chapter18","Listing18.05.ReflectionWithGenerics.cs" }, new string[] { "Chapter18.Tests","Listing18.05.ReflectionWithGenerics.Tests.cs" }, "ReflectionWithGenerics.Tests")]
+    public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_UpdateTestWithListingCaption(string[] listingPath, string[] testPath, string expected)
     {
         List<string> filesToMake = new()
         {
-            listingPath,
-            testPath
+            Path.Combine(listingPath),
+            Path.Combine(testPath)
         };
         List<string> expectedFiles = filesToMake.GetRange(1, filesToMake.Count - 1);
         Assert.Equal(filesToMake.Count - 1, expectedFiles.Count);
@@ -992,13 +992,13 @@ public class ListingManagerTests : TempFileTestBase
     {
         List<string> filesToMake = new()
         {
-            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
-            Path.Join("Chapter18","Listing18.04.UsingTypeofToCreateASystem.TypeInstance.cs"),
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.04.UsingTypeofToCreateASystem.TypeInstance.cs"),
         };
         ICollection<string> expectedFiles = new List<string>
         {
-            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
-            Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
         };
 
         List<string> toWrite = new()
@@ -1058,13 +1058,13 @@ public class ListingManagerTests : TempFileTestBase
     {
         List<string> filesToMake = new()
         {
-            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
-            Path.Join("Chapter18","Listing18.04.UsingTypeofToCreateASystem.TypeInstance.cs"),
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.04.UsingTypeofToCreateASystem.TypeInstance.cs"),
         };
         ICollection<string> expectedFiles = new List<string>
         {
-            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
-            Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs")
         };
 
         List<string> toWrite = new()
@@ -1132,17 +1132,17 @@ public class ListingManagerTests : TempFileTestBase
     {
         List<string> filesToMake = new()
         {
-            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
-            Path.Join("Chapter18","Listing18.03.UsingTypeofToCreateASystem1.TypeInstance.cs"),
-            Path.Join("Chapter18","Listing18.06.UsingTypeofToCreateASystem2.TypeInstance.cs"),
-            Path.Join("Chapter18.Tests","Listing18.06.UsingTypeofToCreateASystem2.TypeInstance.Tests.cs"),
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.03.UsingTypeofToCreateASystem1.TypeInstance.cs"),
+            Path.Combine("Chapter18","Listing18.06.UsingTypeofToCreateASystem2.TypeInstance.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.06.UsingTypeofToCreateASystem2.TypeInstance.Tests.cs"),
         };
         List<string> expectedFiles = new()
         {
-            Path.Join("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
-            Path.Join("Chapter18","Listing18.02.UsingTypeofToCreateASystem1.TypeInstance.cs"),
-            Path.Join("Chapter18","Listing18.03.UsingTypeofToCreateASystem2.TypeInstance.cs"),
-            Path.Join("Chapter18.Tests","Listing18.03.UsingTypeofToCreateASystem2.TypeInstance.Tests.cs"),
+            Path.Combine("Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"),
+            Path.Combine("Chapter18","Listing18.02.UsingTypeofToCreateASystem1.TypeInstance.cs"),
+            Path.Combine("Chapter18","Listing18.03.UsingTypeofToCreateASystem2.TypeInstance.cs"),
+            Path.Combine("Chapter18.Tests","Listing18.03.UsingTypeofToCreateASystem2.TypeInstance.Tests.cs"),
         };
 
         IEnumerable<string> toWrite1801 = new List<string>
