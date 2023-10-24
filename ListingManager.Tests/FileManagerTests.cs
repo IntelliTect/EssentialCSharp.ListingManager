@@ -6,7 +6,7 @@ public class FileManagerTests : TempFileTestBase
 {
     [Theory]
     [InlineData(new string[] { "Chapter01" }, 01)]
-    [InlineData(new string[] { "asdasdsad","asd","asd","asd","Chapter42" }, 42)]
+    [InlineData(new string[] { "asdasdsad", "asd", "asd", "asd", "Chapter42" }, 42)]
     public void GetFolderChapterNumber(string[] chapterFilePath, int expectedChapterNum)
     {
         Assert.Equal(expectedChapterNum, FileManager.GetFolderChapterNumber(Path.Join(chapterFilePath)));

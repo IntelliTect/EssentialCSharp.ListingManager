@@ -889,9 +889,9 @@ public class ListingManagerTests : TempFileTestBase
     }
 
     [Theory]
-    [InlineData(new string[]{"Chapter18","Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs"}, new string[] { "Chapter18.Tests","Listing18.01.Tests.cs" }, "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
-    [InlineData(new string[] { "Chapter18","Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs" }, new string[] { "Chapter18.Tests","Listing18.02.Tests.cs" }, "UsingTypeofToCreateASystem.TypeInstance.Tests")]
-    [InlineData(new string[] { "Chapter18","Listing18.05.ReflectionWithGenerics.cs" }, new string[] { "Chapter18.Tests","Listing18.05.ReflectionWithGenerics.Tests.cs" }, "ReflectionWithGenerics.Tests")]
+    [InlineData(new string[] { "Chapter18", "Listing18.01.UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.cs" }, new string[] { "Chapter18.Tests", "Listing18.01.Tests.cs" }, "UsingTypeGetPropertiesToObtainAnObjectsPublicProperties.Tests")]
+    [InlineData(new string[] { "Chapter18", "Listing18.02.UsingTypeofToCreateASystem.TypeInstance.cs" }, new string[] { "Chapter18.Tests", "Listing18.02.Tests.cs" }, "UsingTypeofToCreateASystem.TypeInstance.Tests")]
+    [InlineData(new string[] { "Chapter18", "Listing18.05.ReflectionWithGenerics.cs" }, new string[] { "Chapter18.Tests", "Listing18.05.ReflectionWithGenerics.Tests.cs" }, "ReflectionWithGenerics.Tests")]
     public void PopulateListingDataFromPath_GivenDirectoryOfListingsAndTests_UpdateTestWithListingCaption(string[] listingPath, string[] testPath, string expected)
     {
         List<string> filesToMake = new()
