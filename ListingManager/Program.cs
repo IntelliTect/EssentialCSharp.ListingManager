@@ -27,6 +27,10 @@ public class Program
             name: "--preview",
             description: "Writes all logs to console as if changes will be made without actually making changes.");
 
+        var allChaptersOption = new Option<bool>(
+           name: "--allChapters",
+           description: "The passed in path is the parent directory to many chapter directories rather than a single chapter directory.");
+
         // TODO: Add better descriptions when their functionality becomes clearer
         var byFolderOption = new Option<bool>(
             name: "--byfolder",
@@ -42,7 +46,8 @@ public class Program
             verboseOption,
             previewOption,
             byFolderOption,
-            singleDirOption
+            singleDirOption,
+            allChaptersOption
         };
 
         // Give better description when intent and functionality becomes more flushed out
@@ -57,13 +62,20 @@ public class Program
             scanForMismatchedListings
         };
 
-        listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder, singleDir) =>
+        listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder, singleDir, allChapters) =>
         {
             Console.WriteLine(IntelliTect);
             Console.WriteLine($"Updating listings within: {directoryIn}");
             ListingManager listingManager = new(directoryIn);
-            listingManager.UpdateChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);
-        }, directoryIn, verboseOption, previewOption, byFolderOption, singleDirOption);
+            if (allChapters)
+            {
+                listingManager.UpdateAllChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);
+            }
+            else
+            {
+                listingManager.UpdateChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);
+            }
+        }, directoryIn, verboseOption, previewOption, byFolderOption, singleDirOption, allChaptersOption);
 
         scanForMismatchedListings.SetHandler((directoryIn) =>
         {
