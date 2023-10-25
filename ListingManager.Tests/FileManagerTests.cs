@@ -5,20 +5,20 @@ namespace EssentialCSharp.ListingManager.Tests;
 public class FileManagerTests : TempFileTestBase
 {
     [Theory]
-    [InlineData("Chapter01", 01)]
-    [InlineData("asdasdsad/asd/asd/asd/Chapter42", 42)]
-    public void GetFolderChapterNumber(string chapterFilePath, int expectedChapterNum)
+    [InlineData(new string[] { "Chapter01" }, 01)]
+    [InlineData(new string[] { "asdasdsad", "asd", "asd", "asd", "Chapter42" }, 42)]
+    public void GetFolderChapterNumber(string[] chapterFilePath, int expectedChapterNum)
     {
-        Assert.Equal(expectedChapterNum, FileManager.GetFolderChapterNumber(chapterFilePath));
+        Assert.Equal(expectedChapterNum, FileManager.GetFolderChapterNumber(Path.Join(chapterFilePath)));
     }
     [Theory]
-    [InlineData("Chapter01", 01)]
-    [InlineData("asdasdsad/asd/asd/asd/Chapter42", 42)]
-    public void GetFolderChapterNumber_VerifyMatchesListingInformationLogic(string chapterFilePath, int expectedChapterNum)
+    [InlineData(new string[] { "Chapter01" }, 01)]
+    [InlineData(new string[] { "asdasdsad", "asd", "asd", "asd", "Chapter42" }, 42)]
+    public void GetFolderChapterNumber_VerifyMatchesListingInformationLogic(string[] chapterFilePath, int expectedChapterNum)
     {
         List<string> filesToMake = new()
         {
-            Path.Combine(chapterFilePath,$"Listing{expectedChapterNum:D2}.01.cs"),
+            Path.Join(Path.Join(chapterFilePath),$"Listing{expectedChapterNum:D2}.01.cs"),
         };
 
         IEnumerable<string> toWrite = new List<string>
@@ -32,7 +32,7 @@ public class FileManagerTests : TempFileTestBase
         };
 
         DirectoryInfo tempDir = CreateTempDirectory(new(Path.GetTempPath()));
-        CreateTempDirectory(tempDir, name: chapterFilePath);
+        CreateTempDirectory(tempDir, name: Path.Join(chapterFilePath));
         var writtenFiles = WriteFiles(tempDir, filesToMake, toWrite);
         var writtenFile = Assert.Single(writtenFiles);
 

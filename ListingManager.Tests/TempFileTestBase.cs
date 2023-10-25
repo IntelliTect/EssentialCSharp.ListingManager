@@ -6,7 +6,7 @@ public abstract class TempFileTestBase : IDisposable
 {
     private readonly Lazy<DirectoryInfo> _WorkingDirectory = new(() =>
    {
-       DirectoryInfo working = new(Path.Combine(Path.GetTempPath(),
+       DirectoryInfo working = new(Path.Join(Path.GetTempPath(),
            typeof(TempFileTestBase).Assembly.GetName().Name!,
            Path.GetRandomFileName()));
 
@@ -81,7 +81,7 @@ public abstract class TempFileTestBase : IDisposable
             fileName = Path.ChangeExtension(fileName, extension);
         }
 
-        return Path.Combine(directory.FullName, fileName);
+        return Path.Join(directory.FullName, fileName);
     }
 
     public IEnumerable<string> ConvertFileNamesToFullPath(IEnumerable<string> fileNamesToConvert,
@@ -89,7 +89,7 @@ public abstract class TempFileTestBase : IDisposable
     {
         foreach (string fileName in fileNamesToConvert)
         {
-            yield return Path.Combine(targetDirectory?.FullName ?? TempDirectory.FullName, fileName);
+            yield return Path.Join(targetDirectory?.FullName ?? TempDirectory.FullName, fileName);
         }
     }
 
