@@ -9,7 +9,7 @@
     <PackageVersion Include="LibGit2Sharp" Version="0.28.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
-    <PackageVersion Include="Polly" Version="8.0.0" />
+    <PackageVersion Include="Polly" Version="8.1.0" />
     <PackageVersion Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
     <PackageVersion Include="xunit" Version="2.6.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
