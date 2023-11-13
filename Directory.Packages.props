@@ -7,7 +7,7 @@
     <PackageVersion Include="GitHubActionsTestLogger" Version="2.3.3" />
     <PackageVersion Include="IntelliTect.TestTools.Console" Version="1.0.0-CI-20181030-214503" />
     <PackageVersion Include="LibGit2Sharp" Version="0.28.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Polly" Version="8.1.0" />
     <PackageVersion Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22272.1" />
