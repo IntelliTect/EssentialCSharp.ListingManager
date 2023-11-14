@@ -17,7 +17,7 @@ public class ListingManagerTests : TempFileTestBase
     {
         string path = Path.Join(TempDirectory.ToString(), fileName);
 
-        bool actualResult = ListingManager.IsExtraListing(path);
+        bool actualResult = EssentialCSharp.ListingManager.ListingManagerHelpers.IsExtraListing(path);
 
         Assert.Equal(expectedResult, actualResult);
     }
@@ -31,7 +31,7 @@ public class ListingManagerTests : TempFileTestBase
 
         string path = Path.Join(directory.FullName, fileName);
 
-        bool actualResult = ListingManager.IsExtraListing(path);
+        bool actualResult = EssentialCSharp.ListingManager.ListingManagerHelpers.IsExtraListing(path);
 
         Assert.Equal(expectedResult, actualResult);
     }
@@ -833,7 +833,7 @@ public class ListingManagerTests : TempFileTestBase
         WriteFiles(TempDirectory, filesToMake, toWrite);
         expectedFiles = ConvertFileNamesToFullPath(expectedFiles, null).ToList();
 
-        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(TempDirectory.FullName, true);
+        List<ListingInformation> listingInformation = EssentialCSharp.ListingManager.ListingManagerHelpers.PopulateListingDataFromPath(TempDirectory.FullName, true);
         Assert.Equal(4, listingInformation.Count);
         Assert.All(listingInformation, item => Assert.Equal(01, item.OriginalChapterNumber));
         Assert.Equal(Path.Join(TempDirectory.FullName, filesToMake[0]), listingInformation[0].Path);
@@ -873,7 +873,7 @@ public class ListingManagerTests : TempFileTestBase
         CreateTempDirectory(tempDir, name: "Chapter18.Tests");
         WriteFiles(tempDir, filesToMake, toWrite);
 
-        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
+        List<ListingInformation> listingInformation = EssentialCSharp.ListingManager.ListingManagerHelpers.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
         Assert.Equal(5, listingInformation.Count);
         Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
         Assert.Equal(Path.Join(tempDir.FullName, filesToMake[1]), listingInformation[0].Path);
@@ -917,7 +917,7 @@ public class ListingManagerTests : TempFileTestBase
         CreateTempDirectory(tempDir, name: "Chapter18.Tests");
         WriteFiles(tempDir, filesToMake, toWrite);
 
-        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
+        List<ListingInformation> listingInformation = EssentialCSharp.ListingManager.ListingManagerHelpers.PopulateListingDataFromPath(tempDir.FullName + $"\\Chapter18", false);
         Assert.Single(listingInformation);
         Assert.NotNull(listingInformation.First().AssociatedTest);
         Assert.Equal(expected, listingInformation.First().AssociatedTest!.Caption);
@@ -954,7 +954,7 @@ public class ListingManagerTests : TempFileTestBase
         DirectoryInfo tempDir = CreateTempDirectory();
         WriteFiles(tempDir, filesToMake, toWrite);
 
-        List<ListingInformation> listingInformation = ListingManager.PopulateListingDataFromPath(tempDir.FullName, true);
+        List<ListingInformation> listingInformation = EssentialCSharp.ListingManager.ListingManagerHelpers.PopulateListingDataFromPath(tempDir.FullName, true);
         Assert.Equal(5, listingInformation.Count);
         Assert.All(listingInformation, item => Assert.Equal(18, item.OriginalChapterNumber));
         Assert.Equal(tempDir.FullName + "\\" + filesToMake[1], listingInformation[0].Path);

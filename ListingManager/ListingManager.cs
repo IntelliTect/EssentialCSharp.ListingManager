@@ -26,34 +26,11 @@ public partial class ListingManager
     {
         foreach (string file in FileManager.GetAllFilesAtPath(pathToStartFrom, true))
         {
-            if (IsExtraListing(file))
+            if (ListingManagerHelpers.IsExtraListing(file))
             {
                 yield return file;
             }
         }
-    }
-
-    private static bool TryGetListing(string listingPath, [NotNullWhen(true)] out ListingInformation? listingData)
-    {
-        return TryGetListing(listingPath, out listingData, false);
-    }
-
-    private static bool TryGetListing(string listingPath, [NotNullWhen(true)] out ListingInformation? listingData, bool isTest)
-    {
-        listingData = null;
-
-        if (!ListingInformation.ApprovedFileTypes.Contains(Path.GetExtension(listingPath))) return false;
-
-        try
-        {
-            listingData = new ListingInformation(listingPath, isTest);
-        }
-        catch (Exception) // don't care about the type of exception here. If things didn't go perfectly, abort
-        {
-            return false;
-        }
-
-        return true;
     }
 
     /// <summary>
@@ -68,7 +45,7 @@ public partial class ListingManager
     public void UpdateChapterListingNumbers(DirectoryInfo pathToChapter,
         bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
     {
-        List<ListingInformation> listingData = PopulateListingDataFromPath(pathToChapter.FullName, singleDir);
+        List<ListingInformation> listingData = ListingManagerHelpers.PopulateListingDataFromPath(pathToChapter.FullName, singleDir);
         for (int i = 0, listingNumber = 1; i < listingData.Count; i++, listingNumber++)
         {
             ListingInformation curListingData = listingData[i] ?? throw new InvalidOperationException($"Listing data is null for an index of {i}");
@@ -185,81 +162,19 @@ public partial class ListingManager
         return false;
     }
 
-    public static List<ListingInformation> PopulateListingDataFromPath(string pathToChapter, bool singleDir)
-    {
-        List<ListingInformation> listingData = new();
-        List<ListingInformation> testListingData = new();
-        var listingFiles = FileManager.GetAllFilesAtPath(pathToChapter)
-            .OrderBy(x => x);
-        foreach (string fileName in listingFiles)
-        {
-            if (TryGetListing(fileName, out ListingInformation? data))
-            {
-                if (data.IsTest)
-                {
-                    testListingData.Add(data);
-                }
-                else
-                {
-                    listingData.Add(data);
-                }
-            }
-        }
-
-        if (!singleDir)
-        {
-            var listingTestFiles = FileManager.GetAllFilesAtPath($"{pathToChapter}.Tests")
-    .OrderBy(x => x);
-            foreach (string fileName in listingTestFiles)
-            {
-                if (TryGetListing(fileName, out ListingInformation? data, true))
-                {
-                    testListingData.Add(data);
-                }
-            }
-        }
-
-        foreach (ListingInformation testListingInformation in testListingData)
-        {
-            ListingInformation listingInformation = listingData.First(x => x.OriginalListingNumber == testListingInformation.OriginalListingNumber
-                                                                        && x.OriginalChapterNumber == testListingInformation.OriginalChapterNumber
-                                                                        && x.OriginalListingNumberSuffix == testListingInformation.OriginalListingNumberSuffix);
-
-            if (string.Equals(testListingInformation.Caption, "Tests", StringComparison.InvariantCultureIgnoreCase) && listingInformation.Caption != string.Empty)
-            {
-                testListingInformation.Caption = listingInformation.Caption + ".Tests";
-            }
-            listingInformation.AssociatedTest = testListingInformation;
-        }
-
-        return listingData;
-    }
-
-    public static bool IsExtraListing(string path, string regexNamespace = @".*Listing\d{2}\.\d{2}(A|B|C|D).*\.cs$")
-    {
-        Regex fileNameRegex = new(regexNamespace);
-
-        string directoryNameFull = Path.GetDirectoryName(path) ?? string.Empty;
-        string directoryName = Path.GetFileName(directoryNameFull);
-
-        return fileNameRegex.IsMatch(path) && !directoryName.Contains(".Tests");
-    }
-
     [GeneratedRegex("((Listing\\d{2}\\.\\d{2})([A-Z]?)((\\.Tests)?)).*\\.cs.tmp$")]
     private static partial Regex TemporaryListingTestFile();
 
-    public void UpdateAllChapterListingNumbers(DirectoryInfo pathToChapter,
+    public void UpdateAllChapterListingNumbers(DirectoryInfo pathToDirectoryOfChapters,
         bool verbose = false, bool preview = false, bool byFolder = false, bool singleDir = false)
     {
-        IEnumerable<DirectoryInfo> directoryInfos = Directory.EnumerateDirectories(pathToChapter.FullName)
+        IEnumerable<DirectoryInfo> directoryInfos = Directory.EnumerateDirectories(pathToDirectoryOfChapters.FullName)
             .Select(x => new DirectoryInfo(x))
-            .Where(x => ChapterDir().IsMatch(x.Name));
+            .Where(x => ListingManagerHelpers.ChapterDir().IsMatch(x.Name));
 
         foreach (DirectoryInfo directoryInfo in directoryInfos)
         {
             UpdateChapterListingNumbers(directoryInfo, verbose, preview, byFolder, singleDir);
         }
     }
-    [GeneratedRegex("^Chapter\\d{2}$")]
-    private static partial Regex ChapterDir();
 }
