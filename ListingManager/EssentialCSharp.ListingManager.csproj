@@ -8,7 +8,7 @@
 	    <RepositoryType>git</RepositoryType>
 		<Deterministic>true</Deterministic>
 		<PackageTags>IntelliTect, EssentialCSharp, ListingManager</PackageTags>
-        <Authors>IntelliTect</Authors>
+        <Authors>Benjamin Michaelis, IntelliTect</Authors>
         <Version>0.1.5</Version>
         <PackageId>IntelliTect.EssentialCSharp.ListingManager</PackageId>
         <Description>Tool used to expose useful functionality to IntelliTect/EssentialCSharp collaborators</Description>
