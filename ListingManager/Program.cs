@@ -51,15 +51,30 @@ public class Program
         };
 
         // Give better description when intent and functionality becomes more flushed out
-        var scanForMismatchedListings = new Command("scan", "Scans for mismatched listings")
+        var scan = new Command("scan", "Scans for various things")
         {
             directoryIn
         };
 
+        var scanForMismatchedListings = new Command("listings", "Scans for mismatched listings")
+        {
+            directoryIn
+        };
+
+        var scanForMissingTests = new Command("tests", "Scans for missing tests")
+        {
+            directoryIn,
+            allChaptersOption,
+            singleDirOption
+        };
+
+        scan.AddCommand(scanForMismatchedListings);
+        scan.AddCommand(scanForMissingTests);
+
         var rootCommand = new RootCommand()
         {
             listingUpdating,
-            scanForMismatchedListings
+            scan
         };
 
         listingUpdating.SetHandler((directoryIn, verbose, preview, byFolder, singleDir, allChapters) =>
@@ -88,6 +103,21 @@ public class Program
                 Console.WriteLine(extraListing);
             }
         }, directoryIn);
+
+        scanForMissingTests.SetHandler((directoryIn, allChapters, singleDir) =>
+        {
+            Console.WriteLine(IntelliTect);
+
+            Console.WriteLine("---Missing Tests---");
+            if (allChapters)
+            {
+                ScanManager.ScanForAllMissingTests(directoryIn, singleDir);
+            }
+            else
+            {
+                ScanManager.ScanForMissingTests(directoryIn, singleDir);
+            }
+        }, directoryIn, allChaptersOption, singleDirOption);
 
         return rootCommand.Invoke(args);
     }
