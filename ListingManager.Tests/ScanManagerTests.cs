@@ -21,15 +21,15 @@ public class ScanManagerTests : TempFileTestBase
         const string expected = @"Missing test for 1.1
 Missing test for 2.4";
 
-        List<string> toWrite = new()
-        {
+        List<string> toWrite = 
+        [
             "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter01.Listing01_01",
             "{",
             "    using System;",
             "    using System.Reflection;",
             "    public class Program { }",
             "}"
-        };
+        ];
         DirectoryInfo tempDir = CreateTempDirectory();
         CreateTempDirectory(tempDir, "Chapter01");
         CreateTempDirectory(tempDir, "Chapter01.Tests");
