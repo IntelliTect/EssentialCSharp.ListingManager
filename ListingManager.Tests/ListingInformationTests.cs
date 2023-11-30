@@ -231,4 +231,16 @@ public class ListingInformationTests : TempFileTestBase
 
         Assert.Equal(expected, new ListingInformation(writtenFile.FullName, isTest).GetNewFileName());
     }
+
+    [Theory]
+    [InlineData("namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06;", 0, true, false)]
+    [InlineData("namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06 ;", 1, true, false)]
+    [InlineData("namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06{ ", 0, false, true)]
+    [InlineData("namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06 { ", 1, false, true)]
+    [InlineData("namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06  { ", 2, false, true)]
+    public void GetNumberOfWhitespaceCharactersInTheSuffixOfNamespace_Namespace_ReturnCorrectNumberOfWhitespaceCharacters(string @namespace, int expected, bool isNamespaceFileScoped, bool isNamespaceCurlyBraced)
+    {
+        Assert.Equal(expected, ListingInformation.GetNumberOfWhitespaceCharactersInTheSuffixOfNamespace(@namespace, isNamespaceFileScoped, isNamespaceCurlyBraced));
+    }
+
 }
