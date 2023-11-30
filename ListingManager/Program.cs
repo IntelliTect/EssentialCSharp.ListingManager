@@ -12,10 +12,13 @@ public sealed class Program
 
     public static CliConfiguration GetConfiguration()
     {
-        CliArgument<DirectoryInfo> directoryInArgument = new("path")
+        // Use the ExistingOnly method to only parse the arguments that are defined in the configuration
+
+        CliArgument<DirectoryInfo> directoryInArgument = new("directoryIn")
         {
             Description = "The directory of the chapter to update listings on.",
         };
+        directoryInArgument.AcceptExistingOnly();
 
         // With proper logging implemented, this option will hopefully be removed
         CliOption<bool> verboseOption = new("--verbose")
