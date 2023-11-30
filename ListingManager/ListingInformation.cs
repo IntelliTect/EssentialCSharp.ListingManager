@@ -133,12 +133,34 @@ public partial class ListingInformation
         {
             if (FileContents[i].TrimStart().StartsWith("namespace"))
             {
+                bool isNamespaceFileScoped = FileContents[i].TrimEnd().EndsWith(';');
+                bool isNamespaceCurlyBraced = FileContents[i].TrimEnd().EndsWith('{');
+                if (isNamespaceFileScoped && isNamespaceCurlyBraced) throw new InvalidOperationException("Namespace is detected to be both file scoped and curly braced scoped.");
+                int numberOfWhitespaceCharacters = GetNumberOfWhitespaceCharactersInTheSuffixOfNamespace(FileContents[i], isNamespaceFileScoped, isNamespaceCurlyBraced);
                 FileContents[i] = $"namespace {newNamespace}";
+                // add the whitespace characters back in
+                FileContents[i] += new string(' ', numberOfWhitespaceCharacters);
+                // append the closing curly brace if the namespace was curly braced and a ; if it was file scoped
+                if (isNamespaceFileScoped) FileContents[i] += ";";
+                else if (isNamespaceCurlyBraced) FileContents[i] += "{";
                 updated = true;
                 FileContentsChanged = true;
             }
         }
         return updated;
+    }
+
+    public static int GetNumberOfWhitespaceCharactersInTheSuffixOfNamespace(string @namespace, bool isNamespaceFileScoped, bool isNamespaceCurlyBraced)
+    {
+        int indexOfNamespaceEnd = @namespace.TrimEnd().LastIndexOfAny([';', '{']);
+        // get the number of whitespace characters between the last non-whitespace character and the index indexOfNamespaceEnd
+        int numberOfWhitespaceCharacters = 0;
+        if (indexOfNamespaceEnd > 0 && (isNamespaceCurlyBraced || isNamespaceFileScoped))
+        {
+            numberOfWhitespaceCharacters = indexOfNamespaceEnd - @namespace[..(indexOfNamespaceEnd)].TrimEnd().Length;
+        }
+
+        return numberOfWhitespaceCharacters;
     }
 
     public void UpdateReferencesInFileAndTest(List<ListingInformation> listingData)

@@ -235,6 +235,149 @@ public class ListingManagerTests : TempFileTestBase
     #endregion GitStorageManager
     #region UsingOSStorageManager
     [Fact]
+    public void UpdateChapterListingNumbers_OSStorageManager_FileScopedNamespacesUpdated()
+    {
+        ICollection<string> filesToMake = new List<string>
+        {
+            Path.Join("Chapter42","Listing42.06.cs"),
+        };
+
+        ICollection<string> expectedFiles = new List<string>
+        {
+            Path.Join("Chapter42","Listing42.01.cs")
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06;",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+        };
+
+        IEnumerable<string> expectedToWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter42.Listing42_01;",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+        };
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+        CreateTempDirectory(tempDir, name: "Chapter42.Tests");
+        WriteFiles(tempDir, filesToMake, toWrite);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir);
+
+        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+        // Assert
+        string expectedFile = Assert.Single(files);
+        Assert.Equivalent(expectedFiles, files);
+
+        Assert.Equal(string.Join(Environment.NewLine, expectedToWrite) + Environment.NewLine, File.ReadAllText(expectedFile));
+    }
+
+    [Fact]
+    public void UpdateChapterListingNumbers_OSStorageManager_FileScopedNamespaceWithSpacesUpdated()
+    {
+        ICollection<string> filesToMake = new List<string>
+        {
+            Path.Join("Chapter42","Listing42.06.cs"),
+        };
+
+        ICollection<string> expectedFiles = new List<string>
+        {
+            Path.Join("Chapter42","Listing42.01.cs")
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06  ;",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+        };
+
+        IEnumerable<string> expectedToWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter42.Listing42_01  ;",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+        };
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+        CreateTempDirectory(tempDir, name: "Chapter42.Tests");
+        WriteFiles(tempDir, filesToMake, toWrite);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir);
+
+        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+        // Assert
+        string expectedFile = Assert.Single(files);
+        Assert.Equivalent(expectedFiles, files);
+
+        Assert.Equal(string.Join(Environment.NewLine, expectedToWrite) + Environment.NewLine, File.ReadAllText(expectedFile));
+    }
+
+    [Fact]
+    public void UpdateChapterListingNumbers_OSStorageManager_NamespacesWithCurlyBraceOnSameLineUpdated()
+    {
+        ICollection<string> filesToMake = new List<string>
+        {
+            Path.Join("Chapter42","Listing42.06.cs"),
+        };
+
+        ICollection<string> expectedFiles = new List<string>
+        {
+            Path.Join("Chapter42","Listing42.01.cs")
+        };
+
+        IEnumerable<string> toWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter18.Listing18_06 {",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}"
+        };
+
+        IEnumerable<string> expectedToWrite = new List<string>
+        {
+            "namespace AddisonWesley.Michaelis.EssentialCSharp.Chapter42.Listing42_01 {",
+            "    using System;",
+            "    using System.Reflection;",
+            "    public class Program { }",
+            "}",
+        };
+        DirectoryInfo tempDir = CreateTempDirectory();
+        DirectoryInfo chapterDir = CreateTempDirectory(tempDir, name: "Chapter42");
+        CreateTempDirectory(tempDir, name: "Chapter42.Tests");
+        WriteFiles(tempDir, filesToMake, toWrite);
+        expectedFiles = ConvertFileNamesToFullPath(expectedFiles, tempDir).ToList();
+
+        ListingManager listingManager = new(tempDir, new OSStorageManager());
+        listingManager.UpdateChapterListingNumbers(chapterDir);
+
+        List<string> files = FileManager.GetAllFilesAtPath(tempDir.FullName, true)
+            .Where(x => Path.GetExtension(x) == ".cs").OrderBy(x => x).ToList();
+
+        // Assert
+        string expectedFile = Assert.Single(files);
+        Assert.Equivalent(expectedFiles, files);
+
+        Assert.Equal(string.Join(Environment.NewLine, expectedToWrite) + Environment.NewLine, File.ReadAllText(expectedFile));
+    }
+
+    [Fact]
     public void UpdateChapterListingNumbers_ListingsWithinListMissing_ListingsRenumbered()
     {
         List<string> filesToMake = new()
