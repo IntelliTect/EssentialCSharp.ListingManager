@@ -11,7 +11,7 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Polly" Version="8.2.0" />
 	<PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.23407.1" />
-    <PackageVersion Include="xunit" Version="2.6.2" />
+    <PackageVersion Include="xunit" Version="2.6.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4" />
   </ItemGroup>
 </Project>
