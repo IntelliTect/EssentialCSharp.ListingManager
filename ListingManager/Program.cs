@@ -4,10 +4,10 @@ namespace EssentialCSharp.ListingManager;
 
 public sealed class Program
 {
-    private static Task<int> Main(string[] args)
+    private static async Task<int> Main(string[] args)
     {
         CliConfiguration configuration = GetConfiguration();
-        return configuration.InvokeAsync(args);
+        return await configuration.InvokeAsync(args);
     }
 
     public static CliConfiguration GetConfiguration()
