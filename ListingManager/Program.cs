@@ -6,48 +6,48 @@ public sealed class Program
 {
     private static Task<int> Main(string[] args)
     {
-        CliConfiguration configuration = GetConfiguration();
+        CommandLineConfiguration configuration = GetConfiguration();
         return configuration.InvokeAsync(args);
     }
 
-    public static CliConfiguration GetConfiguration()
+    public static CommandLineConfiguration GetConfiguration()
     {
         // Use the ExistingOnly method to only parse the arguments that are defined in the configuration
 
-        CliArgument<DirectoryInfo> directoryInArgument = new("directoryIn")
+        Argument<DirectoryInfo> directoryInArgument = new("directoryIn")
         {
             Description = "The directory of the chapter to update listings on.",
         };
         directoryInArgument.AcceptExistingOnly();
 
         // With proper logging implemented, this option will hopefully be removed
-        CliOption<bool> verboseOption = new("--verbose")
+        Option<bool> verboseOption = new("--verbose")
         {
             Description = "Displays more detailed messages in the log.",
         };
 
-        CliOption<bool> previewOption = new("--preview")
+        Option<bool> previewOption = new("--preview")
         {
             Description = "Displays the changes that will be made without actually making them.",
         };
 
-        CliOption<bool> allChaptersOption = new("--all-chapters")
+        Option<bool> allChaptersOption = new("--all-chapters")
         {
             Description = "The passed in path is the parent directory to many chapter directories rather than a single chapter directory.",
         };
 
         // TODO: Add better descriptions when their functionality becomes clearer
-        CliOption<bool> byFolderOption = new("--by-folder")
+        Option<bool> byFolderOption = new("--by-folder")
         {
             Description = "Updates namespaces and filenames for all listings and accompanying tests within a folder.",
         };
 
-        CliOption<bool> singleDirOption = new("--single-dir")
+        Option<bool> singleDirOption = new("--single-dir")
         {
             Description = "All listings are in a single directory and not separated into chapter and chapter test directories.",
         };
 
-        CliCommand listingUpdating = new("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter")
+        Command listingUpdating = new("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter")
         {
             directoryInArgument,
             verboseOption,
@@ -78,9 +78,9 @@ public sealed class Program
             }
         });
 
-        CliCommand scan = new("scan", "Scans for various things");
+        Command scan = new("scan", "Scans for various things");
 
-        CliCommand listings = new("listings", "Scans for mismatched listings")
+        Command listings = new("listings", "Scans for mismatched listings")
         {
             directoryInArgument
         };
@@ -98,7 +98,7 @@ public sealed class Program
         });
         scan.Subcommands.Add(listings);
 
-        CliCommand tests = new("tests", "Scans for mismatched tests")
+        Command tests = new("tests", "Scans for mismatched tests")
         {
             directoryInArgument,
             allChaptersOption,
@@ -124,12 +124,12 @@ public sealed class Program
 
         scan.Subcommands.Add(tests);
 
-        CliRootCommand rootCommand = new("The EssentialCSharp.ListingManager helps to organize and manage the EssentialCSharp source code")
+        RootCommand rootCommand = new("The EssentialCSharp.ListingManager helps to organize and manage the EssentialCSharp source code")
         {
             listingUpdating,
             scan
         };
 
-        return new CliConfiguration(rootCommand);
+        return new CommandLineConfiguration(rootCommand);
     }
 }
