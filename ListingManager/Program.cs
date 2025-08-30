@@ -6,11 +6,11 @@ public sealed class Program
 {
     private static Task<int> Main(string[] args)
     {
-        CommandLineConfiguration configuration = GetConfiguration();
-        return configuration.InvokeAsync(args);
+        RootCommand rootCommand = GetConfiguration();
+        return rootCommand.InvokeAsync(args);
     }
 
-    public static CommandLineConfiguration GetConfiguration()
+    public static RootCommand GetConfiguration()
     {
         // Use the ExistingOnly method to only parse the arguments that are defined in the configuration
 
@@ -18,7 +18,7 @@ public sealed class Program
         {
             Description = "The directory of the chapter to update listings on.",
         };
-        directoryInArgument.AcceptExistingOnly();
+        directoryInArgument.ExistingOnly();
 
         // With proper logging implemented, this option will hopefully be removed
         Option<bool> verboseOption = new("--verbose")
@@ -57,15 +57,8 @@ public sealed class Program
             allChaptersOption
         };
 
-        listingUpdating.SetAction((ParseResult parseResult) =>
+        listingUpdating.SetHandler((DirectoryInfo directoryIn, bool verbose, bool preview, bool byFolder, bool singleDir, bool allChapters) =>
         {
-            DirectoryInfo directoryIn = parseResult.CommandResult.GetValue(directoryInArgument)!;
-            bool verbose = parseResult.CommandResult.GetValue(verboseOption);
-            bool preview = parseResult.CommandResult.GetValue(previewOption);
-            bool byFolder = parseResult.CommandResult.GetValue(byFolderOption);
-            bool singleDir = parseResult.CommandResult.GetValue(singleDirOption);
-            bool allChapters = parseResult.CommandResult.GetValue(allChaptersOption);
-
             Console.WriteLine($"Updating listings within: {directoryIn}");
             ListingManager listingManager = new(directoryIn);
             if (allChapters)
@@ -76,18 +69,15 @@ public sealed class Program
             {
                 listingManager.UpdateChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);
             }
-        });
-
-        Command scan = new("scan", "Scans for various things");
+        }, directoryInArgument, verboseOption, previewOption, byFolderOption, singleDirOption, allChaptersOption);
 
         Command listings = new("listings", "Scans for mismatched listings")
         {
             directoryInArgument
         };
 
-        listings.SetAction((ParseResult parseResult) =>
+        listings.SetHandler((DirectoryInfo directoryIn) =>
         {
-            DirectoryInfo directoryIn = parseResult.CommandResult.GetValue(directoryInArgument)!;
             var extraListings = ListingManager.GetAllExtraListings(directoryIn.FullName).OrderBy(x => x);
 
             Console.WriteLine("---Extra Listings---");
@@ -95,8 +85,7 @@ public sealed class Program
             {
                 Console.WriteLine(extraListing);
             }
-        });
-        scan.Subcommands.Add(listings);
+        }, directoryInArgument);
 
         Command tests = new("tests", "Scans for mismatched tests")
         {
@@ -105,12 +94,8 @@ public sealed class Program
             singleDirOption
         };
 
-        tests.SetAction((ParseResult parseResult) =>
+        tests.SetHandler((DirectoryInfo directoryIn, bool allChapters, bool singleDir) =>
         {
-            DirectoryInfo directoryIn = parseResult.CommandResult.GetValue(directoryInArgument)!;
-            bool allChapters = parseResult.CommandResult.GetValue(allChaptersOption);
-            bool singleDir = parseResult.CommandResult.GetValue(singleDirOption);
-
             Console.WriteLine("---Missing Tests---");
             if (allChapters)
             {
@@ -120,9 +105,13 @@ public sealed class Program
             {
                 ScanManager.ScanForMissingTests(directoryIn, singleDir);
             }
-        });
+        }, directoryInArgument, allChaptersOption, singleDirOption);
 
-        scan.Subcommands.Add(tests);
+        Command scan = new("scan", "Scans for various things")
+        {
+            listings,
+            tests
+        };
 
         RootCommand rootCommand = new("The EssentialCSharp.ListingManager helps to organize and manage the EssentialCSharp source code")
         {
@@ -130,6 +119,6 @@ public sealed class Program
             scan
         };
 
-        return new CommandLineConfiguration(rootCommand);
+        return rootCommand;
     }
 }
