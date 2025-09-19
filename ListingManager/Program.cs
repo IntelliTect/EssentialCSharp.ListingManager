@@ -47,24 +47,22 @@ public sealed class Program
             Description = "All listings are in a single directory and not separated into chapter and chapter test directories.",
         };
 
-        Command listingUpdating = new("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter")
-        {
-            directoryInArgument,
-            verboseOption,
-            previewOption,
-            byFolderOption,
-            singleDirOption,
-            allChaptersOption
-        };
+        Command listingUpdating = new("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter");
+        listingUpdating.Arguments.Add(directoryInArgument);
+        listingUpdating.Options.Add(verboseOption);
+        listingUpdating.Options.Add(previewOption);
+        listingUpdating.Options.Add(byFolderOption);
+        listingUpdating.Options.Add(singleDirOption);
+        listingUpdating.Options.Add(allChaptersOption);
 
         listingUpdating.SetAction((ParseResult parseResult) =>
         {
-            DirectoryInfo directoryIn = parseResult.CommandResult.GetValue(directoryInArgument)!;
-            bool verbose = parseResult.CommandResult.GetValue(verboseOption);
-            bool preview = parseResult.CommandResult.GetValue(previewOption);
-            bool byFolder = parseResult.CommandResult.GetValue(byFolderOption);
-            bool singleDir = parseResult.CommandResult.GetValue(singleDirOption);
-            bool allChapters = parseResult.CommandResult.GetValue(allChaptersOption);
+            DirectoryInfo directoryIn = parseResult.GetValue(directoryInArgument)!;
+            bool verbose = parseResult.GetValue(verboseOption);
+            bool preview = parseResult.GetValue(previewOption);
+            bool byFolder = parseResult.GetValue(byFolderOption);
+            bool singleDir = parseResult.GetValue(singleDirOption);
+            bool allChapters = parseResult.GetValue(allChaptersOption);
 
             Console.WriteLine($"Updating listings within: {directoryIn}");
             ListingManager listingManager = new(directoryIn);
@@ -80,14 +78,12 @@ public sealed class Program
 
         Command scan = new("scan", "Scans for various things");
 
-        Command listings = new("listings", "Scans for mismatched listings")
-        {
-            directoryInArgument
-        };
+        Command listings = new("listings", "Scans for mismatched listings");
+        listings.Arguments.Add(directoryInArgument);
 
         listings.SetAction((ParseResult parseResult) =>
         {
-            DirectoryInfo directoryIn = parseResult.CommandResult.GetValue(directoryInArgument)!;
+            DirectoryInfo directoryIn = parseResult.GetValue(directoryInArgument)!;
             var extraListings = ListingManager.GetAllExtraListings(directoryIn.FullName).OrderBy(x => x);
 
             Console.WriteLine("---Extra Listings---");
@@ -96,20 +92,19 @@ public sealed class Program
                 Console.WriteLine(extraListing);
             }
         });
+        
         scan.Subcommands.Add(listings);
 
-        Command tests = new("tests", "Scans for mismatched tests")
-        {
-            directoryInArgument,
-            allChaptersOption,
-            singleDirOption
-        };
+        Command tests = new("tests", "Scans for mismatched tests");
+        tests.Arguments.Add(directoryInArgument);
+        tests.Options.Add(allChaptersOption);
+        tests.Options.Add(singleDirOption);
 
         tests.SetAction((ParseResult parseResult) =>
         {
-            DirectoryInfo directoryIn = parseResult.CommandResult.GetValue(directoryInArgument)!;
-            bool allChapters = parseResult.CommandResult.GetValue(allChaptersOption);
-            bool singleDir = parseResult.CommandResult.GetValue(singleDirOption);
+            DirectoryInfo directoryIn = parseResult.GetValue(directoryInArgument)!;
+            bool allChapters = parseResult.GetValue(allChaptersOption);
+            bool singleDir = parseResult.GetValue(singleDirOption);
 
             Console.WriteLine("---Missing Tests---");
             if (allChapters)
@@ -124,11 +119,9 @@ public sealed class Program
 
         scan.Subcommands.Add(tests);
 
-        RootCommand rootCommand = new("The EssentialCSharp.ListingManager helps to organize and manage the EssentialCSharp source code")
-        {
-            listingUpdating,
-            scan
-        };
+        RootCommand rootCommand = new("The EssentialCSharp.ListingManager helps to organize and manage the EssentialCSharp source code");
+        rootCommand.Subcommands.Add(listingUpdating);
+        rootCommand.Subcommands.Add(scan);
 
         return new CommandLineConfiguration(rootCommand);
     }
