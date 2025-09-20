@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="System.CommandLine" VersionOverride="2.0.0-rc.1.25451.107" />
         <ProjectReference Include="..\ListingManager\EssentialCSharp.ListingManager.csproj" />
     </ItemGroup>
 
