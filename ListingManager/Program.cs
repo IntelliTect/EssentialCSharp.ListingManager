@@ -4,13 +4,13 @@ namespace EssentialCSharp.ListingManager;
 
 public sealed class Program
 {
-    private static Task<int> Main(string[] args)
+    private static async Task<int> Main(string[] args)
     {
-        CommandLineConfiguration configuration = GetConfiguration();
-        return configuration.InvokeAsync(args);
+        RootCommand rootCommand = GetRootCommand();
+        return await rootCommand.Parse(args).InvokeAsync();
     }
 
-    public static CommandLineConfiguration GetConfiguration()
+    public static RootCommand GetRootCommand()
     {
         // Use the ExistingOnly method to only parse the arguments that are defined in the configuration
 
@@ -123,6 +123,6 @@ public sealed class Program
         rootCommand.Subcommands.Add(listingUpdating);
         rootCommand.Subcommands.Add(scan);
 
-        return new CommandLineConfiguration(rootCommand);
+        return rootCommand;
     }
 }
