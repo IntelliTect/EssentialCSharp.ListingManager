@@ -3,45 +3,99 @@ Tool used to expose useful functionality to IntelliTect/EssentialCSharp collabor
 
 # Installation
 
-Run `dotnet tool install IntelliTect.EssentialCSharp.ListingManager -g`. This will install the Nupkg as a dotnet global tool.
+## Global Tool Installation
+
+Run `dotnet tool install IntelliTect.EssentialCSharp.ListingManager -g`. This will install the package as a dotnet global tool.
+
+You can verify the installation by running:
+```bash
+ListingManager --version
+```
+
+## Local Development Installation
+
+For local development, you can install from the local build:
+```bash
+dotnet pack
+dotnet tool install -g IntelliTect.EssentialCSharp.ListingManager --add-source ./ListingManager/bin/Release/
+```
 
 # Update
 
-Run `dotnet tool update -g IntelliTect.EssentialCSharp.ListingManager`. This will update the Nupkg for use globally.
+Run `dotnet tool update -g IntelliTect.EssentialCSharp.ListingManager`. This will update the package for use globally.
+
+# Verification
+
+After installation, verify that the tool is working correctly:
+
+```bash
+# Check version
+ListingManager --version
+
+# View help and available commands
+ListingManager --help
+```
 
 # Usage
 
-Any command can be run with these optional parameters.
+## Available Commands
 
-- `verbose` -> provides more detail into what the command is doing
+The ListingManager provides two main commands:
 
-`ListingUpdating` can be run with the following additional optional parameters.
+1. `update` - Updates namespaces and filenames for all listings and accompanying tests within a chapter
+2. `scan` - Scans for various issues (mismatched listings, missing tests)
 
-- `preview` -> leave files in place but still print actions that would take place to console
-- `by-folder` -> changes a listing's chapter based on the chapter number in the chapter's path
-- `chapter-only` -> changes only the chapter of the listing, leaving the listing number unchanged. Use with `byfolder` 
+## Common Options
 
-Run `ListingManager` from the command line. 
+Any command can be run with these optional parameters:
 
-For available commands run `ListingManager -h`. This will display all the commands available to you.
+- `--verbose` - Provides more detailed messages in the log
+- `--help` or `-h` - Shows help and usage information
 
-To update Listings at a path provide the Chapter's path and specify the `ListingUpdating` mode.
-`ListingManager --path "user/EssentialCSharp/src/Chapter03/" --mode ListingUpdating` or 
-`ListingManager --path "user/EssentialCSharp/src/Chapter03/"`
-NOTE: It is highly recommended that you commit and push your changes before running this command. Additionally you should 
-run this command with `--preview` and `--verbose` specified to ensure there are no adverse affects. Once you are confident
+## Update Command Options
+
+The `update` command supports these additional options:
+
+- `--preview` - Displays the changes that will be made without actually making them
+- `--by-folder` - Changes a listing's chapter based on the chapter number in the chapter's path
+- `--single-dir` - All listings are in a single directory and not separated into chapter and chapter test directories
+- `--all-chapters` - The passed in path is the parent directory to many chapter directories rather than a single chapter directory
+
+## Updating Listings
+
+To update listings at a path, provide the chapter's directory path:
+```bash
+ListingManager update "user/EssentialCSharp/src/Chapter03/"
+```
+
+**NOTE:** It is highly recommended that you commit and push your changes before running this command. Additionally, you should 
+run this command with `--preview` and `--verbose` specified to ensure there are no adverse effects. Once you are confident
 that the proposed changes are what you want, you can run the command without the `--preview` modifier.
 
-To find potentially mismatched listings in a chapter run, 
-`ListingManager --path "user/EssentialCSharp/src/Chapter03/" --mode ScanForMismatchedListings`. Potentially mismatched listings
-will be printed to the console.
-
-To run all chapters in powershell from ListingManager directory,
+```bash
+ListingManager update "user/EssentialCSharp/src/Chapter03/" --preview --verbose
 ```
-Get-ChildItem -Path 'insert.srcPathNameHere' -Directory | Where-Object {
-!$_.name.EndsWith("Tests")
+
+## Scanning for Issues
+
+To find potentially mismatched listings in a chapter:
+```bash
+ListingManager scan listings "user/EssentialCSharp/src/Chapter03/"
+```
+
+To find missing tests:
+```bash
+ListingManager scan tests "user/EssentialCSharp/src/Chapter03/"
+```
+
+## Batch Operations
+
+To run all chapters in PowerShell:
+```powershell
+Get-ChildItem -Path 'insert_src_path_here' -Directory | Where-Object {
+    !$_.name.EndsWith("Tests")
 } | ForEach-Object {
-listingmanager --path $_.FullName --preview --verbose
+    ListingManager update $_.FullName --preview --verbose
 } 
 ```
 
