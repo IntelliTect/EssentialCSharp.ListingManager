@@ -33,9 +33,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: 8.x
+      uses: ./.github/actions/setup-dotnet
     - name: Setup Dependency Caching
       uses: actions/cache@v4
       id: nuget-cache
