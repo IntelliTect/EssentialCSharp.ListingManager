@@ -35,7 +35,7 @@ jobs:
     - name: Setup .NET
       uses: ./.github/actions/setup-dotnet
     - name: Setup Dependency Caching
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: nuget-cache
       with:
         path: |
