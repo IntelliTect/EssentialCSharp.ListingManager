@@ -72,6 +72,8 @@ public sealed class Program
             bool useGit = parseResult.GetValue(gitOption);
 
             Console.WriteLine($"Updating listings within: {directoryIn}");
+            // When --git is specified, use the explicit constructor to force GitStorageManager.
+            // When --git is NOT specified, use the parameterless constructor for auto-detection.
             ListingManager listingManager = useGit ? new(directoryIn, useGit) : new(directoryIn);
             if (allChapters)
             {
