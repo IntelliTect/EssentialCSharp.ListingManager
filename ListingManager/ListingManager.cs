@@ -16,6 +16,22 @@ public partial class ListingManager
         StorageManager = Repository.IsValid(pathToChapter.FullName) ? new GitStorageManager(pathToChapter.FullName) : new OSStorageManager();
     }
 
+    public ListingManager(DirectoryInfo pathToChapter, bool useGit)
+    {
+        if (useGit)
+        {
+            if (!Repository.IsValid(pathToChapter.FullName))
+            {
+                throw new InvalidOperationException($"The --git option was specified, but the directory '{pathToChapter.FullName}' is not a valid git repository.");
+            }
+            StorageManager = new GitStorageManager(pathToChapter.FullName);
+        }
+        else
+        {
+            StorageManager = new OSStorageManager();
+        }
+    }
+
     public ListingManager(DirectoryInfo pathToChapter, IStorageManager storageManager)
         : this(pathToChapter)
     {

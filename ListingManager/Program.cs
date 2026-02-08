@@ -47,6 +47,11 @@ public sealed class Program
             Description = "All listings are in a single directory and not separated into chapter and chapter test directories.",
         };
 
+        Option<bool> gitOption = new("--git")
+        {
+            Description = "Use git mv for moving files instead of OS file operations. Requires the directory to be a valid git repository.",
+        };
+
         Command listingUpdating = new("update", "Updates namespaces and filenames for all listings and accompanying tests within a chapter");
         listingUpdating.Arguments.Add(directoryInArgument);
         listingUpdating.Options.Add(verboseOption);
@@ -54,6 +59,7 @@ public sealed class Program
         listingUpdating.Options.Add(byFolderOption);
         listingUpdating.Options.Add(singleDirOption);
         listingUpdating.Options.Add(allChaptersOption);
+        listingUpdating.Options.Add(gitOption);
 
         listingUpdating.SetAction((ParseResult parseResult) =>
         {
@@ -63,9 +69,10 @@ public sealed class Program
             bool byFolder = parseResult.GetValue(byFolderOption);
             bool singleDir = parseResult.GetValue(singleDirOption);
             bool allChapters = parseResult.GetValue(allChaptersOption);
+            bool useGit = parseResult.GetValue(gitOption);
 
             Console.WriteLine($"Updating listings within: {directoryIn}");
-            ListingManager listingManager = new(directoryIn);
+            ListingManager listingManager = new(directoryIn, useGit);
             if (allChapters)
             {
                 listingManager.UpdateAllChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);

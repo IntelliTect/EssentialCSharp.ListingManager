@@ -1440,4 +1440,72 @@ public class ListingManagerTests : TempFileTestBase
         Assert.Equivalent(expectedFiles, files);
     }
     #endregion UpdateAllChaptersListingNumbers
+
+    #region Constructor with useGit parameter
+    [Fact]
+    public void Constructor_WithUseGitTrue_InGitRepo_UsesGitStorageManager()
+    {
+        // Arrange
+        DirectoryInfo tempDir = CreateTempDirectory();
+        Repository.Init(tempDir.FullName);
+
+        // Act
+        ListingManager listingManager = new(tempDir, useGit: true);
+
+        // Assert
+        Assert.IsType<GitStorageManager>(listingManager.StorageManager);
+    }
+
+    [Fact]
+    public void Constructor_WithUseGitFalse_UsesOSStorageManager()
+    {
+        // Arrange
+        DirectoryInfo tempDir = CreateTempDirectory();
+
+        // Act
+        ListingManager listingManager = new(tempDir, useGit: false);
+
+        // Assert
+        Assert.IsType<OSStorageManager>(listingManager.StorageManager);
+    }
+
+    [Fact]
+    public void Constructor_WithUseGitTrue_NotInGitRepo_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        DirectoryInfo tempDir = CreateTempDirectory();
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => new ListingManager(tempDir, useGit: true));
+        Assert.Contains("--git option was specified", exception.Message);
+        Assert.Contains("not a valid git repository", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_Default_InGitRepo_UsesGitStorageManager()
+    {
+        // Arrange
+        DirectoryInfo tempDir = CreateTempDirectory();
+        Repository.Init(tempDir.FullName);
+
+        // Act
+        ListingManager listingManager = new(tempDir);
+
+        // Assert
+        Assert.IsType<GitStorageManager>(listingManager.StorageManager);
+    }
+
+    [Fact]
+    public void Constructor_Default_NotInGitRepo_UsesOSStorageManager()
+    {
+        // Arrange
+        DirectoryInfo tempDir = CreateTempDirectory();
+
+        // Act
+        ListingManager listingManager = new(tempDir);
+
+        // Assert
+        Assert.IsType<OSStorageManager>(listingManager.StorageManager);
+    }
+    #endregion Constructor with useGit parameter
 }
