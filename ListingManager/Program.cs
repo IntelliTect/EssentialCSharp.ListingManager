@@ -72,7 +72,7 @@ public sealed class Program
             bool useGit = parseResult.GetValue(gitOption);
 
             Console.WriteLine($"Updating listings within: {directoryIn}");
-            ListingManager listingManager = new(directoryIn, useGit);
+            ListingManager listingManager = useGit ? new(directoryIn, useGit) : new(directoryIn);
             if (allChapters)
             {
                 listingManager.UpdateAllChapterListingNumbers(directoryIn, verbose, preview, byFolder, singleDir);
