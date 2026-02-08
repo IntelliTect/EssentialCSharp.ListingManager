@@ -13,7 +13,25 @@ public partial class ListingManager
 
     public ListingManager(DirectoryInfo pathToChapter)
     {
-        StorageManager = Repository.IsValid(pathToChapter.FullName) ? new GitStorageManager(pathToChapter.FullName) : new OSStorageManager();
+        string? repoPath = Repository.Discover(pathToChapter.FullName);
+        StorageManager = repoPath is not null ? new GitStorageManager(repoPath) : new OSStorageManager();
+    }
+
+    public ListingManager(DirectoryInfo pathToChapter, bool useGit)
+    {
+        if (useGit)
+        {
+            string? repoPath = Repository.Discover(pathToChapter.FullName);
+            if (repoPath is null)
+            {
+                throw new InvalidOperationException($"The --git option was specified, but the directory '{pathToChapter.FullName}' is not in a git repository.");
+            }
+            StorageManager = new GitStorageManager(repoPath);
+        }
+        else
+        {
+            StorageManager = new OSStorageManager();
+        }
     }
 
     public ListingManager(DirectoryInfo pathToChapter, IStorageManager storageManager)

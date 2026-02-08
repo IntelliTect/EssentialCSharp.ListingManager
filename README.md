@@ -11,37 +11,70 @@ Run `dotnet tool update -g IntelliTect.EssentialCSharp.ListingManager`. This wil
 
 # Usage
 
-Any command can be run with these optional parameters.
-
-- `verbose` -> provides more detail into what the command is doing
-
-`ListingUpdating` can be run with the following additional optional parameters.
-
-- `preview` -> leave files in place but still print actions that would take place to console
-- `by-folder` -> changes a listing's chapter based on the chapter number in the chapter's path
-- `chapter-only` -> changes only the chapter of the listing, leaving the listing number unchanged. Use with `byfolder` 
-
 Run `ListingManager` from the command line. 
 
 For available commands run `ListingManager -h`. This will display all the commands available to you.
 
-To update Listings at a path provide the Chapter's path and specify the `ListingUpdating` mode.
-`ListingManager --path "user/EssentialCSharp/src/Chapter03/" --mode ListingUpdating` or 
-`ListingManager --path "user/EssentialCSharp/src/Chapter03/"`
-NOTE: It is highly recommended that you commit and push your changes before running this command. Additionally you should 
-run this command with `--preview` and `--verbose` specified to ensure there are no adverse affects. Once you are confident
+## Update Command
+
+The `update` command updates namespaces and filenames for all listings and accompanying tests within a chapter.
+
+### Basic Usage
+
+```bash
+ListingManager update <directoryIn>
+```
+
+### Optional Parameters
+
+- `--verbose` -> Displays more detailed messages in the log
+- `--preview` -> Displays the changes that will be made without actually making them
+- `--by-folder` -> Updates namespaces and filenames for all listings and accompanying tests within a folder
+- `--single-dir` -> All listings are in a single directory and not separated into chapter and chapter test directories
+- `--all-chapters` -> The passed in path is the parent directory to many chapter directories rather than a single chapter directory
+- `--git` -> Use git mv for moving files instead of OS file operations. Requires the directory to be in a git repository. This preserves git history for renamed files.
+
+### Examples
+
+```bash
+# Update listings in a chapter with preview
+ListingManager update "user/EssentialCSharp/src/Chapter03/" --preview --verbose
+
+# Update listings using git mv (preserves git history)
+ListingManager update "user/EssentialCSharp/src/Chapter03/" --git --preview --verbose
+
+# Update all chapters
+ListingManager update "user/EssentialCSharp/src/" --all-chapters --preview --verbose
+```
+
+**NOTE:** It is highly recommended that you commit and push your changes before running this command. Additionally you should 
+run this command with `--preview` and `--verbose` specified to ensure there are no adverse effects. Once you are confident
 that the proposed changes are what you want, you can run the command without the `--preview` modifier.
 
-To find potentially mismatched listings in a chapter run, 
-`ListingManager --path "user/EssentialCSharp/src/Chapter03/" --mode ScanForMismatchedListings`. Potentially mismatched listings
-will be printed to the console.
+## Scan Commands
 
-To run all chapters in powershell from ListingManager directory,
+### Scan for Mismatched Listings
+
+To find potentially mismatched listings in a chapter run:
+```bash
+ListingManager scan listings <directoryIn>
 ```
+
+### Scan for Missing Tests
+
+To find missing tests:
+```bash
+ListingManager scan tests <directoryIn>
+```
+
+### Running All Chapters in PowerShell
+
+From the ListingManager directory:
+```powershell
 Get-ChildItem -Path 'insert.srcPathNameHere' -Directory | Where-Object {
 !$_.name.EndsWith("Tests")
 } | ForEach-Object {
-listingmanager --path $_.FullName --preview --verbose
+listingmanager update $_.FullName --preview --verbose
 } 
 ```
 
