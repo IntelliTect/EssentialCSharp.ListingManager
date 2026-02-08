@@ -1478,7 +1478,7 @@ public class ListingManagerTests : TempFileTestBase
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() => new ListingManager(tempDir, useGit: true));
         Assert.Contains("--git option was specified", exception.Message);
-        Assert.Contains("not a valid git repository", exception.Message);
+        Assert.Contains("not in a git repository", exception.Message);
     }
 
     [Fact]
