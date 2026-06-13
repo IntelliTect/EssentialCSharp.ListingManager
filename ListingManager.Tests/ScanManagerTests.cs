@@ -1,8 +1,8 @@
-﻿using IntelliTect.TestTools.Console;
-using Xunit;
+﻿using Xunit;
 
 namespace EssentialCSharp.ListingManager.Tests;
 
+[Collection(ConsoleOutputCollection.Name)]
 public class ScanManagerTests : TempFileTestBase
 {
     [Fact]
@@ -18,8 +18,11 @@ public class ScanManagerTests : TempFileTestBase
             Path.Join("Chapter02.Tests","Listing02.06.Something.Tests.cs")
         };
 
-        const string expected = @"Missing test for 1.1
-Missing test for 2.4";
+        List<string> expected = new()
+        {
+            "Missing test for 1.1",
+            "Missing test for 2.4"
+        };
 
         List<string> toWrite = 
         [
@@ -37,6 +40,23 @@ Missing test for 2.4";
         CreateTempDirectory(tempDir, "Chapter02.Tests");
         WriteFiles(tempDir, filesToMake, toWrite);
 
-        ConsoleAssert.Expect(expected, () => ScanManager.ScanForAllMissingTests(tempDir, false));
+        TextWriter originalOut = Console.Out;
+        using StringWriter output = new();
+        try
+        {
+            Console.SetOut(output);
+            ScanManager.ScanForAllMissingTests(tempDir, false);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+
+        List<string> actual = output.ToString()
+            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+            .OrderBy(line => line, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(expected.OrderBy(line => line, StringComparer.Ordinal), actual);
     }
 }
